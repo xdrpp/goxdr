@@ -1,0 +1,67 @@
+#!/bin/sh -xe
+
+PKG="github.com/xdrpp/goxdr"
+MANS="goxdr"
+
+rm -rf goroot gh-pages
+make go1
+git archive --prefix=goroot/src/$PKG/ go1 | tar xf -
+
+GOPATH="$PWD/goroot" godoc -goroot "$PWD/goroot" -http localhost:6666 &
+pid=$!
+trap "kill $pid" 0
+
+mkdir gh-pages
+cd gh-pages
+
+sleep 1
+
+wget -r -m -k -E -p -erobots=off -nH \
+     --include-directories="/pkg/$PKG/,/lib" \
+     --exclude-directories="*" \
+     "http://localhost:6666/pkg/"
+
+cat >> lib/godoc/style.css <<EOF
+div#topbar {
+    visibility: hidden;
+}
+EOF
+
+cat > index.html <<EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>moved</title>
+	<meta http-equiv="refresh" content="0; URL='pkg/$PKG/'" />
+</head>
+
+<body>
+</body>
+</html>
+EOF
+
+for man in $MANS; do
+    pandoc --self-contained ../cmd/$man/$man.1.md \
+	   -c lib/godoc/style.css -c ../cmd/man.css \
+	   -o "pkg/$PKG/cmd/$man/$man.1.html"
+done
+
+GIT_DIR=$(git rev-parse --git-dir)
+export GIT_INDEX_FILE="$GIT_DIR/index.gh-pages"
+rm -f "$GIT_INDEX_FILE"
+git add -f .
+tree=$(git write-tree --prefix=gh-pages)
+commit=$(echo 'godoc output' | git commit-tree $tree)
+git branch -f gh-pages $commit
+
+if github=$(git remote -v | sed -ne '/git@github.com/{s/[ 	].*//p;q;}')
+then
+    cat <<EOF
+Now you may want to run:
+
+    git push -f $github go1
+    git push -f $github gh-pages
+
+EOF
+fi
