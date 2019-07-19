@@ -47,8 +47,9 @@ clean: always
 maintainer-clean: clean
 	rm -f $(BUILT_SOURCES) $(TARGET).1 generate-stamp
 
-print-generated: $(TARGET).1 generate-stamp
-	echo $(BUILT_SOURCES) $(TARGET).1
+print-generated: always
+	@$(MAKE) man $(BUILT_SOURCES) >/dev/null
+	@echo $(BUILT_SOURCES) $(TARGET).1
 
 always:
 	@:

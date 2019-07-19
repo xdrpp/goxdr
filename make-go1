@@ -15,9 +15,11 @@ rm -f "$GIT_INDEX_FILE"
 
 git read-tree HEAD
 git add -u
-git add -f go.mod go.sum $(make print-generated)
+git add -f go.mod $(make print-generated)
+test ! -r go.sum || git add -f go.sum
 for dir in $CMDS; do
-    (cd $dir && git add -f $(make print-generated) && rm --cache tools.go)
+    (cd cmd/$dir && git add -f $(make print-generated) && \
+	 git rm --cache tools.go)
 done
 
 tree=$(git write-tree)

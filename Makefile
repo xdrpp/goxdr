@@ -44,8 +44,9 @@ maintainer-clean: always
 install uninstall man: always
 	$(RECURSE)
 
-print-generated: $(BUILT_SOURCES)
-	echo $(BUILT_SOURCES)
+print-generated: always
+	@make >/dev/null
+	@echo $(BUILT_SOURCES)
 
 go1: always
 	./make-go1
