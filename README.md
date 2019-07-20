@@ -72,10 +72,27 @@ To install it from within a go module (i.e., below a directory with a
 The compiler's command-line usage and its generated code are both
 detailed in the [goxdr(1)][goxdr.1] man page.
 
-# Copyright and warranty disclaimer
+# Disclaimer
 
-goxdr is distributed with the `stc` module and subject to the
-copyright and warranty disclaimers of the whole module.
+There is no warranty for the program, to the extent permitted by
+applicable law.  Except when otherwise stated in writing the copyright
+holders and/or other parties provide the program "as is" without
+warranty of any kind, either expressed or implied, including, but not
+limited to, the implied warranties of merchantability and fitness for
+a particular purpose.  The entire risk as to the quality and
+performance of the program is with you.  Should the program prove
+defective, you assume the cost of all necessary servicing, repair or
+correction.
+
+In no event unless required by applicable law or agreed to in writing
+will any copyright holder, or any other party who modifies and/or
+conveys the program as permitted above, be liable to you for damages,
+including any general, special, incidental or consequential damages
+arising out of the use or inability to use the program (including but
+not limited to loss of data or data being rendered inaccurate or
+losses sustained by you or third parties or a failure of the program
+to operate with any other programs), even if such holder or other
+party has been advised of the possibility of such damages.
 
 [RFC4506]: https://tools.ietf.org/html/rfc4506
 [RFC5531]: https://tools.ietf.org/html/rfc5531
