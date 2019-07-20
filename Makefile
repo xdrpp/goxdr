@@ -38,10 +38,12 @@ test: always
 
 clean: always
 	rm -f $(CLEANFILES)
+	rm -rf goroot gh-pages
 	$(RECURSE)
 
 maintainer-clean: always
 	rm -f $(CLEANFILES) $(BUILT_SOURCES) go.mod go.sum
+	rm -rf goroot gh-pages
 	$(RECURSE)
 
 install uninstall man: always
