@@ -14,13 +14,13 @@ export GIT_INDEX_FILE="$GIT_DIR/index.go1"
 rm -f "$GIT_INDEX_FILE"
 
 git read-tree HEAD
+make built_sources
 git add -u
-git add -f go.mod $(make print-generated)
+git add -f go.mod
 test ! -r go.sum || git add -f go.sum
-for dir in $CMDS; do
-    (cd cmd/$dir && git add -f $(make print-generated) && \
-	 git rm --cache tools.go)
-done
+git add -f $(cat built_sources)
+rm -f built_sources
+git rm --cache cmd/*/tools.go
 
 tree=$(git write-tree)
 rm -f "$GIT_INDEX_FILE"

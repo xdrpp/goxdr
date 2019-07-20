@@ -27,6 +27,9 @@ goxdr: cmd/goxdr/goxdr
 go.mod: $(MAKEFILE_LIST)
 	echo 'module github.com/xdrpp/goxdr' > go.mod
 
+depend: always
+	cd / && go get -u golang.org/x/tools/cmd/goyacc
+
 RECURSE = for dir in $(CMDS); do cd cmd/$$dir && $(MAKE) $@; done
 
 test: always
@@ -44,9 +47,12 @@ maintainer-clean: always
 install uninstall man: always
 	$(RECURSE)
 
-print-generated: always
-	@make >/dev/null
-	@echo $(BUILT_SOURCES)
+built_sources: $(BUILT_SOURCES) go.mod
+	rm -f $@
+	for file in $(BUILT_SOURCES); do \
+		echo $$file >> $@; \
+	done
+	$(RECURSE)
 
 go1: always
 	./make-go1

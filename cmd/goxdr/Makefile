@@ -47,9 +47,10 @@ clean: always
 maintainer-clean: clean
 	rm -f $(BUILT_SOURCES) $(TARGET).1 generate-stamp
 
-print-generated: always
-	@$(MAKE) man $(BUILT_SOURCES) >/dev/null
-	@echo $(BUILT_SOURCES) $(TARGET).1
+built_sources: $(BUILT_SOURCES) $(TARGET).1 always
+	for file in $(BUILT_SOURCES) $(TARGET).1; do \
+		echo cmd/$$(basename $$PWD)/$$file >> ../../built_sources; \
+	done
 
 always:
 	@:
