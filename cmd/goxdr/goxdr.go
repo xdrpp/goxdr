@@ -25,6 +25,7 @@ type emitter struct {
 	emitted map[string]struct{}
 	enum_comments bool
 	lax_discriminants bool
+	ptr_args bool
 }
 
 type Emittable interface {
@@ -937,25 +938,29 @@ func (v *%[1]s) XdrRecurse(x XDR, name string) {
 	e.xprintf(`}
 func XDR_%[1]s(v *%[1]s) *%[1]s { return v }
 `, args)
-	// e.xprintf("var _ XdrType = &%[1]s{}\n", args) // XXX
-	e.xprintf("\n")
+	e.xprintf("var _ XdrType = &%[1]s{} // XXX\n", args) // XXX
 	return args
 }
 
 func (e *emitter) doClientProc(cli string, p *rpc_proc) {
+	argtype, fromarg, toarg := "", "&", "*"
+	if e.ptr_args {
+		argtype, fromarg, toarg = "*", "", ""
+	}
 	var args, setargs string
 	for i := range p.arg {
 		if i != 0 {
 			args += ", "
 		}
-		args += fmt.Sprintf("a%d *%s", i+1, p.arg[i])
+		args += fmt.Sprintf("a%d %s%s", i+1, argtype, p.arg[i])
 	}
 	if len(p.arg) == 1 {
-		setargs = "\tproc.Arg = a1\n"
+		setargs = fmt.Sprintf("\tproc.Arg = %sa1\n", fromarg)
 	} else if len(p.arg) > 1 {
 		setargs = "\tproc.GetArg()\n"
 		for i := range p.arg {
-			setargs += fmt.Sprintf("\tproc.Arg.a%[1]d = a%[1]d\n", i+1)
+			setargs += fmt.Sprintf("\tproc.Arg.a%[1]d = %[2]sa%[1]d\n",
+				i+1, fromarg)
 		}
 	}
 	if p.res.getx() == "void" {
@@ -969,18 +974,22 @@ func (e *emitter) doClientProc(cli string, p *rpc_proc) {
 `, cli, p.id, args, setargs)
 	} else {
 		e.xprintf(
-`func (c %[1]s) %[2]s(%[3]s) *%[5]s {
+`func (c %[1]s) %[2]s(%[3]s) %[6]s%[5]s {
 	var proc xdrProc_%[2]s
 %[4]s	if err := c.XdrSend(&proc); err != nil {
 		panic(err)
 	}
-	return proc.Res
+	return %[7]sproc.Res
 }
-`, cli, p.id, args, setargs, p.res)
+`, cli, p.id, args, setargs, p.res, argtype, toarg)
 	}
 }
 
 func (r *rpc_program) emit(e *emitter) {
+	argtype, toarg, fromarg := "", "*", "&"
+	if e.ptr_args {
+		argtype, toarg, fromarg = "*", "", ""
+	}
 	for i := range r.vers {
 		if i != 0 {
 			e.printf("\n")
@@ -993,11 +1002,11 @@ func (r *rpc_program) emit(e *emitter) {
 				if j != 0 {
 					e.printf(", ")
 				}
-				e.printf("*%s", p.arg[j])
+				e.printf("%s%s", argtype, p.arg[j])
 			}
 			e.printf(")")
 			if p.res.getx() != "void" {
-				e.printf(" *%s", p.res)
+				e.printf(" %s%s", argtype, p.res)
 			}
 			e.printf("\n")
 		}
@@ -1046,27 +1055,32 @@ type %[1]s struct {
 
 			var av string
 			if len(p.arg) == 1 {
-				av = "p.Arg"
+				av = toarg + "p.Arg"
 			} else if len(p.arg) > 1 {
 				for a := range p.arg {
 					if a > 0 {
 						av += ", "
 					}
-					av += fmt.Sprintf("p.Arg.a%d", a+1)
+					av += fmt.Sprintf("%sp.Arg.a%d", toarg, a+1)
 				}
 			}
 
-			var reseq string
+			var reseq1, reseq2 string
 			if p.res.getx() != "void" {
-				reseq = "p.Res = "
+				if e.ptr_args {
+					reseq1 = "p.Res = "
+				} else {
+					reseq1 = "r := "
+					reseq2 = "\n\tp.Res = " + fromarg + "r\n"
+				}
 			}
 
 			fmt.Fprintf(out,
 `func (p *%[1]s) Do() {
-	%[4]sp.Srv.%[2]s(%[3]s)
+	%[4]sp.Srv.%[2]s(%[3]s)%[5]s
 }
 var _ XdrSrvProc = &%[1]s{} // XXX
-`, "xdrSrvProc_" + p.id.String(), p.id, av, reseq)
+`, "xdrSrvProc_" + p.id.String(), p.id, av, reseq1, reseq2)
 			e.xappend(out)
 		}
 
