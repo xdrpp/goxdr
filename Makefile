@@ -33,7 +33,7 @@ depend: always
 RECURSE = for dir in $(CMDS); do cd cmd/$$dir && $(MAKE) $@; done
 
 test: always
-	go test -v .
+	#go test -v .
 	$(RECURSE)
 
 clean: always
