@@ -48,17 +48,18 @@ func (s *RpcSrv) Register(srv xdr.XdrSrv) {
 }
 
 // Receive an RPC call in a server, and format the reply header.  Does
-// not actually execute the call (which you would do by calling
-// proc.Do() when this function returns a non-NULL proc).
+// not actually perform the requested remote procedure call.  To
+// perform the call, you should call proc.Do() (maybe in a goroutine)
+// when this function returns a non-NULL proc.
 //
-// If cmsg == nil, will read the call header directly from in.  The
-// reason you might not want to do this if you are multiplexing calls
-// and replies on the same underlying transport, in which case you
-// will first want to get the header to check if you have just
-// received a call or a reply.
+// If cmsg == nil, this function unmarshals the call header directly
+// from in.  The reason you might not want to do this if you are
+// multiplexing calls and replies on the same underlying transport, in
+// which case you will first want to get the header to check if you
+// have just received a call or a reply.
 //
-// If in == nil (in which case cmsg may not be nil), then this
-// function will skip unmarshalling the arguments.
+// If in == nil (in which case cmsg must not be nil), then this
+// function skips unmarshalling the arguments.
 func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 	rmsg *Rpc_msg, proc xdr.XdrSrvProc) {
 	if cmsg == nil {
