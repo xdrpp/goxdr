@@ -2,8 +2,19 @@
 // Utilities for implementing RFC5531 RPC.
 package rpcmsg
 
-import "fmt"
-import "github.com/xdrpp/goxdr/xdr"
+import (
+	"fmt"
+	"github.com/xdrpp/goxdr/xdr"
+)
+
+// Fake accept state to represent a response we can't unmarshal
+const GARBAGE_RET Accept_stat = 99
+func init() {
+	_XdrNames_Accept_stat[int32(GARBAGE_RET)] = "GARBAGE_RET"
+	_XdrValues_Accept_stat["GARBAGE_RET"] = int32(GARBAGE_RET)
+	_XdrComments_Accept_stat[int32(GARBAGE_RET)] =
+		"Unable to decode return value"
+}
 
 func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
 	defer func() {
@@ -19,6 +30,14 @@ func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
 	return nil
 }
 
+// Returns true iff rmsg is an accepted REPLY with status SUCCESS.
+func IsSuccess(rmsg *Rpc_msg) bool {
+	return rmsg != nil &&
+		rmsg.Body.Mtype == REPLY &&
+		rmsg.Body.Rbody().Stat == MSG_ACCEPTED &&
+		rmsg.Body.Rbody().Areply().Reply_data.Stat == SUCCESS
+}
+
 // Unmarshal an Rpc_msg header, returning an error instead of throwing
 // an exception if the bytes are garbage.
 func GetMsg(in xdr.XDR) (*Rpc_msg, error) {
@@ -29,7 +48,66 @@ func GetMsg(in xdr.XDR) (*Rpc_msg, error) {
 	return &m, nil
 }
 
-// Container for a bunch of XdrSrv structures.
+type PendingCall struct {
+	Proc xdr.XdrProc
+	Cb func(*Rpc_msg)
+}
+
+type CallSet struct {
+	LastXid uint32
+	Calls map[uint32]*PendingCall
+}
+
+// Allocate a new XID and create a message header for an outgoing RPC
+// call.
+func (cs *CallSet) NewCall(proc xdr.XdrProc, cb func(*Rpc_msg)) *Rpc_msg {
+	if cs.Calls == nil {
+		cs.Calls = make(map[uint32]*PendingCall)
+	}
+	for ok := true; ok; {
+		cs.LastXid++
+		_, ok = cs.Calls[cs.LastXid]
+	}
+	cs.Calls[cs.LastXid] = &PendingCall{
+		Proc: proc,
+		Cb: cb,
+	}
+	cmsg := Rpc_msg { Xid: cs.LastXid }
+	cmsg.Body.Mtype = CALL
+	cmsg.Body.Cbody().Rpcvers = 2
+	cmsg.Body.Cbody().Prog = proc.Prog()
+	cmsg.Body.Cbody().Vers = proc.Vers()
+	cmsg.Body.Cbody().Proc = proc.Proc()
+	return &cmsg
+}
+
+// Free the XID associated with a pending RPC call if the call is
+// being canceled.
+func (cs *CallSet) Free(msg *Rpc_msg) {
+	delete(cs.Calls, msg.Xid)
+}
+
+// Attempt to match a reply with a pending call, and make the callback
+// if it succeeds.
+func (cs *CallSet) GetReply(rmsg *Rpc_msg, in xdr.XDR) {
+	if rmsg.Body.Mtype != REPLY {
+		return
+	}
+	pc, ok := cs.Calls[rmsg.Xid]
+	if !ok {
+		return
+	}
+	cs.Free(rmsg)
+	if IsSuccess(rmsg) {
+		if err := safeMarshal(in, pc.Proc.GetRes(), ""); err != nil {
+			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
+		}
+	}
+	pc.Cb(rmsg)
+}
+
+// Container for a server implementing a set of program/version
+// interfaces.
 type RpcSrv struct {
 	Srvs map[uint32]map[uint32]xdr.XdrSrv
 }
@@ -52,23 +130,9 @@ func (s *RpcSrv) Register(srv xdr.XdrSrv) {
 // perform the call, you should call proc.Do() (maybe in a goroutine)
 // when this function returns a non-NULL proc.
 //
-// If cmsg == nil, this function unmarshals the call header directly
-// from in.  The reason you might not want to do this if you are
-// multiplexing calls and replies on the same underlying transport, in
-// which case you will first want to get the header to check if you
-// have just received a call or a reply.
-//
-// If in == nil (in which case cmsg must not be nil), then this
-// function skips unmarshalling the arguments.
+// If in == nil, then this function skips unmarshalling the arguments.
 func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 	rmsg *Rpc_msg, proc xdr.XdrSrvProc) {
-	if cmsg == nil {
-		var err error
-		if cmsg, err = GetMsg(in); err != nil {
-			return nil, nil
-		}
-	}
-
 	if cmsg.Body.Mtype != CALL {
 		return nil, nil
 	}
@@ -110,7 +174,9 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 	return
 }
 
-func (m *Rpc_msg) Error() string {
+// An *Rpc_msg can represent an error.  Call IsSuccess to see if there
+// was actually an error.
+func (m Rpc_msg) Error() string {
 	if m.Body.Mtype != REPLY {
 		return "RPC message not a REPLY"
 	} else if m.Body.Rbody().Stat == MSG_ACCEPTED {
