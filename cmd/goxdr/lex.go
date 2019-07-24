@@ -155,9 +155,25 @@ func (l *Lexer) findCommentStart(tp byte) bool {
 	return false
 }
 
+func (l *Lexer) get1LineComment() string {
+	if !l.findCommentStart('*') {
+		return ""
+	}
+	j := strings.Index(l.input[2:], "*/")
+	if j < 0 {
+		return ""
+	}
+	comment := l.input[:j+4]
+	l.advance(j+4)
+	if l.skipWSNL() && strings.IndexByte(comment, '\n') == -1 {
+		return comment
+	}
+	return ""
+}
+
 func (l *Lexer) getLineComment() string {
 	if !l.findCommentStart('/') {
-		return ""
+		return l.get1LineComment()
 	}
 	if l.midline {
 		return l.RestOfLine()

@@ -2,6 +2,7 @@
 // Utilities for implementing RFC5531 RPC.
 package rpcmsg
 
+import "fmt"
 import "github.com/xdrpp/goxdr/xdr"
 
 func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
@@ -86,6 +87,16 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROG_UNAVAIL
 	} else if vers, ok := prog[cmsg.Body.Cbody().Vers]; !ok {
 		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROG_MISMATCH
+		mmi := rmsg.Body.Rbody().Areply().Reply_data.Mismatch_info()
+		mmi.Low = 0xffffffff
+		for i := range prog {
+			if i < mmi.Low {
+				mmi.Low = i
+			}
+			if i > mmi.High {
+				mmi.High = i
+			}
+		}
 	} else if proc = vers.GetProc(cmsg.Body.Cbody().Proc); proc == nil {
 		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROC_UNAVAIL
 	} else {
@@ -96,4 +107,29 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 	}
 
 	return
+}
+
+func (m *Rpc_msg) Error() string {
+	if m.Body.Mtype != REPLY {
+		return "RPC message not a REPLY"
+	} else if m.Body.Rbody().Stat == MSG_ACCEPTED {
+		stat := m.Body.Rbody().Areply().Reply_data.Stat
+		c, ok := stat.XdrEnumComments()[int32(stat)]
+		if !ok {
+			c = stat.String()
+		}
+		if stat == PROG_MISMATCH {
+			mmi := m.Body.Rbody().Areply().Reply_data.Mismatch_info()
+			c = fmt.Sprintf("%s (low %d, high %d)", c, mmi.Low, mmi.High)
+		}
+		return c
+	} else if m.Body.Rbody().Stat == MSG_DENIED {
+		stat := m.Body.Rbody().Rreply().Stat
+		c, ok := stat.XdrEnumComments()[int32(stat)]
+		if !ok {
+			c = stat.String()
+		}
+		return c
+	}
+	return "Invalid reply_stat"
 }

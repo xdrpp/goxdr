@@ -467,7 +467,10 @@ func XDR_%[1]s(v *%[1]s) _XdrTypedef_%[1]s {
 }
 
 func normalize_comment(comment string) string {
-	block := comment[2] == '*'
+	block := comment[1] == '*'
+	if block {
+		comment = comment[:len(comment)-2]
+	}
 	out := &strings.Builder{}
 	first := true
 	for _, line := range strings.Split(comment, "\n") {
@@ -483,9 +486,6 @@ func normalize_comment(comment string) string {
 		out.WriteString(line)
 	}
 	ret := out.String()
-	if block {
-		ret = ret[:len(ret)-2]
-	}
 	return ret
 }
 
