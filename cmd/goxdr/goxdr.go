@@ -1232,6 +1232,7 @@ func main() {
 	if *opt_emitbp {
 		fmt.Fprintf(out, `import(
 	"bytes"
+	"context"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -1243,8 +1244,12 @@ func main() {
 		if !*opt_nobp {
 			fmt.Fprintf(out, "import . \"github.com/xdrpp/goxdr/xdr\"\n")
 		}
-		fmt.Fprint(out, "import \"fmt\"\n\nvar _ = fmt.Sprintf\n")
+		fmt.Fprint(out, "import \"fmt\"\nimport \"context\"\n")
 	}
+	fmt.Fprint(out, `
+var _ = fmt.Sprintf
+var _ context.Context
+`)
 
 	io.WriteString(out, code)
 
