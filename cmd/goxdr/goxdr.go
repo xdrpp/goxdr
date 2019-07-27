@@ -1051,6 +1051,13 @@ type %[1]s struct {
 	%[2]s
 	Srv %[3]s
 }
+func (p *%[1]s) SetContext(ctx context.Context) {
+	if wc, ok := p.Srv.(interface {
+		WithContext(context.Context) %[3]s
+	}); ok {
+		p.Srv = wc.WithContext(ctx)
+	}
+}
 `, "xdrSrvProc_" + p.id.String(), pm, name)
 
 			var av string
@@ -1118,9 +1125,9 @@ type %[1]s struct {
 	Ctx context.Context
 }
 var _ %[2]s = %[1]s{} // XXX
-func (v %[1]s) WithContext(ctx context.Context) %[1]s {
-	v.Ctx = ctx
-	return v
+func (c %[1]s) WithContext(ctx context.Context) %[2]s {
+	c.Ctx = ctx
+	return c
 }
 `, cli, name)
 		for _, p := range r.vers[i].procs {

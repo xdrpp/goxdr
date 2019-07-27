@@ -648,6 +648,7 @@ type XdrProc interface {
 type XdrSrvProc interface {
 	XdrProc
 	Do()
+	SetContext(context.Context)
 }
 
 // Interface for an RPC version interface bound to a server
