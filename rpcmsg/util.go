@@ -7,13 +7,20 @@ import (
 	"github.com/xdrpp/goxdr/xdr"
 )
 
+// Fake accept state to represent a cancelled call
+const CANCELED Accept_stat = 98
 // Fake accept state to represent a response we can't unmarshal
 const GARBAGE_RET Accept_stat = 99
 func init() {
-	_XdrNames_Accept_stat[int32(GARBAGE_RET)] = "GARBAGE_RET"
-	_XdrValues_Accept_stat["GARBAGE_RET"] = int32(GARBAGE_RET)
-	_XdrComments_Accept_stat[int32(GARBAGE_RET)] =
-		"Unable to decode return value"
+	pseudo_states := []struct{stat Accept_stat; name string; comment string}{
+		{CANCELED, "CANCELED", "Call context canceled"},
+		{GARBAGE_RET, "GARBAGE_RET", "Unable to decode return value"},
+	}
+	for _, ps := range pseudo_states {
+		_XdrNames_Accept_stat[int32(ps.stat)] = ps.name
+		_XdrValues_Accept_stat[ps.name] = int32(ps.stat)
+		_XdrComments_Accept_stat[int32(ps.stat)] = ps.comment
+	}
 }
 
 func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
@@ -28,6 +35,14 @@ func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
 	}()
 	t.XdrMarshal(x, name)
 	return nil
+}
+
+// Sets an rpc_message to be an accepted reply with a particular
+// status.
+func SetStat(msg *Rpc_msg, stat Accept_stat) {
+	msg.Body.Mtype = REPLY
+	msg.Body.Rbody().Stat = MSG_ACCEPTED
+	msg.Body.Rbody().Areply().Reply_data.Stat = stat
 }
 
 // Returns true iff rmsg is an accepted REPLY with status SUCCESS.
@@ -143,21 +158,20 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 		return nil, nil
 	}
 	rmsg = &Rpc_msg { Xid: cmsg.Xid }
-	rmsg.Body.Mtype = REPLY
 
 	if cmsg.Body.Cbody().Rpcvers != 2 {
+		rmsg.Body.Mtype = REPLY
 		rmsg.Body.Rbody().Stat = MSG_DENIED
 		rmsg.Body.Rbody().Rreply().Stat = RPC_MISMATCH
 		rmsg.Body.Rbody().Rreply().Mismatch_info().Low = 2
 		rmsg.Body.Rbody().Rreply().Mismatch_info().High = 2
 		return
 	}
-	rmsg.Body.Rbody().Stat = MSG_ACCEPTED
 
 	if prog, ok := s.Srvs[cmsg.Body.Cbody().Prog]; !ok {
-		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROG_UNAVAIL
+		SetStat(rmsg, PROG_UNAVAIL)
 	} else if vers, ok := prog[cmsg.Body.Cbody().Vers]; !ok {
-		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROG_MISMATCH
+		SetStat(rmsg, PROG_MISMATCH)
 		mmi := rmsg.Body.Rbody().Areply().Reply_data.Mismatch_info()
 		mmi.Low = 0xffffffff
 		for i := range prog {
@@ -169,12 +183,12 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 			}
 		}
 	} else if proc = vers.GetProc(cmsg.Body.Cbody().Proc); proc == nil {
-		rmsg.Body.Rbody().Areply().Reply_data.Stat = PROC_UNAVAIL
+		SetStat(rmsg, PROC_UNAVAIL)
+	} else if in != nil && safeMarshal(in, proc.GetArg(), "") != nil {
+		proc = nil
+		SetStat(rmsg, GARBAGE_ARGS)
 	} else {
-		rmsg.Body.Rbody().Areply().Reply_data.Stat = SUCCESS
-		if in != nil && safeMarshal(in, proc.GetArg(), "") != nil {
-			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_ARGS
-		}
+		SetStat(rmsg, SUCCESS)
 	}
 
 	return
