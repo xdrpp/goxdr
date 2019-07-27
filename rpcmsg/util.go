@@ -51,6 +51,7 @@ func GetMsg(in xdr.XDR) (*Rpc_msg, error) {
 type PendingCall struct {
 	Proc xdr.XdrProc
 	Cb func(*Rpc_msg)
+	Server string
 }
 
 type CallSet struct {
@@ -59,8 +60,12 @@ type CallSet struct {
 }
 
 // Allocate a new XID and create a message header for an outgoing RPC
-// call.
-func (cs *CallSet) NewCall(proc xdr.XdrProc, cb func(*Rpc_msg)) *Rpc_msg {
+// call.  The server string is just an arbitrary name for the server
+// to avoid interpreting messages from one server as replies to RPC
+// sent to a different server.  If the CallSet is only used for one
+// server, the server string can always be empty.
+func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
+	cb func(*Rpc_msg)) *Rpc_msg {
 	if cs.Calls == nil {
 		cs.Calls = make(map[uint32]*PendingCall)
 	}
@@ -71,6 +76,7 @@ func (cs *CallSet) NewCall(proc xdr.XdrProc, cb func(*Rpc_msg)) *Rpc_msg {
 	cs.Calls[cs.LastXid] = &PendingCall{
 		Proc: proc,
 		Cb: cb,
+		Server: server,
 	}
 	cmsg := Rpc_msg { Xid: cs.LastXid }
 	cmsg.Body.Mtype = CALL
@@ -89,12 +95,12 @@ func (cs *CallSet) Free(msg *Rpc_msg) {
 
 // Attempt to match a reply with a pending call, and make the callback
 // if it succeeds.
-func (cs *CallSet) GetReply(rmsg *Rpc_msg, in xdr.XDR) {
+func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
 	if rmsg.Body.Mtype != REPLY {
 		return
 	}
 	pc, ok := cs.Calls[rmsg.Xid]
-	if !ok {
+	if !ok || pc.Server != server {
 		return
 	}
 	cs.Free(rmsg)
