@@ -967,7 +967,7 @@ func (e *emitter) doClientProc(cli string, p *rpc_proc) {
 		e.xprintf(
 `func (c %[1]s) %[2]s(%[3]s) {
 	var proc xdrProc_%[2]s
-%[4]s	if err := c.XdrSend(&proc); err != nil {
+%[4]s	if err := c.XdrSend(c.Ctx, &proc); err != nil {
 		panic(err)
 	}
 }
@@ -976,7 +976,7 @@ func (e *emitter) doClientProc(cli string, p *rpc_proc) {
 		e.xprintf(
 `func (c %[1]s) %[2]s(%[3]s) %[6]s%[5]s {
 	var proc xdrProc_%[2]s
-%[4]s	if err := c.XdrSend(&proc); err != nil {
+%[4]s	if err := c.XdrSend(c.Ctx, &proc); err != nil {
 		panic(err)
 	}
 	return %[7]sproc.Res
@@ -1114,9 +1114,14 @@ var _ XdrSrv = %s{} // XXX
 		cli := fmt.Sprintf("%s_Client", name)
 		e.xprintf(`
 type %[1]s struct {
-	XdrSend func(XdrProc) error
+	XdrSend func(context.Context, XdrProc) error
+	Ctx context.Context
 }
 var _ %[2]s = %[1]s{} // XXX
+func (v %[1]s) WithContext(ctx context.Context) %[1]s {
+	v.Ctx = ctx
+	return v
+}
 `, cli, name)
 		for _, p := range r.vers[i].procs {
 			e.doClientProc(cli, &p)
