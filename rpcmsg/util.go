@@ -104,8 +104,8 @@ func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 
 // Free the XID associated with a pending RPC call if the call is
 // being canceled.
-func (cs *CallSet) Free(msg *Rpc_msg) {
-	delete(cs.Calls, msg.Xid)
+func (cs *CallSet) Free(xid uint32) {
+	delete(cs.Calls, xid)
 }
 
 // Attempt to match a reply with a pending call, and make the callback
@@ -118,7 +118,7 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
 	if !ok || pc.Server != server {
 		return
 	}
-	cs.Free(rmsg)
+	cs.Free(rmsg.Xid)
 	if IsSuccess(rmsg) {
 		if err := safeMarshal(in, pc.Proc.GetRes(), ""); err != nil {
 			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
