@@ -102,10 +102,14 @@ func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 	return &cmsg
 }
 
-// Free the XID associated with a pending RPC call if the call is
-// being canceled.
-func (cs *CallSet) Free(xid uint32) {
-	delete(cs.Calls, xid)
+// Cancel a pending call and return a fake Rpc_msg with the the
+// CANCELED pseudo-error.
+func (cs *CallSet) Cancel(xid uint32) {
+	if pc, ok := cs.Calls[xid]; ok {
+		rmsg := Rpc_msg{ Xid: xid }
+		SetStat(&rmsg, CANCELED)
+		pc.Cb(&rmsg)
+	}
 }
 
 // Attempt to match a reply with a pending call, and make the callback
@@ -118,7 +122,7 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
 	if !ok || pc.Server != server {
 		return
 	}
-	cs.Free(rmsg.Xid)
+	delete(cs.Calls, rmsg.Xid)
 	if IsSuccess(rmsg) {
 		if err := safeMarshal(in, pc.Proc.GetRes(), ""); err != nil {
 			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
