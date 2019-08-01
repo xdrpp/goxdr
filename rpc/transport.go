@@ -3,12 +3,12 @@ package rpc
 
 import (
 	"bytes"
-	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/xdrpp/goxdr/xdr"
 	"io"
 	"net"
+	"sync/atomic"
 )
 
 type Message struct {
@@ -16,19 +16,31 @@ type Message struct {
 	Peer string
 }
 
-func (m Message) In() xdr.XDR {
-	return xdr.XdrIn{&m}
+func (m *Message) In() xdr.XDR {
+	return xdr.XdrIn{m}
 }
 
-func (m Message) Out() xdr.XDR {
-	return xdr.XdrOut{&m}
+func (m *Message) Out() xdr.XDR {
+	return xdr.XdrOut{m}
 }
 
+func (m Message) Serialize(vs...xdr.XdrType) {
+	out := m.Out()
+	for i := range vs {
+		vs[i].XdrMarshal(out, "")
+	}
+}
+
+// Abstraction for an RPC transport.  Note that Send() should not be
+// called multiple times concurrently and Receive() should not be
+// called multiple times concurrently, but it is okay to call Send()
+// concurrently with Receive().
 type Transport interface {
-	// Send a message
+	// Send a message.
 	Send(*Message) error
 
-	// Receive the next incoming message
+	// Receive the next incoming message.  Blocks until a message is
+	// available.
 	Receive() (*Message, error)
 
 	// Close the underlying file descriptor and make subsequent calls
@@ -43,83 +55,56 @@ type Transport interface {
 	IsConnected() bool
 }
 
-// Return true if ctx is a non-nil context that is done.
-func IsDone(ctx context.Context) bool {
-	if ctx == nil {
-		return false
-	}
-	select {
-	case <-ctx.Done():
-		return true
-	default:
-		return false
-	}
-}
-
-// Create a channel that return received messages from a Transport.
-func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
-	ret := make(chan *Message)
-	go func(c chan<- *Message) {
-		for {
-			m, err := t.Receive()
-			if err != nil {
-				close(c)
-				return
-			}
-			select {
-			case c <- m:
-			case <-ctx.Done():
-			}
-			if IsDone(ctx) {
-				close(c)
-				return
-			}
-		}
-	}(ret)
-	return ret
-}
-
-// Create a channel for sending messages through a Transport.
-func SendChan(t Transport) chan<- *Message {
-	ret := make(chan *Message, 1)
-	go func(c <-chan *Message) {
-		for {
-			if m, ok := <-c; !ok {
-				return
-			} else {
-				t.Send(m)
-			}
-		}
-	}(ret)
-	return ret
-}
+var ErrTransportClosed = fmt.Errorf("Transport is closed")
 
 // Implements RFC5531 record-marking protocol for stream sockets
 type StreamTransport struct {
 	MaxMsgSize int
 	Conn net.Conn
-	Err error
+
+	// We jump through a few hoops with atomics because err may be
+	// accessed in multiple threads.  We want to make sure all uses of
+	// err are synchronized through okay.  Shared read-only access to
+	// err is allowed only when okay == 0.  Value -1 is used as an
+	// exclusive lock to ensure only one thread updates err.
+	okay int32					// 1 = okay, 0 = failed, -1 = failing
+	err error
 }
 
+// Create a stream transport from a connected stream socket.  This is
+// the only valid way to initialize a StreamTransport.  You can
+// manually adjust MaxMsgSize after calling this function.
 func NewStreamTransport(c net.Conn) *StreamTransport {
 	return &StreamTransport{
 		MaxMsgSize: 0x100000,
 		Conn: c,
+		okay: 1,
 	}
 }
 
-func (tx *StreamTransport) Close() {
-	if tx.Conn != nil {
+func (tx *StreamTransport) fail(err error) {
+	if atomic.CompareAndSwapInt32(&tx.okay, 1, -1) {
+		tx.err = err
 		tx.Conn.Close()
-		tx.Conn = nil
+		atomic.StoreInt32(&tx.okay, 0)
 	}
+}
+
+func (tx *StreamTransport) failed() bool {
+	return atomic.LoadInt32(&tx.okay) == 0
+}
+
+// Close the transport and underlying Conn if it hasn't been closed
+// yet.  Subsequent calls to Close() have no effect.
+func (tx *StreamTransport) Close() {
+	tx.fail(ErrTransportClosed)
 }
 
 const maxSegment = 0x7fffffff
 
 func (tx *StreamTransport) Send(m *Message) error {
-	if tx.Err != nil {
-		return tx.Err
+	if tx.failed() {
+		return tx.err
 	}
 	iov := make(net.Buffers, 0, 2)
 	for {
@@ -137,35 +122,33 @@ func (tx *StreamTransport) Send(m *Message) error {
 			break
 		}
 	}
-	_, tx.Err = iov.WriteTo(tx.Conn)
-	if tx.Err != nil {
-		tx.Close()
+	if _, err := iov.WriteTo(tx.Conn); err != nil {
+		tx.fail(err)
+		return err
 	}
-	return tx.Err
+	return nil
 }
 
 func (tx *StreamTransport) Receive() (*Message, error) {
-	if tx.Err != nil {
-		return nil, tx.Err
+	if tx.failed() {
+		return nil, tx.err
 	}
 	var ret Message
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
-			tx.Err = err
-			tx.Close()
+			tx.fail(err)
 			return nil, err
 		}
 		n := binary.BigEndian.Uint32(b) & 0x7fffffff
 		if int(n) > tx.MaxMsgSize - ret.Len() {
-			tx.Err = fmt.Errorf("Message length %d exceeds maximum %d",
+			err := fmt.Errorf("Message length %d exceeds maximum %d",
 				int(n) + ret.Len(), tx.MaxMsgSize)
-			tx.Close()
-			return nil, tx.Err
+			tx.fail(err)
+			return nil, err
 		}
 		if _, err := io.CopyN(&ret, tx.Conn, int64(n)); err != nil {
-			tx.Err = err
-			tx.Close()
+			tx.fail(err)
 			return nil, err
 		}
 	}

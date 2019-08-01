@@ -5,6 +5,7 @@ package rpc
 import (
 	"fmt"
 	"github.com/xdrpp/goxdr/xdr"
+	"sync"
 )
 
 // Fake accept state to represent a cancelled call
@@ -69,9 +70,12 @@ type PendingCall struct {
 	Server string
 }
 
+// A CallSet represents a set of pending calls.  Its methods can be
+// called concurrently from multiple threads.
 type CallSet struct {
-	LastXid uint32
-	Calls map[uint32]*PendingCall
+	lock sync.Mutex
+	lastXid uint32
+	calls map[uint32]*PendingCall
 }
 
 // Allocate a new XID and create a message header for an outgoing RPC
@@ -81,19 +85,21 @@ type CallSet struct {
 // server, the server string can always be empty.
 func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 	cb func(*Rpc_msg)) *Rpc_msg {
-	if cs.Calls == nil {
-		cs.Calls = make(map[uint32]*PendingCall)
+	cs.lock.Lock()
+	defer cs.lock.Unlock()
+	if cs.calls == nil {
+		cs.calls = make(map[uint32]*PendingCall)
 	}
 	for ok := true; ok; {
-		cs.LastXid++
-		_, ok = cs.Calls[cs.LastXid]
+		cs.lastXid++
+		_, ok = cs.calls[cs.lastXid]
 	}
-	cs.Calls[cs.LastXid] = &PendingCall{
+	cs.calls[cs.lastXid] = &PendingCall{
 		Proc: proc,
 		Cb: cb,
 		Server: server,
 	}
-	cmsg := Rpc_msg { Xid: cs.LastXid }
+	cmsg := Rpc_msg { Xid: cs.lastXid }
 	cmsg.Body.Mtype = CALL
 	cmsg.Body.Cbody().Rpcvers = 2
 	cmsg.Body.Cbody().Prog = proc.Prog()
@@ -102,10 +108,20 @@ func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 	return &cmsg
 }
 
+// Delete a pending call without making its callback.
+func (cs *CallSet) Delete(xid uint32) {
+	cs.lock.Lock()
+	defer cs.lock.Unlock()
+	delete(cs.calls, xid)
+}
+
 // Cancel a pending call and return a fake Rpc_msg with the the
 // CANCELED pseudo-error.
 func (cs *CallSet) Cancel(xid uint32) {
-	if pc, ok := cs.Calls[xid]; ok {
+	cs.lock.Lock()
+	defer cs.lock.Unlock()
+	if pc, ok := cs.calls[xid]; ok {
+		delete(cs.calls, xid)
 		rmsg := Rpc_msg{ Xid: xid }
 		SetStat(&rmsg, CANCELED)
 		pc.Cb(&rmsg)
@@ -113,8 +129,10 @@ func (cs *CallSet) Cancel(xid uint32) {
 }
 
 func (cs *CallSet) CancelAll() {
-	calls := cs.Calls
-	cs.Calls = nil
+	cs.lock.Lock()
+	defer cs.lock.Unlock()
+	calls := cs.calls
+	cs.calls = nil
 	for xid, pc := range calls {
 		rmsg := Rpc_msg{ Xid: xid }
 		SetStat(&rmsg, CANCELED)
@@ -128,11 +146,13 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
 	if rmsg.Body.Mtype != REPLY {
 		return
 	}
-	pc, ok := cs.Calls[rmsg.Xid]
+	cs.lock.Lock()
+	defer cs.lock.Unlock()
+	pc, ok := cs.calls[rmsg.Xid]
 	if !ok || pc.Server != server {
 		return
 	}
-	delete(cs.Calls, rmsg.Xid)
+	delete(cs.calls, rmsg.Xid)
 	if IsSuccess(rmsg) {
 		if err := safeMarshal(in, pc.Proc.GetRes(), ""); err != nil {
 			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
@@ -210,7 +230,7 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 
 // An *Rpc_msg can represent an error.  Call IsSuccess to see if there
 // was actually an error.
-func (m Rpc_msg) Error() string {
+func (m *Rpc_msg) Error() string {
 	if m.Body.Mtype != REPLY {
 		return "RPC message not a REPLY"
 	} else if m.Body.Rbody().Stat == MSG_ACCEPTED {
