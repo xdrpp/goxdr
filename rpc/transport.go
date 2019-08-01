@@ -3,6 +3,7 @@ package rpc
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"fmt"
 	"github.com/xdrpp/goxdr/xdr"
@@ -24,9 +25,73 @@ func (m Message) Out() xdr.XDR {
 }
 
 type Transport interface {
+	// Send a message
 	Send(*Message) error
+
+	// Receive the next incoming message
 	Receive() (*Message, error)
+
+	// Close the underlying file descriptor and make subsequent calls
+	// to Send and Receive return errors.  Note that transports must
+	// allow multiple calls to Close (unlike most io.Closer types,
+	// which don't guaratnee this).
 	Close()
+
+	// Returns true if the Peer field of Message does not matter
+	// because each instance of the transport is connected to a single
+	// endpoint (like TCP and unlike an unconnected UDP socket).
+	IsConnected() bool
+}
+
+// Return true if ctx is a non-nil context that is done.
+func IsDone(ctx context.Context) bool {
+	if ctx == nil {
+		return false
+	}
+	select {
+	case <-ctx.Done():
+		return true
+	default:
+		return false
+	}
+}
+
+// Create a channel that return received messages from a Transport.
+func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
+	ret := make(chan *Message)
+	go func(c chan<- *Message) {
+		for {
+			m, err := t.Receive()
+			if err != nil {
+				close(c)
+				return
+			}
+			select {
+			case c <- m:
+			case <-ctx.Done():
+			}
+			if IsDone(ctx) {
+				close(c)
+				return
+			}
+		}
+	}(ret)
+	return ret
+}
+
+// Create a channel for sending messages through a Transport.
+func SendChan(t Transport) chan<- *Message {
+	ret := make(chan *Message, 1)
+	go func(c <-chan *Message) {
+		for {
+			if m, ok := <-c; !ok {
+				return
+			} else {
+				t.Send(m)
+			}
+		}
+	}(ret)
+	return ret
 }
 
 // Implements RFC5531 record-marking protocol for stream sockets
@@ -105,6 +170,10 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 		}
 	}
 	return &ret, nil
+}
+
+func (tx *StreamTransport) IsConnected() bool {
+	return true
 }
 
 var _ Transport = &StreamTransport{}

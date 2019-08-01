@@ -112,6 +112,16 @@ func (cs *CallSet) Cancel(xid uint32) {
 	}
 }
 
+func (cs *CallSet) CancelAll() {
+	calls := cs.Calls
+	cs.Calls = nil
+	for xid, pc := range calls {
+		rmsg := Rpc_msg{ Xid: xid }
+		SetStat(&rmsg, CANCELED)
+		pc.Cb(&rmsg)
+	}
+}
+
 // Attempt to match a reply with a pending call, and make the callback
 // if it succeeds.
 func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
