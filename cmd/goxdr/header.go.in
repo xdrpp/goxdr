@@ -574,11 +574,11 @@ type XdrOut struct {
 	Out io.Writer
 }
 
-func (xp *XdrOut) Sprintf(f string, args ...interface{}) string {
+func (xp XdrOut) Sprintf(f string, args ...interface{}) string {
 	return ""
 }
 
-func (xo *XdrOut) Marshal(name string, i XdrType) {
+func (xo XdrOut) Marshal(name string, i XdrType) {
 	switch v := i.(type) {
 	case XdrNum32:
 		xdrPut32(xo.Out, v.GetU32())
@@ -636,11 +636,11 @@ type XdrIn struct {
 	In io.Reader
 }
 
-func (xp *XdrIn) Sprintf(f string, args ...interface{}) string {
+func (xp XdrIn) Sprintf(f string, args ...interface{}) string {
 	return ""
 }
 
-func (xi *XdrIn) Marshal(name string, i XdrType) {
+func (xi XdrIn) Marshal(name string, i XdrType) {
 	switch v := i.(type) {
 	case XdrNum32:
 		v.SetU32(xdrGet32(xi.In))
