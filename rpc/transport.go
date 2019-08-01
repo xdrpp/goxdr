@@ -1,5 +1,5 @@
 
-package rpcmsg
+package rpc
 
 import (
 	"bytes"

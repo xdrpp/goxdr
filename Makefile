@@ -1,14 +1,14 @@
 CMDS = goxdr
 CLEANFILES = .*~ *~ */*~ goxdr
-BUILT_SOURCES = rpcmsg/rpc_msg.go xdr/boilerplate.go
+BUILT_SOURCES = rpc/rpc_msg.go xdr/boilerplate.go
 
 all: build man
 
 build: cmd/goxdr/goxdr $(BUILT_SOURCES) always
-	go build ./xdr ./rpcmsg
+	go build ./xdr ./rpc
 
-rpcmsg/rpc_msg.go: rpcmsg/rpc_msg.x goxdr
-	./goxdr -enum-comments -p $$(dirname $@) -o $@ rpcmsg/rpc_msg.x
+rpc/rpc_msg.go: rpc/rpc_msg.x goxdr
+	./goxdr -enum-comments -p $$(dirname $@) -o $@ rpc/rpc_msg.x
 
 xdr/boilerplate.go: goxdr
 	./goxdr -B -p $$(dirname $@) -o $@

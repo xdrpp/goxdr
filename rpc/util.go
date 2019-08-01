@@ -1,6 +1,6 @@
 
 // Utilities for implementing RFC5531 RPC.
-package rpcmsg
+package rpc
 
 import (
 	"fmt"
