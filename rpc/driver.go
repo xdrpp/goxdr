@@ -2,6 +2,7 @@
 package rpc
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/xdrpp/goxdr/xdr"
@@ -85,11 +86,22 @@ func SendChan(t Transport) chan<- *Message {
 	return ret
 }
 
+func (r *RPC) logXdr(t xdr.XdrType, f string, args...interface{}) {
+	if r.Log == nil {
+		return
+	}
+	var out bytes.Buffer
+	fmt.Fprintf(&out, f, args...)
+	out.WriteByte('\n')
+	t.XdrMarshal(xdr.XdrPrint{&out}, "")
+	r.Log.Write(out.Bytes())
+}
 
 // Simple RPC driver.  Can handle calls from multiple threads, but all
 // server side handling happens in a single thread (inside Loop()).
 type RPC struct {
 	Srv RpcSrv
+	Log io.Writer
 	ctx context.Context
 	cancel context.CancelFunc
 	out chan<- *Message
@@ -139,6 +151,8 @@ func (r *RPC) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		close(c)
 	})
 	m := Message { Peer: peer }
+	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
+		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
 	if !r.safeSend(ctx, &m) {
 		r.cs.Delete(cmsg.Xid)
@@ -174,11 +188,11 @@ func (r *RPC) Loop() {
 			break
 		}
 
-		// Only has effect if we just received a call
-		r.cs.GetReply(m.Peer, msg, m.In())
-
-		// Only has effect if we just received a reply
-		if rmsg, proc := r.Srv.GetProc(msg, m.In()); rmsg != nil {
+		if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
+			r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s",
+				m.Peer, msg.Xid, pc.Proc.ProcName())
+			pc.Cb(msg)
+		} else if rmsg, proc := r.Srv.GetProc(msg, m.In()); rmsg != nil {
 			reply := Message{ Peer: m.Peer }
 			reply.Serialize(rmsg)
 			if proc != nil {
@@ -189,7 +203,11 @@ func (r *RPC) Loop() {
 				if ctx != nil {
 					proc.SetContext(ctx)
 				}
+				r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s",
+					m.Peer, msg.Xid, proc.ProcName())
 				proc.Do()
+				r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
+					m.Peer, msg.Xid, proc.ProcName())
 				reply.Serialize(proc.GetRes())
 			}
 			r.safeSend(r.ctx, &reply)

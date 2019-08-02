@@ -140,17 +140,18 @@ func (cs *CallSet) CancelAll() {
 	}
 }
 
-// Attempt to match a reply with a pending call, and make the callback
-// if it succeeds.
-func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
+// Attempt to match a reply with a pending call.  If it returns
+// a non-nil pc, you should call pc.Cb(rmsg).
+func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg,
+	in xdr.XDR) *PendingCall {
 	if rmsg.Body.Mtype != REPLY {
-		return
+		return nil
 	}
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
 	pc, ok := cs.calls[rmsg.Xid]
 	if !ok || pc.Server != server {
-		return
+		return nil
 	}
 	delete(cs.calls, rmsg.Xid)
 	if IsSuccess(rmsg) {
@@ -158,7 +159,7 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) {
 			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
 		}
 	}
-	pc.Cb(rmsg)
+	return pc
 }
 
 // Container for a server implementing a set of program/version

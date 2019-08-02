@@ -526,11 +526,11 @@ func XdrToString(t XdrType) string {
 	return out.String()
 }
 
-func (xp *XdrPrint) Sprintf(f string, args ...interface{}) string {
+func (xp XdrPrint) Sprintf(f string, args ...interface{}) string {
 	return fmt.Sprintf(f, args...)
 }
 
-func (xp *XdrPrint) Marshal(name string, i XdrType) {
+func (xp XdrPrint) Marshal(name string, i XdrType) {
 	switch v := i.(type) {
 	case fmt.Stringer:
 		fmt.Fprintf(xp.Out, "%s: %s\n", name, v.String())
