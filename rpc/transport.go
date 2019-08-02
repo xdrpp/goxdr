@@ -62,6 +62,10 @@ type StreamTransport struct {
 	MaxMsgSize int
 	Conn net.Conn
 
+	// Since a StreamTransport is connected, we ignore Peer in sent
+	// messages, but can hardcode a value for incoming messages.
+	Peer string
+
 	// We jump through a few hoops with atomics because err may be
 	// accessed in multiple threads.  We want to make sure all uses of
 	// err are synchronized through okay.  Shared read-only access to
@@ -133,7 +137,7 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 	if tx.failed() {
 		return nil, tx.err
 	}
-	var ret Message
+	ret := Message{ Peer: tx.Peer }
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
