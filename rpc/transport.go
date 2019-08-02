@@ -24,7 +24,7 @@ func (m *Message) Out() xdr.XDR {
 	return xdr.XdrOut{m}
 }
 
-func (m Message) Serialize(vs...xdr.XdrType) {
+func (m *Message) Serialize(vs...xdr.XdrType) {
 	out := m.Out()
 	for i := range vs {
 		vs[i].XdrMarshal(out, "")

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/xdrpp/goxdr/xdr"
+	"io"
 	"os"
 )
 
@@ -52,6 +53,9 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 		for {
 			m, err := t.Receive()
 			if err != nil {
+				if err != io.EOF {
+					fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
+				}
 				close(c)
 				return
 			}
@@ -134,7 +138,7 @@ func (r *RPC) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		c <- rmsg
 		close(c)
 	})
-	m := Message { Peer: GetPeer(ctx) }
+	m := Message { Peer: peer }
 	m.Serialize(cmsg, proc.GetArg())
 	if !r.safeSend(ctx, &m) {
 		r.cs.Delete(cmsg.Xid)
@@ -166,7 +170,7 @@ func (r *RPC) Loop() {
 		}
 		msg, err := GetMsg(m.In())
 		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintf(os.Stderr, "GetMsg failed: %s\n", err)
 			break
 		}
 
