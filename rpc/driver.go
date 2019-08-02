@@ -10,6 +10,9 @@ import (
 	"os"
 )
 
+// The default value for Log in newly allocated RPCs.
+var DefaultLog io.Writer
+
 type peerKeyType struct {}
 var peerKey peerKeyType
 
@@ -115,6 +118,7 @@ func NewRpc(ctx context.Context, t Transport) *RPC {
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	ret := RPC {
+		Log: DefaultLog,
 		ctx: ctx,
 		cancel: cancel,
 		out: SendChan(t),
