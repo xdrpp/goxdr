@@ -1,6 +1,6 @@
 CMDS = goxdr
 CLEANFILES = .*~ *~ */*~ goxdr
-BUILT_SOURCES = rpc/rpc_msg.go xdr/boilerplate.go
+BUILT_SOURCES = rpc/rpc_msg.go xdr/boilerplate.go rpc/prot_test.go
 
 all: build man
 
@@ -9,6 +9,9 @@ build: cmd/goxdr/goxdr $(BUILT_SOURCES) always
 
 rpc/rpc_msg.go: rpc/rpc_msg.x goxdr
 	./goxdr -enum-comments -p $$(dirname $@) -o $@ rpc/rpc_msg.x
+
+rpc/prot_test.go: rpc/prot_test.x goxdr
+	./goxdr -enum-comments -p rpc_test -o $@ rpc/prot_test.x
 
 xdr/boilerplate.go: goxdr
 	./goxdr -B -p $$(dirname $@) -o $@
@@ -33,7 +36,7 @@ depend: always
 RECURSE = for dir in $(CMDS); do cd cmd/$$dir && $(MAKE) $@; done
 
 test: always
-	#go test -v .
+	go test -v ./rpc
 	$(RECURSE)
 
 clean: always

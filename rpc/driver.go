@@ -166,7 +166,7 @@ func (r *RPC) Loop() {
 		}
 		msg, err := GetMsg(m.In())
 		if err != nil {
-			fmt.Println(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, err)
 			break
 		}
 
