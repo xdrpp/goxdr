@@ -92,20 +92,21 @@ func TestRPC(t *testing.T) {
 	defer cancel()
 	cs := streampair()
 
-	r1 := rpc.NewRpc(ctx, rpc.NewStreamTransport(cs[0]))
-	r1.Srv.Register(TEST_V1_Server{&Server{}})
+	r1 := rpc.NewDriver(ctx, rpc.NewStreamTransport(cs[0]))
+	r1.Register(TEST_V1_Server{&Server{}})
 	go func() {
-		r1.Loop()
+		r1.Go()
 		fmt.Println("loop1 returned")
 	}()
 
-	r2 := rpc.NewRpc(ctx, rpc.NewStreamTransport(cs[1]))
+	r2 := rpc.NewDriver(ctx, rpc.NewStreamTransport(cs[1]))
+	r2.Log = os.Stderr
 	go func() {
-		r2.Loop()
+		r2.Go()
 		fmt.Println("loop2 returned")
 	}()
 
-	c := TEST_V1_Client { XdrSend: r2.SendCall, Ctx: ctx }
+	c := TEST_V1_Client { Send: r2, Ctx: ctx }
 
 	c.Test_null()
 	if c.Test_inc(1) != 2 {

@@ -1,12 +1,15 @@
 # Go XDR compiler (goxdr)
 
 goxdr compiles the [RFC4506] eXternal Data Representation IDL down to
-go data structures.  goxdr has several features that together make it
-an attractive alternative to other go XDR compilers for many
-situations:
+go data structures.  It also creates go interfaces for [RFC5531] RPC
+interfaces.  goxdr has several features that together make it an
+attractive alternative to other go XDR compilers for many situations:
 
 * Fully [RFC4506] compliant, including nested structure and union
   declarations.
+
+* Fully [RFC5531] compliant, including procedures that take multiple
+  arguments.
 
 * Output code is highly readable, with data structures segregated from
   messier marshaling code.  The generated go source is a convenient
@@ -48,13 +51,19 @@ situations:
   that check for alias-name-specific marshaling methods that can
   differentiate treatment of identical go types.
 
-* Tiny runtime package dependency is optional.  For small projects the
-  compiler can instead emit boilerplate code directly into its output.
-
 * An option to make comments on enum constants available at runtime
   allows you to specify things like human-readable error messages for
   error codes right in the source code of your XDR file, avoiding the
   need for manual synchronization between your XDR and go sources.
+
+* Tiny XDR runtime package dependency is optional.  For small projects
+  the compiler can instead emit boilerplate code directly into its
+  output.
+
+* Also includes a thread-safe [RFC5531] RPC library.  For simplicity,
+  server side calls are handled non-concurrently by default, but
+  functions can choose to detach from the main event loop to reply
+  asynchronously.
 
 # Installation
 

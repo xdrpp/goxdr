@@ -695,6 +695,12 @@ type XdrSrv interface {
 	GetProc(uint32) XdrSrvProc
 }
 
+// An interface for types that can send remote procedure calls and
+// await their reply.
+type XdrSendCall interface {
+	SendCall(context.Context, XdrProc) error
+}
+
 //
 // end boilerplate
 //
