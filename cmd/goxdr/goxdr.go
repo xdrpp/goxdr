@@ -1091,6 +1091,22 @@ var _ XdrSrvProc = &%[1]s{} // XXX
 			e.xappend(out)
 		}
 
+		e.xprintf(`
+func init() {
+	XdrCatalog[%[1]d<<32|%[2]d] = func(p uint32) XdrProc {
+		switch(p) {
+`, r.val, r.vers[i].val)
+		for _, p := range r.vers[i].procs {
+			e.xprintf("\t\tcase %d:\n", p.val)
+			e.xprintf("\t\t\treturn &xdrProc_%s{}\n", p.id.String())
+		}
+		e.xprintf(
+`		}
+		return nil
+	}
+}
+`)
+
 		srv := fmt.Sprintf("%s_Server", name)
 		e.xprintf(`
 type %[1]s struct {

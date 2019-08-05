@@ -701,6 +701,12 @@ type XdrSendCall interface {
 	SendCall(context.Context, XdrProc) error
 }
 
+// A catalog of procedures of different RPC programs and versions,
+// mostly useful for debugging (e.g., pretty-printing a log of RPC
+// messages).  The key to the map is prog<<32|vers.  The function
+// returns a new instance of an appropriate XdrProc.
+var XdrCatalog = make(map[uint64]func(uint32)XdrProc)
+
 //
 // end boilerplate
 //
