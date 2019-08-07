@@ -35,7 +35,7 @@ func safeMarshal(x xdr.XDR, t xdr.XdrType, name string) (err error) {
 		}
 	}()
 	t.XdrMarshal(x, name)
-	return nil
+	return
 }
 
 // Sets an rpc_message to be an accepted reply with a particular
