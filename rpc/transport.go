@@ -95,7 +95,14 @@ func (tx *StreamTransport) fail(err error) {
 }
 
 func (tx *StreamTransport) failed() bool {
-	return atomic.LoadInt32(&tx.okay) == 0
+	for {
+		switch atomic.LoadInt32(&tx.okay) {
+		case 0:
+			return true
+		case 1:
+			return false
+		}
+	}
 }
 
 // Close the transport and underlying Conn if it hasn't been closed

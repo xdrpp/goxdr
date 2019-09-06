@@ -199,9 +199,8 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args...interface{}) {
 // the Transport it and will Close it when Done.  Do not use a
 // Transport after you have passed it to Driver.
 //
-// The only way to free a Driver is to cancel the Context ctx that you
-// have passed in.  If you will never need to free the Driver, you may
-// supply a nil ctx.
+// If you will never need to cancel the driver, or plan to do so by
+// calling Close(), then you may supply a nil ctx.
 func NewDriver(ctx context.Context, t Transport) *Driver {
 	if ctx == nil {
 		ctx = context.Background()
@@ -230,8 +229,8 @@ func (r *Driver) Register(srv xdr.XdrSrv) {
 }
 
 // Free a Driver, close its transport, and cancel any pending calls
-// (which will return with errors).  Calling this is the same as
-// canceling the context that was passed to NewDriver.
+// (which will return with errors).  Calling this will have the same
+// effect as canceling the context that was passed to NewDriver.
 func (r *Driver) Close() {
 	r.cancel()
 }
@@ -250,6 +249,9 @@ func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
 // used as the Send field of generated RPC client structures.
 func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 	c := make(chan *Rpc_msg, 1)
+	if ctx == nil {
+		ctx = r.ctx
+	}
 	peer := GetPeer(ctx)
 	cmsg := r.cs.NewCall(peer, proc, func(rmsg *Rpc_msg) {
 		c <- rmsg
