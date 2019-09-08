@@ -118,14 +118,17 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 // Create a channel for sending messages through a Transport.  Creates
 // a thread that won't exit until the returned channel is closed.
 // Does not close the underlying Transport.
-func SendChan(t Transport) chan<- *Message {
+func SendChan(t Transport, onErr func(uint32, error)) chan<- *Message {
 	ret := make(chan *Message, 1)
 	go func(c <-chan *Message) {
 		for {
 			if m, ok := <-c; !ok {
 				return
 			} else {
-				t.Send(m)
+				xid := m.Xid()
+				if err := t.Send(m); err != nil && onErr != nil {
+					onErr(xid, err)
+				}
 			}
 		}
 	}(ret)
@@ -211,9 +214,11 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 		Lock: &sync.Mutex{},
 		ctx: ctx,
 		cancel: cancel,
-		out: SendChan(t),
 		in: ReceiveChan(ctx, t),
 	}
+	ret.out = SendChan(t, func(xid uint32, _ error){
+		ret.cs.Cancel(xid, SEND_ERR)
+	})
 	go func() {
 		<-ctx.Done()
 		t.Close()

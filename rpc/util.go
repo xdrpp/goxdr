@@ -8,12 +8,15 @@ import (
 	"sync"
 )
 
-// Fake accept state to represent a cancelled call
+// Fake accept stat for when we can't send a message
+const SEND_ERR Accept_stat = 97
+// Fake accept stat to represent a cancelled call
 const CANCELED Accept_stat = 98
-// Fake accept state to represent a response we can't unmarshal
+// Fake accept stat to represent a response we can't unmarshal
 const GARBAGE_RET Accept_stat = 99
 func init() {
 	pseudo_states := []struct{stat Accept_stat; name string; comment string}{
+		{SEND_ERR, "SEND_ERR", "Transport-level error when sending call"},
 		{CANCELED, "CANCELED", "Call context canceled"},
 		{GARBAGE_RET, "GARBAGE_RET", "Unable to decode return value"},
 	}
@@ -116,14 +119,20 @@ func (cs *CallSet) Delete(xid uint32) {
 }
 
 // Cancel a pending call and return a fake Rpc_msg with the the
-// CANCELED pseudo-error.
-func (cs *CallSet) Cancel(xid uint32) {
+// CANCELED pseudo-error (by default) or another pseudo-error if
+// reason is supplied.  The only lengths that make sense for reason
+// are 0 (use default) and 1 (supply Accept_stat).
+func (cs *CallSet) Cancel(xid uint32, reason...Accept_stat) {
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
 	if pc, ok := cs.calls[xid]; ok {
 		delete(cs.calls, xid)
 		rmsg := Rpc_msg{ Xid: xid }
-		SetStat(&rmsg, CANCELED)
+		if len(reason) == 0 || reason[0] == SUCCESS {
+			SetStat(&rmsg, CANCELED)
+		} else {
+			SetStat(&rmsg, reason[0])
+		}
 		pc.Cb(&rmsg)
 	}
 }
