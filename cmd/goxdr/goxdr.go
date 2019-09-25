@@ -1269,10 +1269,11 @@ func main() {
 )
 `)
 	} else {
-		if !*opt_nobp {
-			fmt.Fprintf(out, "import . \"github.com/xdrpp/goxdr/xdr\"\n")
-		}
 		fmt.Fprint(out, "import \"fmt\"\nimport \"context\"\n")
+		if !*opt_nobp {
+			fmt.Fprintf(out, "import . \"github.com/xdrpp/goxdr/xdr\"\n" +
+				"\nvar _ XDR")
+		}
 	}
 	fmt.Fprint(out, `
 var _ = fmt.Sprintf

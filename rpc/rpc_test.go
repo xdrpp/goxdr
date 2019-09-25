@@ -67,7 +67,7 @@ func TestChannels(t *testing.T) {
 	tx1, tx2 := rpc.NewStreamTransport(cs[0]), rpc.NewStreamTransport(cs[1])
 	r := rpc.ReceiveChan(ctx, tx1)
 	defer tx1.Close()
-	s := rpc.SendChan(tx2)
+	s := rpc.SendChan(tx2, nil)
 	go func() {
 		defer close(s)
 		defer tx2.Close()
