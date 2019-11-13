@@ -348,7 +348,8 @@ string) if the input is invalid or a value is out of range.
 
 ## Pre-defined XDR types
 
-The predefined types `XdrOut`, `XdrIn`, and `XdrPrint` implement the
+The types `XdrOut`, `XdrIn`, and `XdrPrint` in the boilerplate code
+(by default package `"github.com/xdrpp/goxdr/xdr"`) implement the
 `XDR` interface and perform RFC4506 binary marshaling, RFC4506 binary
 unmarshaling, and pretty-printing, respectively.
 
@@ -468,12 +469,13 @@ goxdr supports the following options:
 :	Print a brief usage message.
 
 `-b`
-:	goxdr by default imports a module with boilerplate code to assist
-in marshaling and unmarshaling values, including code for interfaces
-such as `XDR` and `XdrNum32` as well as helper types implementing
-these interfaces, such as `XdrInt32`.  This option suppresses that
-default import.  This can be useful if you are importing another
-package that includes the boilerplate (see `-B`).
+:	goxdr by default imports `"github.com/xdrpp/goxdr/xdr"`, a module
+with boilerplate code to assist in marshaling and unmarshaling values,
+including code for interfaces such as `XDR` and `XdrNum32` as well as
+helper types implementing these interfaces (`XdrInt32`, `XdrUint32`,
+etc.).  This option suppresses that default import.  This can be
+useful if you are importing another package that includes the
+boilerplate (see `-B`).
 
 `-B`
 :	Causes goxdr to emit the boilerplate into its output instead of
