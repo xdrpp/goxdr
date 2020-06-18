@@ -141,7 +141,7 @@ func SendChan(t Transport, onErr func(uint32, error)) chan<- *Message {
 // You must create a Driver with NewDriver().  A new Driver will not
 // process messages until you call the Go() method.  On a server, you
 // will often want to call Go() in the main thread.  In a client, you
-// will need to invoke Go it in its own goroutine.
+// will need to invoke Go in its own goroutine.
 //
 // Between the time you create a Driver and the time you call its Go()
 // method, you may want to do any of the following to customize the

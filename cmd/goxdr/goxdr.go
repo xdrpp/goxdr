@@ -20,7 +20,7 @@ var progname string
 
 type emitter struct {
 	syms *rpc_syms
-	output strings.Builder
+	output *strings.Builder
 	footer strings.Builder
 	emitted map[string]struct{}
 	enum_comments bool
@@ -73,6 +73,15 @@ func parseXDR(out *rpc_syms, file string) {
 	yyParse(l)
 }
 
+func (e *emitter) push() (out *strings.Builder, pop func()) {
+	out = e.output
+	e.output = &strings.Builder{}
+	return out, func() {
+		out.WriteString(e.output.String())
+		e.output = out
+	}
+}
+
 func (e *emitter) done(typ string) bool {
 	if _, ok := e.emitted[typ]; ok {
 		return true
@@ -95,7 +104,7 @@ func (e *emitter) append(out interface{}) {
 }
 
 func (e *emitter) printf(str string, args ...interface{}) {
-	fmt.Fprintf(&e.output, str, args...)
+	fmt.Fprintf(e.output, str, args...)
 }
 
 func (e *emitter) xappend(out interface{}) {
@@ -603,7 +612,7 @@ skip:
 }
 
 func (r *rpc_struct) emit(e *emitter) {
-	out := &strings.Builder{}
+	out, pop := e.push()
 	if r.comment != "" {
 		fmt.Fprintf(out, "%s\n", r.comment)
 	}
@@ -614,8 +623,8 @@ func (r *rpc_struct) emit(e *emitter) {
 			e.decltypeb(r.id, &r.decls[i]))
 	}
 	fmt.Fprintf(out, "}\n")
-	e.append(out)
-	out.Reset()
+	pop()
+	out = &strings.Builder{}
 
 	fmt.Fprintf(out,
 `func (v *%[1]s) XdrPointer() interface{} { return v }
@@ -679,7 +688,7 @@ func (u *rpc_ufield) isVoid() bool {
 }
 
 func (r *rpc_union) emit(e *emitter) {
-	out := &strings.Builder{}
+	out, pop := e.push()
 	if r.comment != "" {
 		fmt.Fprintf(out, "%s\n", r.comment)
 	}
@@ -705,8 +714,8 @@ func (r *rpc_union) emit(e *emitter) {
 	fmt.Fprintf(out, "\t%s %s\n", r.tagid, r.tagtype)
 	fmt.Fprintf(out, "\t_u interface{}\n" +
 		"}\n")
-	e.append(out)
-	out.Reset()
+	pop()
+	out = &strings.Builder{}
 
 	uh := unionHelper {
 		castCases: e.lax_discriminants && !e.is_bool(r.tagtype),
@@ -1155,6 +1164,7 @@ func (c %[1]s) WithContext(ctx context.Context) %[2]s {
 func emitAll(syms *rpc_syms, comments bool, lax bool) string {
 	e := emitter{
 		syms: syms,
+		output: &strings.Builder{},
 		emitted: map[string]struct{}{},
 		enum_comments: comments,
 		lax_discriminants: lax,
