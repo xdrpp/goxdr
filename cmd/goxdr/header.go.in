@@ -207,6 +207,17 @@ type XdrAggregate interface {
 	XdrRecurse(XDR, string)
 }
 
+// A union type is an XdrAggregate with extra methods for individually
+// accessing the tag and active branch.
+type XdrUnion interface {
+	XdrAggregate
+	XdrValid() bool
+	XdrUnionTag() interface{}
+	XdrUnionTagName() string
+	XdrUnionBody() interface{}
+	XdrUnionBodyName() string
+}
+
 // Any pointer type is converted to an XdrType implementing the XdrPtr
 // interface for marshaling.  Note XdrPtr is a subtype of
 // XdrAggregate.  When a Marshal function does nothing special for
