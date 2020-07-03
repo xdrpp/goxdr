@@ -136,14 +136,17 @@ returns a mapping from numeric values to the names assigned to those
 values.
 
 XDR `union` types have an `XdrValid() bool` method that returns
-whether the discriminant is in a valid state.  For `union` types that
-are not valid by default, because go's default 0 value does not
-correspond to a valid discriminant, a method `XdrInitialize()` places
-them in a valid state.  Similarly, `enum` types that can't be
-statically verified to be valid with value 0 (either because no name
-is assigned to constant 0, or because names are assigned to constants
-in a different file), have an `XdrInitialize()` method that sets them
-to the first name in the `enum` definition.
+whether the discriminant is in a valid state.  If the `union` type
+does not have a default case, another method `XdrValidTags()
+map[uint32]bool` specifies the set of valid discriminant values.  For
+`union` types that are not valid by default, because go's default 0
+value does not correspond to a valid discriminant, a method
+`XdrInitialize()` places them in a valid state.  Similarly, `enum`
+types that can't be statically verified to be valid with value 0
+(either because no name is assigned to constant 0, or because names
+are assigned to constants in a different file), have an
+`XdrInitialize()` method that sets them to the first name in the
+`enum` definition.
 
 ## The XDR interface
 
@@ -205,53 +208,55 @@ many different types to be collapsed together.  Specifically, here is
 the type of `val` depending on what is being marshaled:
 
 * For bool and all 32-bit numeric types (including the size of
-  variable-length arrays), `val` is passed as a pointer implementing
-  `XdrNum32`, which allows the value to be extracted and set as a
-  `uint32`.
+variable-length arrays), `val` is passed as a pointer implementing
+`XdrNum32`, which allows the value to be extracted and set as a
+`uint32`.
 
 * For all 64-bit numeric types, `val` is passed as a pointer
-  implementing `XdrNum64`, which allows the value to be extracted and
-  set as a `uint64`.
+implementing `XdrNum64`, which allows the value to be extracted and
+set as a `uint64`.
 
 * For `struct` and `union` types, `val` is just a pointer to the type
-  being marshaled.  However, these types implement the `XdrAggregate`
-  interface, which allows the `Marshal` method of `XDR` to call the
-  `XdrRecurse(x XDR, name string)` method on `val` to recurse through
-  all fields of `val`.
+being marshaled.  However, these types implement the `XdrAggregate`
+interface, which allows the `Marshal` method of `XDR` to call the
+`XdrRecurse(x XDR, name string)` method on `val` to recurse through
+all fields of `val`.  `union` types also implement the `XdrUnion`
+interface.
 
 * `enum` types are also passed as a simple pointer to the underlying
-  field, but `enum` types implement `XdrNum32` instead of
-  `XdrAggregate`.
+field, but `enum` types implement `XdrNum32` instead of
+`XdrAggregate`.  They also implement the `XdrEnum` interface, which
+provides access to symbolic names via the `XdrEnumNames()
+map[int32]string` method.
 
 * Fixed-length arrays (other than `opaque[]`) are passed to `Marshal`
-  as a defined type implementing `XdrArray`.  Calling `XdrRecurse()`
-  on this defined type iterates over the array to marshal each element
-  individually.
+as a defined type implementing `XdrArray`.  Calling `XdrRecurse()` on
+this defined type iterates over the array to marshal each element
+individually.
 
 * Variable-length arrays (other than `opaque<>`) are passed first as a
-  pointer to a defined type implementing the `XdrVec` and
-  `XdrAggregate` interfaces.  If `Marshal` calls the `XdrRecurse`
-  function (as for a `struct` or `union`), it recurses, first calling
-  `Marshal` on a value of `XdrSize`, then on each element of the
-  vector.
+pointer to a defined type implementing the `XdrVec` and `XdrAggregate`
+interfaces.  If `Marshal` calls the `XdrRecurse` function (as for a
+`struct` or `union`), it recurses, first calling `Marshal` on a value
+of `XdrSize`, then on each element of the vector.
 
 * Similar to variable-length arrays, pointers use a defined type that
-  implements the `XdrPtr` and `XdrAggregate` interfaces.  When
-  recursing, `Marshal` is called first on another defined type that
-  implements the `XdrNum32` interface (capable of containing the value
-  0 or 1 to indicate nil or value-present), then, if the pointer is
-  non-nil, it calls `Marshal` on the underlying value.
+implements the `XdrPtr` and `XdrAggregate` interfaces.  When
+recursing, `Marshal` is called first on another defined type that
+implements the `XdrNum32` interface (capable of containing the value 0
+or 1 to indicate nil or value-present), then, if the pointer is
+non-nil, it calls `Marshal` on the underlying value.
 
 * `string` is passed as an `XdrString`, which also encodes the size
-  bound of the string and implements the `XdrVarBytes` and `XdrBytes`
-  interfaces.
+bound of the string and implements the `XdrVarBytes` and `XdrBytes`
+interfaces.
 
 * `opaque<>` is passed as an `XdrVecOpaque` structure, which also
-  implements the `XdrVarBytes` and `XdrBytes` interfaces.
+implements the `XdrVarBytes` and `XdrBytes` interfaces.
 
 * `opaque[]` is passed as an `XdrArrayOpaque` (user-defined slice type
-  pointing to the entire array).  This type implements `XdrBytes` but
-  not `XdrVarBytes`.
+pointing to the entire array).  This type implements `XdrBytes` but
+not `XdrVarBytes`.
 
 For most types, the original type or a pointer to it can be retrieved
 via the `XdrPointer()` and `XdrValue()` methods, which return an
@@ -277,7 +282,8 @@ cover all types, for instance `XdrNum32`, `XdrNum64`, `XdrBytes`, and
     XdrArray     T[n]
     XdrVec       T<n>
     XdrPtr       T*
-    XdrEnum      enums
+    XdrEnum      enum T
+    XdrUnion     union T
     XdrVarBytes  string<n>, opaque<n>
     XdrBytes     string<n>, opaque[n], opaque<n>
     XdrAggregate struct T, union T, T*, T<n>, T[n]

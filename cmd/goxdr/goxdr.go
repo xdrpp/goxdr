@@ -665,24 +665,6 @@ func (uh unionHelper) join(u *rpc_ufield) string {
 	return ret
 }
 
-/*
-func castCase(boolDiscriminant bool, v idval) string {
-	if boolDiscriminant {
-		return v.String()
-	}
-	return fmt.Sprintf("int32(%s)", v)
-}
-
-func (u *rpc_ufield) joinedCases(boolDiscriminant bool) string {
-	ret := castCase(boolDiscriminant, u.cases[0])
-	for i := 1; i < len(u.cases); i++ {
-		ret += ", "
-		ret += castCase(boolDiscriminant, u.cases[i])
-	}
-	return ret
-}
-*/
-
 func (u *rpc_ufield) isVoid() bool {
 	return u.decl.id.getx() == "" || u.decl.typ.getx() == "void"
 }
@@ -717,8 +699,24 @@ func (r *rpc_union) emit(e *emitter) {
 	pop()
 	out = &strings.Builder{}
 
+	isBoolTag := e.is_bool(r.tagtype)
 	uh := unionHelper {
-		castCases: e.lax_discriminants && !e.is_bool(r.tagtype),
+		castCases: e.lax_discriminants && !isBoolTag,
+	}
+
+	if !r.hasdefault {
+		fmt.Fprintf(out, "var _XdrTags_%s = map[uint32]bool{\n", r.id)
+		for i := range r.fields {
+			u := &r.fields[i]
+			for j := range u.cases {
+				fmt.Fprintf(out, "\tXdrToU32(%s): true,\n", u.cases[j])
+			}
+		}
+		fmt.Fprintf(out, "}\n")
+		fmt.Fprintf(out, `func (_ %[1]s) XdrValidTags() map[uint32]bool {
+	return _XdrTags_%[1]s
+}
+`, r.id)
 	}
 
 	var discriminant string

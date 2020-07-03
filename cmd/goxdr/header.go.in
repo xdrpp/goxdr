@@ -133,6 +133,30 @@ const (
 	FALSE = false
 )
 
+// Unfortunately, you can't cast a bool to an int.  Hence, in
+// situations like a union discriminant where we don't know if a type
+// is equivalent to bool or not, then, short of using reflection, this
+// is how we have to convert to an integer.  Note that this expects
+// types int, [u]int32, enum, and bool, rather than pointers to these
+// types.
+func XdrToU32(i interface{}) uint32 {
+	switch v := i.(type) {
+	case interface{ GetU32() uint32 }:
+		return v.GetU32()
+	case int32:
+		return uint32(v)
+	case uint32:
+		return v
+	case int:
+		return uint32(v)
+	case bool:
+		if v {
+			return 1
+		}
+		return 0
+	}
+	panic(XdrError(fmt.Sprintf("XdrToU32: bad type %T", i)))
+}
 
 //
 // User-defined types used to place methods on basic types
@@ -671,6 +695,11 @@ func (xi XdrIn) Marshal(name string, i XdrType) {
 	}
 }
 
+
+//
+// RFC5531 RPC support
+//
+
 // Interface for a data structure containing the argument and result
 // types of a call.
 type XdrProc interface {
@@ -686,7 +715,7 @@ type XdrProc interface {
 
 // Interface for a data structure containing argument and results of a
 // procedure plus a way to invoke the procedure on an instance of the
-// RPC version.  In other words, Do() actuall performs the work of an
+// RPC version.  In other words, Do() actually performs the work of an
 // RPC on the server side.
 type XdrSrvProc interface {
 	XdrProc
