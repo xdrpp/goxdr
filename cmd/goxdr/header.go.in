@@ -42,6 +42,10 @@ package main
 // * For arrays, XdrValue() passes a slice, rather than the full
 // array, so as to avoid copying the array.
 type XdrType interface {
+	// Return a string describing the name of the type (which will
+	// reflect the name of a typedef).
+	XdrTypeName() string
+
 	// Return the underlying native representation of an XdrType
 	// (e.g., int32 for an XdrInt32).
 	XdrValue() interface{}
@@ -304,13 +308,17 @@ func XdrSymChar(r rune) bool {
 // An XdrType that marshals as zero bytes, and hence is used to
 // represent void argument and return types of functions.
 type XdrVoid struct{}
+type XdrType_void = XdrVoid
+func (XdrVoid) XdrTypeName() string { return "void" }
 func (XdrVoid) XdrValue() interface{} { return nil }
 func (XdrVoid) XdrPointer() interface{} { return nil }
 func (XdrVoid) XdrMarshal(XDR, string) {}
-func XDR_XdrVoid(v *XdrVoid) *XdrVoid { return v }
+func XDR_XdrVoid(v XdrVoid) XdrType_void { return v }
 
 // The XdrType that bool gets turned into for marshaling.
 type XdrBool bool
+type XdrType_bool = *XdrBool
+func (XdrBool) XdrTypeName() string { return "bool" }
 func (v XdrBool) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrBool) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -334,6 +342,8 @@ func XDR_bool(v *bool) *XdrBool { return (*XdrBool)(v) }
 
 // The XdrType that int gets converted to for marshaling.
 type XdrInt32 int32
+type XdrType_int32 = *XdrInt32
+func (XdrInt32) XdrTypeName() string { return "int32" }
 func (v XdrInt32) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrInt32) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -348,6 +358,8 @@ func XDR_int32(v *int32) *XdrInt32 { return (*XdrInt32)(v) }
 
 // The XdrType that unsigned int gets converted to for marshaling.
 type XdrUint32 uint32
+type XdrType_uint32 = *XdrUint32
+func (XdrUint32) XdrTypeName() string { return "uint32" }
 func (v XdrUint32) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrUint32) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -362,6 +374,8 @@ func XDR_uint32(v *uint32) *XdrUint32 { return (*XdrUint32)(v) }
 
 // The XdrType that float gets converted to for marshaling.
 type XdrFloat32 float32
+type XdrType_float32 = *XdrFloat32
+func (XdrFloat32) XdrTypeName() string { return "float32" }
 func (v XdrFloat32) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrFloat32) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -405,6 +419,7 @@ func (v *XdrSize) SetU32(nv uint32) {
 	}
 	v.Size = nv
 }
+func (XdrSize) XdrTypeName() string { return "len" }
 func (v *XdrSize) XdrPointer() interface{} { return &v.Size }
 func (v XdrSize) XdrValue() interface{} { return v.Size }
 func (v *XdrSize) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -412,6 +427,8 @@ func (v XdrSize) XdrBound() uint32 { return v.Bound }
 
 // The XdrType that hyper gets converted to for marshaling.
 type XdrInt64 int64
+type XdrType_int64 = *XdrInt64
+func (XdrInt64) XdrTypeName() string { return "int64" }
 func (v XdrInt64) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrInt64) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -426,6 +443,8 @@ func XDR_int64(v *int64) *XdrInt64 { return (*XdrInt64)(v) }
 
 // The XdrType that unsigned hyper gets converted to for marshaling.
 type XdrUint64 uint64
+type XdrType_uint64 = *XdrUint64
+func (XdrUint64) XdrTypeName() string { return "uint64" }
 func (v XdrUint64) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrUint64) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -440,6 +459,8 @@ func XDR_uint64(v *uint64) *XdrUint64 { return (*XdrUint64)(v) }
 
 // The XdrType that double gets converted to for marshaling.
 type XdrFloat64 float64
+type XdrType_float64 = *XdrFloat64
+func (XdrFloat64) XdrTypeName() string { return "float64" }
 func (v XdrFloat64) String() string { return fmt.Sprintf("%v", v.XdrValue()) }
 func (v *XdrFloat64) Scan(ss fmt.ScanState, r rune) error {
 	_, err := fmt.Fscanf(ss, string([]rune{'%', r}), v.XdrPointer())
@@ -486,6 +507,7 @@ func (v XdrString) SetByteSlice(bs []byte) {
 	}
 	*v.Str = string(bs)
 }
+func (XdrString) XdrTypeName() string { return "string" }
 func (v XdrString) XdrPointer() interface{} { return v.Str }
 func (v XdrString) XdrValue() interface{} { return *v.Str }
 func (v XdrString) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -514,6 +536,7 @@ func (v XdrVecOpaque) SetByteSlice(bs []byte) {
 	}
 	*v.Bytes = bs
 }
+func (XdrVecOpaque) XdrTypeName() string { return "opaque<>" }
 func (v XdrVecOpaque) XdrPointer() interface{} { return v.Bytes }
 func (v XdrVecOpaque) XdrValue() interface{} { return *v.Bytes }
 func (v XdrVecOpaque) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -521,6 +544,7 @@ func (v XdrVecOpaque) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 // The XdrType that opaque[] gets turned into when marahaling.
 type XdrArrayOpaque []byte
 func (v XdrArrayOpaque) GetByteSlice() []byte { return ([]byte)(v) }
+func (XdrArrayOpaque) XdrTypeName() string { return "opaque[]" }
 func (v XdrArrayOpaque) XdrValue() interface{} { return v }
 func (v XdrArrayOpaque) XdrPointer() interface{} { return nil }
 func (v XdrArrayOpaque) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }

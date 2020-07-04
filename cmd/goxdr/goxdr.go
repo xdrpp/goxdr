@@ -212,6 +212,7 @@ func (v _ptrflag_$TYPE) SetU32(nv uint32) {
 		XdrPanic("*$TYPE present flag value %d should be 0 or 1", nv)
 	}
 }
+func (_ptrflag_$TYPE) XdrTypeName() string { return "$TYPE?" }
 func (v _ptrflag_$TYPE) XdrPointer() interface{} { return nil }
 func (v _ptrflag_$TYPE) XdrValue() interface{} { return v.GetU32() != 0 }
 func (v _ptrflag_$TYPE) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -234,6 +235,7 @@ func (v $PTR) XdrRecurse(x XDR, name string) {
 	x.Marshal(name, _ptrflag_$TYPE(v))
 	v.XdrMarshalValue(x, name)
 }
+func ($PTR) XdrTypeName() string { return "$TYPE*" }
 func (v $PTR) XdrPointer() interface{} { return v.p }
 func (v $PTR) XdrValue() interface{} { return *v.p }
 `
@@ -355,6 +357,7 @@ func (v *$VEC) XdrRecurse(x XDR, name string) {
 	x.Marshal(name, &size)
 	v.XdrMarshalN(x, name, size.Size)
 }
+func ($VEC) XdrTypeName() string { return "$TYPE<>" }
 func (v *$VEC) XdrPointer() interface{} { return (*[]$TYPE)(v) }
 func (v $VEC) XdrValue() interface{} { return ([]$TYPE)(v) }
 func (v *$VEC) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -388,6 +391,7 @@ func (v *$VEC) XdrRecurse(x XDR, name string) {
 	}
 }
 func (v *$VEC) XdrPointer() interface{} { return (*[$BOUND]$TYPE)(v) }
+func ($VEC) XdrTypeName() string { return "$TYPE[]" }
 func (v *$VEC) XdrValue() interface{} { return v[:] }
 func (v *$VEC) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 `
@@ -456,12 +460,13 @@ func (r0 *rpc_typedef) emit(e *emitter) {
 	}
 	e.printf("type %s = %s\n", r.id, e.decltypeb(gid(""), r))
 	e.xprintf(
-`type _XdrTypedef_%[1]s struct {
+`type XdrType_%[1]s struct {
 	p *%[1]s
 }
-func (v _XdrTypedef_%[1]s) XdrPointer() interface{} { return v.p }
-func (v _XdrTypedef_%[1]s) XdrValue() interface{} { return *v.p }
-func (v _XdrTypedef_%[1]s) XdrMarshal(x XDR, name string) {
+func (v XdrType_%[1]s) XdrPointer() interface{} { return v.p }
+func (XdrType_%[1]s) XdrTypeName() string { return "%[1]s" }
+func (v XdrType_%[1]s) XdrValue() interface{} { return *v.p }
+func (v XdrType_%[1]s) XdrMarshal(x XDR, name string) {
 	if xs, ok := x.(interface{
 		Marshal_%[1]s(string, *%[1]s)
 	}); ok {
@@ -469,8 +474,8 @@ func (v _XdrTypedef_%[1]s) XdrMarshal(x XDR, name string) {
 	} else {
 	%[2]s	}
 }
-func XDR_%[1]s(v *%[1]s) _XdrTypedef_%[1]s {
-	return _XdrTypedef_%[1]s{ v }
+func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
+	return XdrType_%[1]s{ v }
 }
 `, r.id, e.xdrgen("v.p", "name", gid(""), r))
 }
@@ -578,8 +583,10 @@ func (v *%[1]s) Scan(ss fmt.ScanState, _ rune) error {
 func (v %[1]s) GetU32() uint32 { return uint32(v) }
 func (v *%[1]s) SetU32(n uint32) { *v = %[1]s(n) }
 func (v *%[1]s) XdrPointer() interface{} { return v }
+func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
 func (v *%[1]s) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
+type XdrType_%[1]s = *%[1]s
 func XDR_%[1]s(v *%[1]s) *%[1]s { return v }
 `, r.id)
 
@@ -627,7 +634,9 @@ func (r *rpc_struct) emit(e *emitter) {
 	out = &strings.Builder{}
 
 	fmt.Fprintf(out,
-`func (v *%[1]s) XdrPointer() interface{} { return v }
+`type XdrType_%[1]s = *%[1]s
+func (v *%[1]s) XdrPointer() interface{} { return v }
+func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
 func (v *%[1]s) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 func (v *%[1]s) XdrRecurse(x XDR, name string) {
@@ -847,7 +856,9 @@ func (r *rpc_union) emit(e *emitter) {
 	fmt.Fprintf(out, "}\n")
 
 	fmt.Fprintf(out,
-`func (v *%[1]s) XdrPointer() interface{} { return v }
+`type XdrType_%[1]s = *%[1]s
+func (v *%[1]s) XdrPointer() interface{} { return v }
+func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
 func (v *%[1]s) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 func (u *%[1]s) XdrRecurse(x XDR, name string) {
@@ -929,6 +940,7 @@ func (e *emitter) getArgType(p *rpc_proc) string {
 	e.xprintf("}\n")
 	e.xprintf(
 `func (v *%[1]s) XdrPointer() interface{} { return v }
+func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
 func (v *%[1]s) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 func (v *%[1]s) XdrRecurse(x XDR, name string) {
