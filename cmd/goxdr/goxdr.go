@@ -115,7 +115,7 @@ func (e *emitter) xappend(out interface{}) {
 	case fmt.Stringer:
 		s = t.String()
 	default:
-		panic("emitter append non-String")
+		panic("emitter xappend non-String")
 	}
 	e.footer.WriteString(s)
 }
@@ -124,6 +124,11 @@ func (e *emitter) xprintf(str string, args ...interface{}) {
 	fmt.Fprintf(&e.footer, str, args...)
 }
 
+// Return the base type name of a declaration in go (without any
+// pointer/array qualifiers).  For normally declared types. this is
+// just the capitalized identifier of the type.  For inline struct and
+// union declarations, this emits the declaration of the inline type
+// and gives it a unique name starting "XdrAnon_".
 func (e *emitter) get_typ(context idval, d *rpc_decl) idval {
 	if d.typ.getgo() == "" {
 		d.typ.setlocal(xdrinline(context.getgo()) + "_" + d.id.getgo())
@@ -133,6 +138,7 @@ func (e *emitter) get_typ(context idval, d *rpc_decl) idval {
 	return d.typ
 }
 
+// The native go type corresponding to a declared XDR type.
 func (e *emitter) decltype(context idval, d *rpc_decl) string {
 	typ := e.get_typ(context, d)
 	switch d.qual {
@@ -149,9 +155,11 @@ func (e *emitter) decltype(context idval, d *rpc_decl) string {
 	}
 }
 
-// With line-ending comment showing bound
+// Like decltype but with line-ending comment showing bound for
+// strings and vectors.
 func (e *emitter) decltypeb(context idval, d *rpc_decl) string {
 	ret := e.decltype(context, d)
+	// recall: a string rpc_decl has qual SCALAR but may have a bound
 	if (d.qual == VEC || d.typ.getgo() == "string") && d.bound.getgo() != "" {
 		return fmt.Sprintf("%s // bound %s", ret, d.bound.getgo())
 	}
@@ -243,26 +251,6 @@ func (v $PTR) XdrValue() interface{} { return *v.p }
 	frag = strings.Replace(frag, "$TYPE", typ.getgo(), -1)
 	e.footer.WriteString(frag)
 	return ptrtyp
-}
-
-func (e *emitter) is_bool(t idval) bool {
-	for {
-		if t.getx() == "bool" {
-			return true
-		} else if gg := t.getgo(); gg == "" || (gg[0] >= 'a' && gg[0] <= 'z') {
-			return false
-		}
-		s, ok := e.syms.SymbolMap[t.getx()]
-		if !ok {
-			return false
-		}
-		td, ok := s.(*rpc_typedef)
-		if !ok || td.qual != SCALAR || td.typ.getgo() == "" ||
-			td.inline_decl != nil {
-			return false
-		}
-		t = td.typ
-	}
 }
 
 // Return (bound, sbound) where bound is just the normalized bound,
@@ -402,47 +390,53 @@ func (v *$VEC) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 	return vectyp
 }
 
-func (e *emitter) xdrgen(target, name string, context idval,
-	d *rpc_decl) string {
-	typ := e.get_typ(context, d)
-	var frag string
-	switch d.qual {
-	case SCALAR:
-		if typ.getgo() == "string" {
-			frag = "\tx.Marshal($NAME, XdrString{$TARGET, $BOUND})\n"
-		} else {
-			frag = "\tXDR_$TYPE($TARGET).XdrMarshal(x, $NAME)\n"
-		}
-	case PTR:
-		ptrtype := e.gen_ptr(typ)
-		frag = fmt.Sprintf("\tx.Marshal($NAME, %s{$TARGET})\n", ptrtype)
-	case ARRAY:
-		if typ.getgo() == "byte" {
-			frag = "\tx.Marshal($NAME, XdrArrayOpaque((*$TARGET)[:]))\n"
-			break
-		}
-		vectyp := e.gen_array(typ, d.bound)
-		frag = fmt.Sprintf("\tx.Marshal($NAME, (*%s)($TARGET))\n", vectyp)
-	case VEC:
-		if typ.getgo() == "byte" {
-			frag = "\tx.Marshal($NAME, XdrVecOpaque{$TARGET, $BOUND})\n"
-			break
-		}
-		vectyp := e.gen_vec(typ, d.bound)
-		frag = fmt.Sprintf("\tx.Marshal($NAME, (*%s)($TARGET))\n", vectyp)
+func deref(ptr string) string {
+	if len(ptr) > 0 && ptr[0] == '&' {
+		return ptr[1:]
 	}
+	return "*" + ptr
+}
+
+// Convert expression `target` into an XdrType of type type declared
+// by `d`.  The `context` argument is the name of the surrounding
+// structure, so as to generate unique names for inline struct and
+// union declarations.
+func (e *emitter) xdrval(target string, context idval, d *rpc_decl) string {
+	typ := e.get_typ(context, d)
 	normbound := d.bound.getgo()
 	if normbound == "" {
 		normbound = "0xffffffff"
 	}
-	if len(target) >= 1 && target[0] == '&' {
-		frag = strings.Replace(frag, "*$TARGET", target[1:], -1)
+	if typ.getgo() == "string" {
+		return fmt.Sprintf("XdrString{%s, %s}", target, normbound)
+	} else if typ.getgo() == "byte" {
+		if d.qual == VEC {
+			return fmt.Sprintf("XdrVecOpaque{%s, %s}", target, normbound)
+		}
+		return fmt.Sprintf("XdrArrayOpaque((%s)[:])", deref(target))
 	}
-	frag = strings.Replace(frag, "$TARGET", target, -1)
-	frag = strings.Replace(frag, "$NAME", name, -1)
-	frag = strings.Replace(frag, "$BOUND", normbound, -1)
-	frag = strings.Replace(frag, "$TYPE", typ.getgo(), -1)
-	return frag
+	switch d.qual {
+	case SCALAR:
+		return fmt.Sprintf("XDR_%s(%s)", typ, target)
+	case PTR:
+		return fmt.Sprintf("%s{%s}", e.gen_ptr(typ), target)
+	case ARRAY:
+		return fmt.Sprintf("(*%s)(%s)", e.gen_array(typ, d.bound), target)
+	case VEC:
+		return fmt.Sprintf("(*%s)(%s)", e.gen_vec(typ, d.bound), target)
+	}
+	panic("xdrval: bad qual")
+}
+
+func (e *emitter) xdrgen(target, name string, context idval,
+	d *rpc_decl) string {
+	if d.qual == SCALAR && d.typ.getgo() != "string" {
+		// XXX - for typedefs
+		return fmt.Sprintf("\t%s.XdrMarshal(x, %s)\n",
+			e.xdrval(target, context, d), name)
+	}
+	return fmt.Sprintf("\tx.Marshal(%s, %s)\n",
+		name, e.xdrval(target, context, d))
 }
 
 func (e *emitter) emit(sym rpc_sym) {
@@ -652,6 +646,28 @@ func (v *%[1]s) XdrRecurse(x XDR, name string) {
 	fmt.Fprintf(out, "}\n")
 	fmt.Fprintf(out, "func XDR_%[1]s(v *%[1]s) *%[1]s { return v }\n", r.id)
 	e.xappend(out)
+}
+
+// Return true if a symbol is bool or equivalent to bool through one
+// or more typedefs.
+func (e *emitter) is_bool(t idval) bool {
+	for {
+		if t.getx() == "bool" {
+			return true
+		} else if gg := t.getgo(); gg == "" || (gg[0] >= 'a' && gg[0] <= 'z') {
+			return false
+		}
+		s, ok := e.syms.SymbolMap[t.getx()]
+		if !ok {
+			return false
+		}
+		td, ok := s.(*rpc_typedef)
+		if !ok || td.qual != SCALAR || td.typ.getgo() == "" ||
+			td.inline_decl != nil {
+			return false
+		}
+		t = td.typ
+	}
 }
 
 type unionHelper struct {
