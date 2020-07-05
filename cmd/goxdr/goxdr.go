@@ -397,6 +397,30 @@ func deref(ptr string) string {
 	return "*" + ptr
 }
 
+// Return the type of the expression returned by xdrval
+func (e *emitter) xdrtype(context idval, d *rpc_decl) string {
+	typ := e.get_typ(context, d)
+	if typ.getgo() == "string" {
+		return "XdrString"
+	} else if typ.getgo() == "byte" {
+		if d.qual == VEC {
+			return "XdrVecOpaque"
+		}
+		return "XdrArrayOpaque"
+	}
+	switch d.qual {
+	case SCALAR:
+		return fmt.Sprintf("XdrType_%s", typ)
+	case PTR:
+		return e.gen_ptr(typ)
+	case ARRAY:
+		return e.gen_array(typ, d.bound)
+	case VEC:
+		return e.gen_vec(typ, d.bound)
+	}
+	panic("xdrtype: bad qual")
+}
+
 // Convert expression `target` into an XdrType of type type declared
 // by `d`.  The `context` argument is the name of the surrounding
 // structure, so as to generate unique names for inline struct and

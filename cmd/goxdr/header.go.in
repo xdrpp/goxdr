@@ -308,12 +308,12 @@ func XdrSymChar(r rune) bool {
 // An XdrType that marshals as zero bytes, and hence is used to
 // represent void argument and return types of functions.
 type XdrVoid struct{}
-type XdrType_void = XdrVoid
+type XdrType_void = *XdrVoid
 func (XdrVoid) XdrTypeName() string { return "void" }
 func (XdrVoid) XdrValue() interface{} { return nil }
 func (XdrVoid) XdrPointer() interface{} { return nil }
 func (XdrVoid) XdrMarshal(XDR, string) {}
-func XDR_XdrVoid(v XdrVoid) XdrType_void { return v }
+func XDR_XdrVoid(v *XdrVoid) XdrType_void { return v }
 
 // The XdrType that bool gets turned into for marshaling.
 type XdrBool bool
