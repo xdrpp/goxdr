@@ -25,18 +25,19 @@ map to arrays, and variable-length arrays map to slices, without new
 type declarations that might complicate assignment.  E.g., the XDR
 `typedef string mystring<32>` is just a string, and so can be assigned
 from a string.  This does mean you can assign a string longer than 32
-bytes, but length limits are rigorously enforced during both
-marshaling and unmarshaling.
+bytes, but length limits are enforced during both marshaling and
+unmarshaling.
 
 In order to facilitate uniform handling of marshalable types, every
 underlying type has a corresponding type implementing the interface
-`XdrType`.  For type T, this type is returned by the function
-`XDR_T(*T)`.  With structs, unions, and enums, `XDR_T` is just the
-identity function, because *T already implements `XdrType`.  For other
-types, the compiler generates an auxiliary type.  The auxiliary type
-allows array and string limits to be conveyed, and also implements
-the methods of `XdrType` (since built-in types such as `bool` and
-`int32` cannot have methods).
+`XdrType`.  For type T, this type is given by a type alias
+`XdrType_T`, and the value can be update from the function `XDR_T(*T)
+XdrType_T`.  With structs, unions, and enums, `XDR_T` is just the
+identity function, because `XdrType_T` is just `*T`.  For other types,
+the compiler generates an auxiliary type.  The auxiliary type allows
+array and string limits to be conveyed, and also implements the
+methods of `XdrType` (since built-in types such as `bool` and `int32`
+cannot have methods).
 
 ## Type representations
 
@@ -65,7 +66,25 @@ cannot be `opaque` or `string` in this table):
     T[n]            [n]T          for any XDR type T
 
 Each XDR `typedef` is compiled to a go type alias (`type Alias =
-Original`).
+Original`).  However, each has its own `XdrType`.  Hence, if your code
+specifies:
+
+~~~~{.c}
+typedef int meters;
+typedef int seconds;
+~~~~
+
+which compiles to
+
+~~~~{.go}
+type Meters = int32
+type Seconds = int32
+~~~~
+
+you can treat instances of each specially in your marshaling function
+by testing for type `XdrType_Meters` or `XdrType_Seconds`.  You can
+also use the `XdrTypeName()string` method to obtain the string
+"Meters" or "Seconds."
 
 Each XDR `enum` declaration compiles to a defined type whose
 representation is an `int32`.  The constants of the enum are defined
@@ -270,11 +289,9 @@ array).
 
 The `XdrTypeName()` method returns a string describing the underlying
 type as declared in the XDR file, including any `typedef` aliases
-used.  Hence, this method can be used to determine which of several
-`typedef` names have been used to declare the same underlying go type.
-The typename may have a suffice of "*", "?", "<>", or "[]" to indicate
-pointers, the boolean associated with a pointer, a variable-length
-array, and a fixed-length array, respectively.
+used.  The string returned may have a suffix of "*", "?", "<>", or
+"[]" to indicate pointers, the boolean associated with a pointer, a
+variable-length array, and a fixed-length array, respectively.
 
 The table below summarizes the (overlapping) interfaces implemented by
 types passed to `Marshal` functions, where `T` stands for a complete
