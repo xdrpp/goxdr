@@ -133,23 +133,23 @@ const (
 // is how we have to convert to an integer.  Note that this expects
 // types int, [u]int32, enum, and bool, rather than pointers to these
 // types.
-func XdrToU32(i interface{}) uint32 {
+func XdrToI32(i interface{}) int32 {
 	switch v := i.(type) {
 	case interface{ GetU32() uint32 }:
-		return v.GetU32()
+		return int32(v.GetU32())
 	case int32:
-		return uint32(v)
-	case uint32:
 		return v
+	case uint32:
+		return int32(v)
 	case int:
-		return uint32(v)
+		return int32(v)
 	case bool:
 		if v {
 			return 1
 		}
 		return 0
 	}
-	panic(XdrError(fmt.Sprintf("XdrToU32: bad type %T", i)))
+	panic(XdrError(fmt.Sprintf("XdrToI32: bad type %T", i)))
 }
 
 //
@@ -230,6 +230,7 @@ type XdrAggregate interface {
 type XdrUnion interface {
 	XdrAggregate
 	XdrValid() bool
+	XdrValidTags() map[int32]bool
 	XdrUnionTag() interface{}
 	XdrUnionTagName() string
 	XdrUnionBody() interface{}

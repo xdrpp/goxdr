@@ -35,7 +35,7 @@ depend: always
 
 RECURSE = for dir in $(CMDS); do cd cmd/$$dir && $(MAKE) $@; done
 
-test: always
+test: always $(BUILT_SOURCES)
 	go test -v ./rpc
 	$(RECURSE)
 

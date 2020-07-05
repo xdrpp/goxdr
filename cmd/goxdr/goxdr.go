@@ -773,15 +773,15 @@ func (r *rpc_union) emit(e *emitter) {
 	}
 
 	if !r.hasdefault {
-		fmt.Fprintf(out, "var _XdrTags_%s = map[uint32]bool{\n", r.id)
+		fmt.Fprintf(out, "var _XdrTags_%s = map[int32]bool{\n", r.id)
 		for i := range r.fields {
 			u := &r.fields[i]
 			for j := range u.cases {
-				fmt.Fprintf(out, "\tXdrToU32(%s): true,\n", u.cases[j])
+				fmt.Fprintf(out, "\tXdrToI32(%s): true,\n", u.cases[j])
 			}
 		}
 		fmt.Fprintf(out, "}\n")
-		fmt.Fprintf(out, `func (_ %[1]s) XdrValidTags() map[uint32]bool {
+		fmt.Fprintf(out, `func (_ %[1]s) XdrValidTags() map[int32]bool {
 	return _XdrTags_%[1]s
 }
 `, r.id)
