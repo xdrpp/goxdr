@@ -288,6 +288,21 @@ type XdrArray interface {
 	XdrArraySize() uint32
 }
 
+type XdrTypedef interface {
+	XdrType
+	XdrUnwrap() XdrType
+}
+
+func XdrBaseType(v XdrType) XdrType {
+	for {
+		t, ok := v.(XdrTypedef)
+		if !ok {
+			return v
+		}
+		v = t.XdrUnwrap()
+	}
+}
+
 // Returns true for A-Z, a-z, 0-9, and _.  (Used by the generated code
 // that implements Scanner for enums.)
 func XdrSymChar(r rune) bool {

@@ -479,6 +479,11 @@ func (r0 *rpc_typedef) emit(e *emitter) {
 		e.printf("%s\n", r.comment)
 	}
 	e.printf("type %s = %s\n", r.id, e.decltypeb(gid(""), r))
+	innerxdrtype := e.xdrtype(gid(""), r)
+	unwrap := innerxdrtype
+	if len(unwrap) > 0 && unwrap[0] == '*' {
+		unwrap = unwrap[1:]
+	}
 	e.xprintf(
 `type XdrType_%[1]s struct {
 	%[2]s
@@ -487,7 +492,8 @@ func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
 	return XdrType_%[1]s{%[3]s}
 }
 func (XdrType_%[1]s) XdrTypeName() string { return "%[1]s" }
-`, r.id, e.xdrtype(gid(""), r), e.xdrval("v", gid(""), r))
+func (v XdrType_%[1]s) XdrUnwrap() XdrType { return v.%[4]s }
+`, r.id, innerxdrtype, e.xdrval("v", gid(""), r), unwrap)
 /*
 // Removed this feature because XdrPointer can't work with XdrArrayOpaque
 func (v XdrType_%[1]s) XdrMarshal(x XDR, name string) {
