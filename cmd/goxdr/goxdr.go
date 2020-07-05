@@ -454,11 +454,13 @@ func (e *emitter) xdrval(target string, context idval, d *rpc_decl) string {
 
 func (e *emitter) xdrgen(target, name string, context idval,
 	d *rpc_decl) string {
+/*
 	if d.qual == SCALAR && d.typ.getgo() != "string" {
 		// XXX - for typedefs
 		return fmt.Sprintf("\t%s.XdrMarshal(x, %s)\n",
 			e.xdrval(target, context, d), name)
 	}
+*/
 	return fmt.Sprintf("\tx.Marshal(%s, %s)\n",
 		name, e.xdrval(target, context, d))
 }

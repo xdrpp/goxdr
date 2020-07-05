@@ -48,8 +48,7 @@ attractive alternative to other go XDR compilers for many situations:
 
 * Traversal can special-case particular typdefs.  Even though typedefs
   are compiled to type aliases, their `XDR` functions return types
-  that check for alias-name-specific marshaling methods that can
-  differentiate treatment of identical go types.
+  that return the type name used via the `XdrTypeName()string` method.
 
 * An option to make comments on enum constants available at runtime
   allows you to specify things like human-readable error messages for
