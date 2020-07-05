@@ -293,6 +293,7 @@ type XdrTypedef interface {
 	XdrUnwrap() XdrType
 }
 
+// Unwrap typedefs to obtain the underlying XdrType.
 func XdrBaseType(v XdrType) XdrType {
 	for {
 		t, ok := v.(XdrTypedef)
@@ -546,27 +547,24 @@ func (v XdrVecOpaque) XdrPointer() interface{} { return v.Bytes }
 func (v XdrVecOpaque) XdrValue() interface{} { return *v.Bytes }
 func (v XdrVecOpaque) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 
-// The XdrType that opaque[] gets turned into when marahaling.
-type XdrArrayOpaque []byte
-func (v XdrArrayOpaque) GetByteSlice() []byte { return ([]byte)(v) }
-func (XdrArrayOpaque) XdrTypeName() string { return "opaque[]" }
-func (v XdrArrayOpaque) XdrValue() interface{} { return v }
-func (v XdrArrayOpaque) XdrPointer() interface{} { return nil }
-func (v XdrArrayOpaque) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
-func (v XdrArrayOpaque) String() string { return fmt.Sprintf("%x", []byte(v)) }
-func (v XdrArrayOpaque) Scan(ss fmt.ScanState, _ rune) error {
+// Helper function for scanning fix-size opaque arrays.
+func XdrArrayOpaqueScan(dest []byte, ss fmt.ScanState, _ rune) error {
 	var bs []byte
 	_, err := fmt.Fscanf(ss, "%x", &bs)
 	if err != nil {
 		return err
-	} else if len(bs) != len (v) {
+	} else if len(bs) != len (dest) {
 		return XdrError("Wrong number of bytes when scanning opaque[]")
 	}
-	copy(([]byte)(v), bs)
+	copy(dest, bs)
 	return nil
 }
 
-var _, _, _ fmt.Scanner = XdrString{}, XdrVecOpaque{}, XdrArrayOpaque{}
+// The interface of XdrTypes of opaque[n] for all n
+type XdrArrayOpaque interface {
+	XdrBytes
+	XdrArraySize() uint32
+}
 
 
 //

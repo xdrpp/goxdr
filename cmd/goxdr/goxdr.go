@@ -390,11 +390,32 @@ func (v *$VEC) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
 	return vectyp
 }
 
-func deref(ptr string) string {
-	if len(ptr) > 0 && ptr[0] == '&' {
-		return ptr[1:]
+func (e *emitter) gen_array_opaque(bound0 idval) string {
+	bound, _ := e.get_bound(bound0)
+	vectyp := "_XdrArray_" + bound + "_opaque"
+	if e.done(vectyp) {
+		return vectyp
 	}
-	return "*" + ptr
+	frag :=
+`type $VEC [$BOUND]byte
+func (v *$VEC) GetByteSlice() []byte { return v[:] }
+func (v *$VEC) XdrTypeName() string { return "opaque[]" }
+func (v *$VEC) XdrValue() interface{} { return v[:] }
+func (v *$VEC) XdrPointer() interface{} { return (*[$BOUND]byte)(v) }
+func (v *$VEC) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
+func (v *$VEC) String() string { return fmt.Sprintf("%x", v[:]) }
+func (v *$VEC) Scan(ss fmt.ScanState, c rune) error {
+	return XdrArrayOpaqueScan(v[:], ss, c)
+}
+func ($VEC) XdrArraySize() uint32 {
+	const bound uint32 = $BOUND // Force error if not const or doesn't fit
+	return bound
+}
+`
+	frag = strings.Replace(frag, "$VEC", vectyp, -1)
+	frag = strings.Replace(frag, "$BOUND", bound, -1)
+	e.footer.WriteString(frag)
+	return vectyp
 }
 
 // Return the type of the expression returned by xdrval
@@ -406,7 +427,7 @@ func (e *emitter) xdrtype(context idval, d *rpc_decl) string {
 		if d.qual == VEC {
 			return "XdrVecOpaque"
 		}
-		return "XdrArrayOpaque"
+		return "*" + e.gen_array_opaque(d.bound)
 	}
 	switch d.qual {
 	case SCALAR:
@@ -437,7 +458,7 @@ func (e *emitter) xdrval(target string, context idval, d *rpc_decl) string {
 		if d.qual == VEC {
 			return fmt.Sprintf("XdrVecOpaque{%s, %s}", target, normbound)
 		}
-		return fmt.Sprintf("XdrArrayOpaque((%s)[:])", deref(target))
+		return fmt.Sprintf("(*%s)(%s)", e.gen_array_opaque(d.bound), target)
 	}
 	switch d.qual {
 	case SCALAR:
@@ -494,18 +515,6 @@ func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
 func (XdrType_%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v XdrType_%[1]s) XdrUnwrap() XdrType { return v.%[4]s }
 `, r.id, innerxdrtype, e.xdrval("v", gid(""), r), unwrap)
-/*
-// Removed this feature because XdrPointer can't work with XdrArrayOpaque
-func (v XdrType_%[1]s) XdrMarshal(x XDR, name string) {
-	if xs, ok := x.(interface{
-		Marshal_%[1]s(string, *%[1]s)
-	}); ok {
-		xs.Marshal_%[1]s(name, v.XdrPointer().(*%[1]s))
-	} else {
-		x.Marshal(name, v)
-	}
-}
-*/
 }
 
 func normalize_comment(comment string) string {
