@@ -171,6 +171,7 @@ following interface:
 
 ~~~~{.go}
 type XdrType interface {
+	XdrTypeName() string
 	XdrValue() interface{}
 	XdrPointer() interface{}
 	XdrMarshal(XDR, string)
@@ -267,6 +268,14 @@ supports `XdrValue()`, but returns `nil` from `XdrPointer()`), and
 arrays (for which `XdrValue()` returns a slice, to avoid copying the
 array).
 
+The `XdrTypeName()` method returns a string describing the underlying
+type as declared in the XDR file, including any `typedef` aliases
+used.  Hence, this method can be used to determine which of several
+`typedef` names have been used to declare the same underlying go type.
+The typename may have a suffice of "*", "?", "<>", or "[]" to indicate
+pointers, the boolean associated with a pointer, a variable-length
+array, and a fixed-length array, respectively.
+
 The table below summarizes the (overlapping) interfaces implemented by
 types passed to `Marshal` functions, where `T` stands for a complete
 standalone XDR type (so not `string` or `opaque`).  Basic marshaling
@@ -342,12 +351,8 @@ Note that while an XDR `Marshal` method can use a type switch to
 special-case certain types, this approach does not work for
 `typedefs`, which goxdr emits as type aliases rather than defined
 types---i.e. "`type Alias = Original`" rather than "`type Alias
-Original`".  However, the `XdrType` returned by `XDR_T` on type alises
-has an `XdrMarshal` method function that checks for a method called
-`x.Marshal_Alias(name string, v *Alias)` and calls it instead of
-`x.Marshal` if it exists, allowing code to differentiate type aliases.
-An example would be a pretty printer that prints type `time` in a
-special format where time is a typedefed `int` or `hyper`.
+Original`".  You must use `XdrTypeName()` do determine which name was
+used to declare a value.
 
 `XdrMarshal` methods panic with type `XdrError` (a user-defined
 string) if the input is invalid or a value is out of range.

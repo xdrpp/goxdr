@@ -414,9 +414,9 @@ func (e *emitter) xdrtype(context idval, d *rpc_decl) string {
 	case PTR:
 		return e.gen_ptr(typ)
 	case ARRAY:
-		return e.gen_array(typ, d.bound)
+		return "*" + e.gen_array(typ, d.bound)
 	case VEC:
-		return e.gen_vec(typ, d.bound)
+		return "*" + e.gen_vec(typ, d.bound)
 	}
 	panic("xdrtype: bad qual")
 }
@@ -479,23 +479,25 @@ func (r0 *rpc_typedef) emit(e *emitter) {
 	e.printf("type %s = %s\n", r.id, e.decltypeb(gid(""), r))
 	e.xprintf(
 `type XdrType_%[1]s struct {
-	p *%[1]s
+	%[2]s
 }
-func (v XdrType_%[1]s) XdrPointer() interface{} { return v.p }
+func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
+	return XdrType_%[1]s{%[3]s}
+}
 func (XdrType_%[1]s) XdrTypeName() string { return "%[1]s" }
-func (v XdrType_%[1]s) XdrValue() interface{} { return *v.p }
+`, r.id, e.xdrtype(gid(""), r), e.xdrval("v", gid(""), r))
+/*
+// Removed this feature because XdrPointer can't work with XdrArrayOpaque
 func (v XdrType_%[1]s) XdrMarshal(x XDR, name string) {
 	if xs, ok := x.(interface{
 		Marshal_%[1]s(string, *%[1]s)
 	}); ok {
-		xs.Marshal_%[1]s(name, v.p)
+		xs.Marshal_%[1]s(name, v.XdrPointer().(*%[1]s))
 	} else {
-	%[2]s	}
+		x.Marshal(name, v)
+	}
 }
-func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
-	return XdrType_%[1]s{ v }
-}
-`, r.id, e.xdrgen("v.p", "name", gid(""), r))
+*/
 }
 
 func normalize_comment(comment string) string {
