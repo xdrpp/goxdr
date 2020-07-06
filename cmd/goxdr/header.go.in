@@ -231,9 +231,9 @@ type XdrUnion interface {
 	XdrAggregate
 	XdrValid() bool
 	XdrValidTags() map[int32]bool
-	XdrUnionTag() interface{}
+	XdrUnionTag() XdrNum32
 	XdrUnionTagName() string
-	XdrUnionBody() interface{}
+	XdrUnionBody() XdrType
 	XdrUnionBodyName() string
 }
 

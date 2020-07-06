@@ -867,12 +867,12 @@ func (r *rpc_union) emit(e *emitter) {
 	}
 	fmt.Fprintf(out, "}\n")
 
-	fmt.Fprintf(out, "func (u *%s) XdrUnionTag() interface{} {\n" +
-		"\treturn &u.%s\n}\n", r.id, r.tagid)
+	fmt.Fprintf(out, "func (u *%s) XdrUnionTag() XdrNum32 {\n" +
+		"\treturn XDR_%s(&u.%s)\n}\n", r.id, r.tagtype, r.tagid)
 	fmt.Fprintf(out, "func (u *%s) XdrUnionTagName() string {\n" +
 		"\treturn \"%s\"\n}\n", r.id, r.tagid)
 
-	fmt.Fprintf(out, "func (u *%s) XdrUnionBody() interface{} {\n" +
+	fmt.Fprintf(out, "func (u *%s) XdrUnionBody() XdrType {\n" +
 		"\tswitch %s {\n", r.id, discriminant)
 	for i := range r.fields {
 		u := &r.fields[i]
@@ -884,7 +884,9 @@ func (r *rpc_union) emit(e *emitter) {
 		if u.isVoid() {
 			fmt.Fprintf(out, "\t\treturn nil\n")
 		} else {
-			fmt.Fprintf(out, "\t\treturn u.%s()\n", u.decl.id)
+			//fmt.Fprintf(out, "\t\treturn u.%s()\n", u.decl.id)
+			fmt.Fprintf(out, "\t\treturn %s\n",
+				e.xdrval(fmt.Sprintf("u.%s()", u.decl.id), r.id, &u.decl))
 		}
 	}
 	fmt.Fprintf(out, "\t}\n")
