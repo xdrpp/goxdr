@@ -491,6 +491,9 @@ func (e *emitter) emit(sym rpc_sym) {
 }
 
 func (r *rpc_const) emit(e *emitter) {
+	if r.comment != "" {
+		e.printf("%s\n", r.comment)
+	}
 	e.printf("const %s = %s\n", r.id, r.val)
 }
 

@@ -116,10 +116,12 @@ func (l *Lexer) RestOfLine() string {
 	return ret
 }
 
+func isNotWS(c rune) bool {
+	return c != ' ' && c != '\t'
+}
+
 func (l *Lexer) skipWS() bool {
-	i := strings.IndexFunc(l.input, func(c rune) bool {
-		return c != ' ' && c != '\t'
-	})
+	i := strings.IndexFunc(l.input, isNotWS)
 	if i > 0 {
 		l.advance(i)
 		return true
@@ -127,22 +129,29 @@ func (l *Lexer) skipWS() bool {
 	return false
 }
 
+func isEOL(s string) int {
+	n := len(s)
+	if n >= 1 && s[0] == '\n' {
+		return 1
+	} else if n >= 2 && s[0:2] == "\r\n" {
+		return 2
+	}
+	return 0
+}
+
+// Skip whitespace followed by a newline.  Return true if indeed a
+// newline was consumed.
 func (l *Lexer) skipWSNL() bool {
 	l.skipWS()
-	n := len(l.input)
-	if n >= 1 && l.input[0] == '\n' {
-		l.advance(1)
-		return true
-	}
-	if n >= 2 && l.input[0:2] == "\r\n" {
-		l.advance(2)
+	if n := isEOL(l.input); n > 0 {
+		l.advance(n)
 		return true
 	}
 	return false
 }
 
-// Find a comment start, where tp should be '*' for block comments and
-// '/' for line comments.
+// Find a comment start, where tp, the type of comment, is the second
+// character, i.e., '*' for block comments and '/' for line comments.
 func (l *Lexer) findCommentStart(tp byte) bool {
 	i := strings.IndexFunc(l.input, func(c rune) bool {
 		return c != ' ' && c != '\t'
@@ -155,7 +164,9 @@ func (l *Lexer) findCommentStart(tp byte) bool {
 	return false
 }
 
-func (l *Lexer) get1LineComment() string {
+// Get a /* ... */-style comment that lines at the end of a line and
+// does not include any newlines.
+func (l *Lexer) get1LineBlockComment() string {
 	if !l.findCommentStart('*') {
 		return ""
 	}
@@ -164,16 +175,31 @@ func (l *Lexer) get1LineComment() string {
 		return ""
 	}
 	comment := l.input[:j+4]
-	l.advance(j+4)
-	if l.skipWSNL() && strings.IndexByte(comment, '\n') == -1 {
+	multiline := strings.IndexByte(comment, '\n') != -1
+	nskip := j + 4 + strings.IndexFunc(l.input[j+4:], isNotWS)
+	eol := isEOL(l.input[nskip:])
+
+	if !multiline && (eol > 0 || nskip == len(l.input)) {
+		l.advance(nskip+eol)
 		return comment
+	} else if eol == 0 {
+		// This isn't an end-of-line comment, so just skip it because
+		// we don't need its contents.
+		l.advance(nskip);
+		return ""
 	}
+	// Don't consume a multi-line block comment
 	return ""
 }
 
+// Returns an end of line comment starting "//".  If multiple lines
+// have such a comment starting in the same column, then glues them
+// together into a comment consisting of multiple lines starting "//".
+// Also return a "/* ... */"-style comment that is on only one line at
+// the end of the line.
 func (l *Lexer) getLineComment() string {
 	if !l.findCommentStart('/') {
-		return l.get1LineComment()
+		return l.get1LineBlockComment()
 	}
 	if l.midline {
 		return l.RestOfLine()
@@ -208,6 +234,9 @@ func stripToColumn(column int, input string) string {
 	return strings.Repeat(" ", c - column) + input[i:]
 }
 
+// Skip whitespace and comment.  Returns true if it skipped a comment.
+// If it skips a block comment, that comment will be recorded in
+// l.blockComment.
 func (l *Lexer) skipComment() bool {
 	wasMidline := l.midline
 	if comment := l.getLineComment(); comment != "" {
