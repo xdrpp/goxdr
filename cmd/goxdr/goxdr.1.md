@@ -259,15 +259,15 @@ value of `XdrSize` to get or set the size of the array, then calls
 `Marshal` on each element of the array as with fixed-length arrays.
 
 * Similar to variable-length arrays, pointers use a generated XdrType
-implements the `XdrPtr` interface, which extends `XdrAggregate`.  The
-`XdrRecurse` method first calls `Marshal` marshal on another generated
-type that implements the `XdrNum32` interface (capable of containing
-the value 0 or 1 to indicate nil or value-present), then, if the
-pointer is non-nil, it calls `Marshal` on the underlying value.
+that implements the `XdrPtr` interface, which extends `XdrAggregate`.
+The `XdrRecurse` method first calls `Marshal` marshal on another
+generated type that implements the `XdrNum32` interface (capable of
+containing the value 0 or 1 to indicate nil or value-present), then,
+if the pointer is non-nil, it calls `Marshal` on the underlying value.
 
 * `string` has `XdrType` of `XdrString`, which also encodes the size
 bound of the string and implements the `XdrVarBytes` and `XdrBytes`
-interfaces that extent `XdrType`.
+interfaces that extend `XdrType`.
 
 * `opaque<>` has an `XdrType` of `XdrVecOpaque`, which also implements
 the `XdrVarBytes` and `XdrBytes` interfaces that extend `XdrType`.
@@ -314,8 +314,8 @@ interfaces that cover all types, for instance `XdrNum32`, `XdrNum64`,
     XdrArrayOpaque  opaque[n]
     XdrAggregate    struct T, union T, T*, T<n>, T[n]
     XdrTypedef      typedef BaseT T
-    Stringer        all types in XdrNum{32,64} and XdrBytes
-    Scanner         all types in XdrNum{32,64} and XdrBytes
+    fmt.Stringer    all types in XdrNum{32,64} and XdrBytes
+    fmt.Scanner     all types in XdrNum{32,64} and XdrBytes
     XdrType         all XDR types
 
 ## XDR functions
@@ -526,7 +526,7 @@ compile different XDR files into different go files, you will need to
 specify `-b` with each XDR input file to avoid including the
 boilerplate, then run goxdr with no input files (`goxdr -B -o
 goxdr_boilerplate.go`) to get one copy of the boilerplate.  You should
-also use this option if you are importing another package that already
+also use `-b` if you are importing another package that already
 includes the boilerplate using the `-i` option below.
 
 `-enum-comments`
@@ -562,7 +562,7 @@ To serialize a data structure of type `MyType`:
 ~~~~{.go}
 func serialize_Mytype(val *MyType) []byte {
     buf := &bytes.Buffer{}
-    XDR_MyType(val).XdrMarshal(&XdrOut{ buf }, "",)
+    XDR_MyType(val).XdrMarshal(&XdrOut{ buf }, "")
     return buf.Bytes()
 }
 ~~~~
@@ -635,7 +635,8 @@ func MyXdrToString(t XdrType) string {
 
 rpcgen(1), xdrc(1)
 
-<https://tools.ietf.org/html/rfc4506>
+<https://tools.ietf.org/html/rfc4506>,
+<https://tools.ietf.org/html/rfc5531>
 
 # BUGS
 
