@@ -58,7 +58,8 @@ then
     cat <<EOF
 Now you may want to run:
 
-    git push $github $version go1
+    git push $github -f go1
+    git push $github $version
 
 EOF
 fi
