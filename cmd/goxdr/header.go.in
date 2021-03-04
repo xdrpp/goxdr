@@ -230,7 +230,7 @@ type XdrAggregate interface {
 type XdrUnion interface {
 	XdrAggregate
 	XdrValid() bool
-	XdrValidTags() map[int32]bool
+	XdrValidTags() map[int32]bool // returns nil if there's a default
 	XdrUnionTag() XdrNum32
 	XdrUnionTagName() string
 	XdrUnionBody() XdrType

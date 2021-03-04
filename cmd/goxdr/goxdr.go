@@ -788,6 +788,11 @@ func (r *rpc_union) emit(e *emitter) {
 	return _XdrTags_%[1]s
 }
 `, r.id)
+	} else {
+		fmt.Fprintf(out, `func (_ %[1]s) XdrValidTags() map[int32]bool {
+	return nil
+}
+`, r.id)
 	}
 
 	var discriminant string

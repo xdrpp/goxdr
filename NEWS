@@ -1,0 +1,5 @@
+* Changes in version v0.1.1
+
+Add XdrValidTags() that returns nil when there's a default case.
+
+* Initial release v0.1.0
