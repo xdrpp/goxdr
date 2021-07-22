@@ -8,7 +8,8 @@ goxdr - Go XDR compiler
 
 # SYNOPSIS
 
-goxdr [-b|-B] [-o _output.go_] [-i _import_] [-p _package_] [_file.x_ ...]
+goxdr [-b|-B] [-fmt] [-i _import_] [-p _package_] \
+\ \ \ \ \ \ [-o _output.go_] [_file.x_ ...]
 
 # DESCRIPTION
 
@@ -538,15 +539,19 @@ error conditions.  In that case you can put a human-readable
 description of the error condition as a comment in the XDR source
 file, and access the text of that comment from your program.
 
-`-lax-discriminants`
-:   Cast all discriminants and cases (except bool) to int32, so that
-you can use discriminants and cases that are different enum types.
+`-fmt`
+:	Pass the generated code through `gofmt -s` to simplify and format
+it.
 
 `-i` _import_path_
 :   Add the directive <tt>import . "_import_path_"</tt> at the top of
 the output file.  This is needed when XDR files in the current package
 require XDR structures defined in a different package, since XDR
 itself provides no way to specify package scoping.
+
+`-lax-discriminants`
+:   Cast all discriminants and cases (except bool) to int32, so that
+you can use discriminants and cases that are different enum types.
 
 `-o` _output.go_
 :   Write the output to file _output.go_ instead of standard output.
