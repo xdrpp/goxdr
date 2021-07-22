@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 )
@@ -1287,6 +1288,7 @@ func (sl *stringlist) Set(v string) error {
 }
 
 func main() {
+	opt_fmt := flag.Bool("fmt", false, "Run output through gofmt -s")
 	opt_nobp := flag.Bool("b", false, "Don't import boilerplate code")
 	opt_emitbp := flag.Bool("B", false, "Emit boilerplate code (implies -b)")
 	opt_output := flag.String("o", "", "Name of output file")
@@ -1323,7 +1325,8 @@ func main() {
 	}
 	code := emitAll(&syms, *opt_enum_comments, *opt_lax_discriminants)
 
-	out := os.Stdout
+	var out io.WriteCloser
+	out = os.Stdout
 	if (*opt_output != "") {
 		var err error
 		out, err = os.Create(*opt_output)
@@ -1331,6 +1334,28 @@ func main() {
 			fmt.Fprintf(os.Stderr, "%s: %s\n", progname, err.Error())
 			os.Exit(1)
 		}
+	}
+
+	if (*opt_fmt) {
+		cmd := exec.Command("gofmt", "-s")
+		cmd.Stdout = out
+		cmd.Stderr = os.Stderr
+		var err error
+		if out, err = cmd.StdinPipe(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", progname, err.Error())
+			os.Exit(1)
+		}
+		if err = cmd.Start(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", progname, err.Error())
+			os.Exit(1)
+		}
+		defer func() {
+			out.Close()
+			if err := cmd.Wait(); err != nil {
+				fmt.Fprintf(os.Stderr, "%s: %s\n", progname, err.Error())
+				os.Exit(1)
+			}
+		}()
 	}
 
 	// https://github.com/golang/go/issues/13560#issuecomment-288457920

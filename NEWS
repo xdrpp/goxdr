@@ -1,4 +1,7 @@
+
 * Changes in version v0.1.1
+
+Add -fmt option to run output through gofmt -s.
 
 Add XdrValidTags() that returns nil when there's a default case.
 
