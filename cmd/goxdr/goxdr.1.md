@@ -261,10 +261,10 @@ value of `XdrSize` to get or set the size of the array, then calls
 
 * Similar to variable-length arrays, pointers use a generated XdrType
 that implements the `XdrPtr` interface, which extends `XdrAggregate`.
-The `XdrRecurse` method first calls `Marshal` marshal on another
-generated type that implements the `XdrNum32` interface (capable of
-containing the value 0 or 1 to indicate nil or value-present), then,
-if the pointer is non-nil, it calls `Marshal` on the underlying value.
+The `XdrRecurse` method first calls `Marshal` on another generated
+type that implements the `XdrNum32` interface (capable of containing
+the value 0 or 1 to indicate nil or value-present), then, if the
+pointer is non-nil, it calls `Marshal` on the underlying value.
 
 * `string` has `XdrType` of `XdrString`, which also encodes the size
 bound of the string and implements the `XdrVarBytes` and `XdrBytes`
