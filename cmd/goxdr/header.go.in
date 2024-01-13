@@ -158,7 +158,7 @@ func XdrToI32(i interface{}) int32 {
 
 // All quantities that should be serialized as 32-bit numbers
 // (including bools, enums, union discriminants, the bit saying
-// whether or not a pointer is NULL, floats, and vector lenghts) are
+// whether or not a pointer is NULL, floats, and vector lengths) are
 // passed to the XDR.Marshal function as a pointer to a defined type
 // implementing the XdrNum32 interface.  The one exception is string<>
 // and opaque<>, for which it is the job of XDR.Marshal to serialize
