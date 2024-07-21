@@ -148,7 +148,7 @@ type Myunion struct {
 }
 func (u *Myunion) One() *int32 {...}
 func (u *Myunion) Two() *string {...}
-func XDR_Myunion(x XDR, name string, v *Myunion) *Myunion { return v }
+func XDR_Myunion(x XDR) *Myunion { return v }
 ~~~~
 
 ## Convenience methods

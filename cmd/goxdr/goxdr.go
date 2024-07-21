@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -64,7 +63,7 @@ func xdrinline(s string) string {
 }
 
 func parseXDR(out *rpc_syms, file string) {
-	src, err := ioutil.ReadFile(file)
+	src, err := os.ReadFile(file)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", progname, err)
 		out.Failed = true

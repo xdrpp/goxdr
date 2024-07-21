@@ -153,9 +153,7 @@ func (l *Lexer) skipWSNL() bool {
 // Find a comment start, where tp, the type of comment, is the second
 // character, i.e., '*' for block comments and '/' for line comments.
 func (l *Lexer) findCommentStart(tp byte) bool {
-	i := strings.IndexFunc(l.input, func(c rune) bool {
-		return c != ' ' && c != '\t'
-	})
+	i := strings.IndexFunc(l.input, isNotWS)
 	if i >= 0 && len(l.input) - i >= 2 &&
 		l.input[i] == '/' && l.input[i+1] == tp {
 		l.advance(i)
@@ -164,7 +162,7 @@ func (l *Lexer) findCommentStart(tp byte) bool {
 	return false
 }
 
-// Get a /* ... */-style comment that lines at the end of a line and
+// Get a /* ... */-style comment that lies at the end of a line and
 // does not include any newlines.
 func (l *Lexer) get1LineBlockComment() string {
 	if !l.findCommentStart('*') {
