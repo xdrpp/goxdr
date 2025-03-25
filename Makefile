@@ -31,7 +31,7 @@ go.mod: $(MAKEFILE_LIST)
 	echo 'module github.com/xdrpp/goxdr' > go.mod
 
 depend: always
-	cd / && go get -u golang.org/x/tools/cmd/goyacc
+	cd / && go install golang.org/x/tools/cmd/goyacc@latest
 
 RECURSE = for dir in $(CMDS); do cd cmd/$$dir && $(MAKE) $@; done
 
