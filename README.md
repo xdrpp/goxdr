@@ -68,7 +68,7 @@ attractive alternative to other go XDR compilers for many situations:
 
 To install goxdr, run:
 
-    go get github.com/xdrpp/goxdr/cmd/goxdr
+    go install github.com/xdrpp/goxdr/cmd/goxdr
 
 To use the latest development version within a go module (i.e., below
 a directory with a `go.mod` file), run:
