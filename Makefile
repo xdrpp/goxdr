@@ -29,6 +29,8 @@ goxdr: cmd/goxdr/goxdr
 
 go.mod: $(MAKEFILE_LIST)
 	echo 'module github.com/xdrpp/goxdr' > go.mod
+	echo 'go 1.24.0' >> go.mod
+	echo 'require golang.org/x/tools v0.31.0' >> go.mod
 
 depend: always
 	cd / && go install golang.org/x/tools/cmd/goyacc@latest
