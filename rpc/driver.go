@@ -1,15 +1,15 @@
-
 package rpc
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/xdrpp/goxdr/xdr"
 	"io"
 	"os"
 	"sync"
 	"sync/atomic"
+
+	"github.com/xdrpp/goxdr/xdr"
 )
 
 // The default value for Log in newly allocated RPCs.
@@ -19,6 +19,7 @@ var DefaultLog io.Writer
 // that just has a peer address string, and one that has both a peer
 // address and a way to Detach a server call.
 type ctxKeyType struct{}
+
 var ctxKey ctxKeyType
 
 type peerCtxVal interface {
@@ -28,12 +29,13 @@ type peerCtxVal interface {
 type peerCtx struct {
 	Peer string
 }
-var _ peerCtxVal = &peerCtx{}	// XXX
+
+var _ peerCtxVal = &peerCtx{} // XXX
 func (v *peerCtx) GetPeer() string {
 	return v.Peer
 }
 func (v *peerCtx) WithPeer(peer string) peerCtxVal {
-	return &peerCtx{ Peer: peer }
+	return &peerCtx{Peer: peer}
 }
 
 // Get the network address associated with a context.
@@ -55,7 +57,7 @@ func WithPeer(ctx context.Context, peer string) context.Context {
 		}
 		pc = pc.WithPeer(peer)
 	} else {
-		pc = &peerCtx{ Peer: peer }
+		pc = &peerCtx{Peer: peer}
 	}
 	return context.WithValue(ctx, ctxKey, pc)
 }
@@ -68,7 +70,8 @@ type srvCtx struct {
 	peerCtx
 	unlock func()
 }
-var _ srvCtxVal = &srvCtx{}		// XXX
+
+var _ srvCtxVal = &srvCtx{} // XXX
 func (v *srvCtx) WithPeer(peer string) peerCtxVal {
 	ret := *v
 	ret.Peer = peer
@@ -178,16 +181,32 @@ type Driver struct {
 	// if you want to trace all Drivers by default.
 	Log io.Writer
 
-	srv RpcSrv
-	ctx context.Context
-	cancel context.CancelFunc
-	out chan<- *Message
-	in <-chan *Message
-	cs CallSet
+	// If non-nil, all panics arising from service method implementations are passed to PanicHandle.
+	PanicHandler PanicHandler
+
+	srv     RpcSrv
+	ctx     context.Context
+	cancel  context.CancelFunc
+	out     chan<- *Message
+	in      <-chan *Message
+	cs      CallSet
 	started int32
 }
 
-func (r *Driver) logXdr(t xdr.XdrType, f string, args...interface{}) {
+// PanicHandler defines a handler for panics arising from service method implementations.
+type PanicHandler interface {
+
+	// PanicHandler must not panic.
+	PanicHandle(any)
+}
+
+type PanicHandlerFunc func(any)
+
+func (h PanicHandlerFunc) PanicHandle(r any) {
+	h(r)
+}
+
+func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 	if r.Log == nil {
 		return
 	}
@@ -209,14 +228,14 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 		ctx = context.Background()
 	}
 	ctx, cancel := context.WithCancel(ctx)
-	ret := Driver {
-		Log: DefaultLog,
-		Lock: &sync.Mutex{},
-		ctx: ctx,
+	ret := Driver{
+		Log:    DefaultLog,
+		Lock:   &sync.Mutex{},
+		ctx:    ctx,
 		cancel: cancel,
-		in: ReceiveChan(ctx, t),
+		in:     ReceiveChan(ctx, t),
 	}
-	ret.out = SendChan(t, func(xid uint32, _ error){
+	ret.out = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
 	})
 	go func() {
@@ -262,7 +281,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		c <- rmsg
 		close(c)
 	})
-	m := Message { Peer: peer }
+	m := Message{Peer: peer}
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -290,7 +309,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 // Acquire a lock and return an idempotent unlock function.
 func mkUnlocker(lock sync.Locker) func() {
 	if lock == nil {
-		return func(){}
+		return func() {}
 	}
 	once := sync.Once{}
 	lock.Lock()
@@ -327,7 +346,7 @@ func (r *Driver) Go() {
 		if rmsg == nil {
 			continue
 		} else if proc == nil {
-			reply := Message{ Peer: m.Peer }
+			reply := Message{Peer: m.Peer}
 			reply.Serialize(rmsg)
 			continue
 		}
@@ -335,21 +354,25 @@ func (r *Driver) Go() {
 		unlock := mkUnlocker(r.Lock)
 		r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s",
 			m.Peer, msg.Xid, proc.ProcName())
-		proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx {
-			peerCtx: peerCtx{ Peer: m.Peer },
-			unlock: unlock,
+		proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
+			peerCtx: peerCtx{Peer: m.Peer},
+			unlock:  unlock,
 		}))
 
 		go func() {
 			defer func() {
 				unlock()
 				if i := recover(); i != nil {
-					fmt.Fprintf(os.Stderr, "%s\n", i)
+					if r.PanicHandler != nil {
+						r.PanicHandler.PanicHandle(i)
+					} else {
+						fmt.Fprintf(os.Stderr, "%s\n", i)
+					}
 					if IsSuccess(rmsg) {
 						SetStat(rmsg, SYSTEM_ERR)
 					}
 				}
-				reply := Message{ Peer: m.Peer }
+				reply := Message{Peer: m.Peer}
 				reply.Serialize(rmsg)
 				if IsSuccess(rmsg) {
 					reply.Serialize(proc.GetRes())
