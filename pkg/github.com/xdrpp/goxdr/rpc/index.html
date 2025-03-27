@@ -1,0 +1,4485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>rpc - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package rpc
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/rpc"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Utilities for implementing RFC5531 RPC.
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+				<dd><a href="index.html#pkg-variables">Variables</a></dd>
+			
+			
+				
+				<dd><a href="index.html#Detach">func Detach(ctx context.Context)</a></dd>
+			
+				
+				<dd><a href="index.html#GetPeer">func GetPeer(ctx context.Context) string</a></dd>
+			
+				
+				<dd><a href="index.html#IsSuccess">func IsSuccess(rmsg *Rpc_msg) bool</a></dd>
+			
+				
+				<dd><a href="index.html#ReceiveChan">func ReceiveChan(ctx context.Context, t Transport) &lt;-chan *Message</a></dd>
+			
+				
+				<dd><a href="index.html#SendChan">func SendChan(t Transport, onErr func(uint32, error)) chan&lt;- *Message</a></dd>
+			
+				
+				<dd><a href="index.html#SetStat">func SetStat(msg *Rpc_msg, stat Accept_stat)</a></dd>
+			
+				
+				<dd><a href="index.html#WithPeer">func WithPeer(ctx context.Context, peer string) context.Context</a></dd>
+			
+			
+				
+				<dd><a href="index.html#Accept_stat">type Accept_stat</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Accept_stat">func XDR_Accept_stat(v *Accept_stat) *Accept_stat</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.GetU32">func (v Accept_stat) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.Scan">func (v *Accept_stat) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.SetU32">func (v *Accept_stat) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.String">func (v Accept_stat) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrEnumComments">func (e Accept_stat) XdrEnumComments() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrEnumNames">func (Accept_stat) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrMarshal">func (v *Accept_stat) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrPointer">func (v *Accept_stat) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrTypeName">func (Accept_stat) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accept_stat.XdrValue">func (v Accept_stat) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Accepted_reply">type Accepted_reply</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Accepted_reply">func XDR_Accepted_reply(v *Accepted_reply) *Accepted_reply</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accepted_reply.XdrMarshal">func (v *Accepted_reply) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accepted_reply.XdrPointer">func (v *Accepted_reply) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accepted_reply.XdrRecurse">func (v *Accepted_reply) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accepted_reply.XdrTypeName">func (Accepted_reply) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Accepted_reply.XdrValue">func (v Accepted_reply) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Auth_flavor">type Auth_flavor</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Auth_flavor">func XDR_Auth_flavor(v *Auth_flavor) *Auth_flavor</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.GetU32">func (v Auth_flavor) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.Scan">func (v *Auth_flavor) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.SetU32">func (v *Auth_flavor) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.String">func (v Auth_flavor) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.XdrEnumNames">func (Auth_flavor) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.XdrMarshal">func (v *Auth_flavor) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.XdrPointer">func (v *Auth_flavor) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.XdrTypeName">func (Auth_flavor) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_flavor.XdrValue">func (v Auth_flavor) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Auth_stat">type Auth_stat</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Auth_stat">func XDR_Auth_stat(v *Auth_stat) *Auth_stat</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.GetU32">func (v Auth_stat) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.Scan">func (v *Auth_stat) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.SetU32">func (v *Auth_stat) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.String">func (v Auth_stat) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrEnumComments">func (e Auth_stat) XdrEnumComments() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrEnumNames">func (Auth_stat) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrMarshal">func (v *Auth_stat) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrPointer">func (v *Auth_stat) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrTypeName">func (Auth_stat) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Auth_stat.XdrValue">func (v Auth_stat) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#CallKey">type CallKey</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#CallSet">type CallSet</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CallSet.Cancel">func (cs *CallSet) Cancel(xid uint32, reason ...Accept_stat)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CallSet.CancelAll">func (cs *CallSet) CancelAll()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CallSet.Delete">func (cs *CallSet) Delete(xid uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CallSet.GetReply">func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) *PendingCall</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CallSet.NewCall">func (cs *CallSet) NewCall(server string, proc xdr.XdrProc, cb func(*Rpc_msg)) *Rpc_msg</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Call_body">type Call_body</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Call_body">func XDR_Call_body(v *Call_body) *Call_body</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Call_body.XdrMarshal">func (v *Call_body) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Call_body.XdrPointer">func (v *Call_body) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Call_body.XdrRecurse">func (v *Call_body) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Call_body.XdrTypeName">func (Call_body) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Call_body.XdrValue">func (v Call_body) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Driver">type Driver</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewDriver">func NewDriver(ctx context.Context, t Transport) *Driver</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Driver.Close">func (r *Driver) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Driver.Go">func (r *Driver) Go()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Driver.Register">func (r *Driver) Register(srv xdr.XdrSrv)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Driver.SendCall">func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Message">type Message</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Message.In">func (m *Message) In() xdr.XDR</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Message.Out">func (m *Message) Out() xdr.XDR</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Message.Serialize">func (m *Message) Serialize(vs ...xdr.XdrType)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Message.Xid">func (m *Message) Xid() uint32</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Msg_type">type Msg_type</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Msg_type">func XDR_Msg_type(v *Msg_type) *Msg_type</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.GetU32">func (v Msg_type) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.Scan">func (v *Msg_type) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.SetU32">func (v *Msg_type) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.String">func (v Msg_type) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.XdrEnumNames">func (Msg_type) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.XdrMarshal">func (v *Msg_type) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.XdrPointer">func (v *Msg_type) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.XdrTypeName">func (Msg_type) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Msg_type.XdrValue">func (v Msg_type) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Opaque_auth">type Opaque_auth</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Opaque_auth">func XDR_Opaque_auth(v *Opaque_auth) *Opaque_auth</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Opaque_auth.XdrMarshal">func (v *Opaque_auth) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Opaque_auth.XdrPointer">func (v *Opaque_auth) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Opaque_auth.XdrRecurse">func (v *Opaque_auth) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Opaque_auth.XdrTypeName">func (Opaque_auth) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Opaque_auth.XdrValue">func (v Opaque_auth) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#PanicHandler">type PanicHandler</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#PanicHandlerFunc">type PanicHandlerFunc</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#PanicHandlerFunc.PanicHandle">func (h PanicHandlerFunc) PanicHandle(r any)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#PendingCall">type PendingCall</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Reject_stat">type Reject_stat</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Reject_stat">func XDR_Reject_stat(v *Reject_stat) *Reject_stat</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.GetU32">func (v Reject_stat) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.Scan">func (v *Reject_stat) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.SetU32">func (v *Reject_stat) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.String">func (v Reject_stat) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrEnumComments">func (e Reject_stat) XdrEnumComments() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrEnumNames">func (Reject_stat) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrMarshal">func (v *Reject_stat) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrPointer">func (v *Reject_stat) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrTypeName">func (Reject_stat) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reject_stat.XdrValue">func (v Reject_stat) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Rejected_reply">type Rejected_reply</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Rejected_reply">func XDR_Rejected_reply(v *Rejected_reply) *Rejected_reply</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.Mismatch_info">func (u *Rejected_reply) Mismatch_info() *XdrAnon_Rejected_reply_Mismatch_info</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.Rj_why">func (u *Rejected_reply) Rj_why() *Auth_stat</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrMarshal">func (v *Rejected_reply) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrPointer">func (v *Rejected_reply) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrRecurse">func (u *Rejected_reply) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrTypeName">func (Rejected_reply) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrUnionBody">func (u *Rejected_reply) XdrUnionBody() XdrType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrUnionBodyName">func (u *Rejected_reply) XdrUnionBodyName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrUnionTag">func (u *Rejected_reply) XdrUnionTag() XdrNum32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrUnionTagName">func (u *Rejected_reply) XdrUnionTagName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrValid">func (u Rejected_reply) XdrValid() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrValidTags">func (_ Rejected_reply) XdrValidTags() map[int32]bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rejected_reply.XdrValue">func (v Rejected_reply) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Reply_body">type Reply_body</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Reply_body">func XDR_Reply_body(v *Reply_body) *Reply_body</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.Areply">func (u *Reply_body) Areply() *Accepted_reply</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.Rreply">func (u *Reply_body) Rreply() *Rejected_reply</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrMarshal">func (v *Reply_body) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrPointer">func (v *Reply_body) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrRecurse">func (u *Reply_body) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrTypeName">func (Reply_body) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrUnionBody">func (u *Reply_body) XdrUnionBody() XdrType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrUnionBodyName">func (u *Reply_body) XdrUnionBodyName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrUnionTag">func (u *Reply_body) XdrUnionTag() XdrNum32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrUnionTagName">func (u *Reply_body) XdrUnionTagName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrValid">func (u Reply_body) XdrValid() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrValidTags">func (_ Reply_body) XdrValidTags() map[int32]bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_body.XdrValue">func (v Reply_body) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Reply_stat">type Reply_stat</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Reply_stat">func XDR_Reply_stat(v *Reply_stat) *Reply_stat</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.GetU32">func (v Reply_stat) GetU32() uint32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.Scan">func (v *Reply_stat) Scan(ss fmt.ScanState, _ rune) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.SetU32">func (v *Reply_stat) SetU32(n uint32)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.String">func (v Reply_stat) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.XdrEnumNames">func (Reply_stat) XdrEnumNames() map[int32]string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.XdrMarshal">func (v *Reply_stat) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.XdrPointer">func (v *Reply_stat) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.XdrTypeName">func (Reply_stat) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Reply_stat.XdrValue">func (v Reply_stat) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#RpcDecoder">type RpcDecoder</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#RpcDecoder.Decode">func (d *RpcDecoder) Decode(m *Message) (*Rpc_msg, xdr.XdrProc)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#RpcSrv">type RpcSrv</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#RpcSrv.GetProc">func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (rmsg *Rpc_msg, proc xdr.XdrSrvProc)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#RpcSrv.Register">func (s *RpcSrv) Register(srv xdr.XdrSrv)</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Rpc_msg">type Rpc_msg</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#GetMsg">func GetMsg(in xdr.XDR) (*Rpc_msg, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_Rpc_msg">func XDR_Rpc_msg(v *Rpc_msg) *Rpc_msg</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.Error">func (m *Rpc_msg) Error() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.XdrMarshal">func (v *Rpc_msg) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.XdrPointer">func (v *Rpc_msg) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.XdrRecurse">func (v *Rpc_msg) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.XdrTypeName">func (Rpc_msg) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Rpc_msg.XdrValue">func (v Rpc_msg) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#StreamTransport">type StreamTransport</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#NewStreamTransport">func NewStreamTransport(c net.Conn) *StreamTransport</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#StreamTransport.Close">func (tx *StreamTransport) Close()</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#StreamTransport.IsConnected">func (tx *StreamTransport) IsConnected() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#StreamTransport.Receive">func (tx *StreamTransport) Receive() (*Message, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#StreamTransport.Send">func (tx *StreamTransport) Send(m *Message) error</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Transport">type Transport</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrAnon_Accepted_reply_Reply_data">type XdrAnon_Accepted_reply_Reply_data</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_XdrAnon_Accepted_reply_Reply_data">func XDR_XdrAnon_Accepted_reply_Reply_data(v *XdrAnon_Accepted_reply_Reply_data) *XdrAnon_Accepted_reply_Reply_data</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.Mismatch_info">func (u *XdrAnon_Accepted_reply_Reply_data) Mismatch_info() *XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.Results">func (u *XdrAnon_Accepted_reply_Reply_data) Results() *[0]byte</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrMarshal">func (v *XdrAnon_Accepted_reply_Reply_data) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrPointer">func (v *XdrAnon_Accepted_reply_Reply_data) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrRecurse">func (u *XdrAnon_Accepted_reply_Reply_data) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrTypeName">func (XdrAnon_Accepted_reply_Reply_data) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionBody">func (u *XdrAnon_Accepted_reply_Reply_data) XdrUnionBody() XdrType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionBodyName">func (u *XdrAnon_Accepted_reply_Reply_data) XdrUnionBodyName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionTag">func (u *XdrAnon_Accepted_reply_Reply_data) XdrUnionTag() XdrNum32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionTagName">func (u *XdrAnon_Accepted_reply_Reply_data) XdrUnionTagName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValid">func (u XdrAnon_Accepted_reply_Reply_data) XdrValid() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValidTags">func (_ XdrAnon_Accepted_reply_Reply_data) XdrValidTags() map[int32]bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValue">func (v XdrAnon_Accepted_reply_Reply_data) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">type XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">func XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info(v *XdrAnon_Accepted_reply_Reply_data_Mismatch_info) *XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrMarshal">func (v *XdrAnon_Accepted_reply_Reply_data_Mismatch_info) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrPointer">func (v *XdrAnon_Accepted_reply_Reply_data_Mismatch_info) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrRecurse">func (v *XdrAnon_Accepted_reply_Reply_data_Mismatch_info) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrTypeName">func (XdrAnon_Accepted_reply_Reply_data_Mismatch_info) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrValue">func (v XdrAnon_Accepted_reply_Reply_data_Mismatch_info) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">type XdrAnon_Rejected_reply_Mismatch_info</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_XdrAnon_Rejected_reply_Mismatch_info">func XDR_XdrAnon_Rejected_reply_Mismatch_info(v *XdrAnon_Rejected_reply_Mismatch_info) *XdrAnon_Rejected_reply_Mismatch_info</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrMarshal">func (v *XdrAnon_Rejected_reply_Mismatch_info) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrPointer">func (v *XdrAnon_Rejected_reply_Mismatch_info) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrRecurse">func (v *XdrAnon_Rejected_reply_Mismatch_info) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrTypeName">func (XdrAnon_Rejected_reply_Mismatch_info) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrValue">func (v XdrAnon_Rejected_reply_Mismatch_info) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#XdrAnon_Rpc_msg_Body">type XdrAnon_Rpc_msg_Body</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XDR_XdrAnon_Rpc_msg_Body">func XDR_XdrAnon_Rpc_msg_Body(v *XdrAnon_Rpc_msg_Body) *XdrAnon_Rpc_msg_Body</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.Cbody">func (u *XdrAnon_Rpc_msg_Body) Cbody() *Call_body</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.Rbody">func (u *XdrAnon_Rpc_msg_Body) Rbody() *Reply_body</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrMarshal">func (v *XdrAnon_Rpc_msg_Body) XdrMarshal(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrPointer">func (v *XdrAnon_Rpc_msg_Body) XdrPointer() interface{}</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrRecurse">func (u *XdrAnon_Rpc_msg_Body) XdrRecurse(x XDR, name string)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrTypeName">func (XdrAnon_Rpc_msg_Body) XdrTypeName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionBody">func (u *XdrAnon_Rpc_msg_Body) XdrUnionBody() XdrType</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionBodyName">func (u *XdrAnon_Rpc_msg_Body) XdrUnionBodyName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionTag">func (u *XdrAnon_Rpc_msg_Body) XdrUnionTag() XdrNum32</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionTagName">func (u *XdrAnon_Rpc_msg_Body) XdrUnionTagName() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrValid">func (u XdrAnon_Rpc_msg_Body) XdrValid() bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrValidTags">func (_ XdrAnon_Rpc_msg_Body) XdrValidTags() map[int32]bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#XdrAnon_Rpc_msg_Body.XdrValue">func (v XdrAnon_Rpc_msg_Body) XdrValue() interface{}</a></dd>
+				
+			
+				
+				<dd><a href="index.html#XdrType_Accept_stat">type XdrType_Accept_stat</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Accepted_reply">type XdrType_Accepted_reply</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Auth_flavor">type XdrType_Auth_flavor</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Auth_stat">type XdrType_Auth_stat</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Call_body">type XdrType_Call_body</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Msg_type">type XdrType_Msg_type</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Opaque_auth">type XdrType_Opaque_auth</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Reject_stat">type XdrType_Reject_stat</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Rejected_reply">type XdrType_Rejected_reply</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Reply_body">type XdrType_Reply_body</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Reply_stat">type XdrType_Reply_stat</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_Rpc_msg">type XdrType_Rpc_msg</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_XdrAnon_Accepted_reply_Reply_data">type XdrType_XdrAnon_Accepted_reply_Reply_data</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">type XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_XdrAnon_Rejected_reply_Mismatch_info">type XdrType_XdrAnon_Rejected_reply_Mismatch_info</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#XdrType_XdrAnon_Rpc_msg_Body">type XdrType_XdrAnon_Rpc_msg_Body</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/decode.go">decode.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go">driver.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go">rpc_msg.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go">transport.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go">util.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+			<h2 id="pkg-variables">Variables</h2>
+			
+				<p>The default value for Log in newly allocated RPCs.
+
+				<pre>var <span id="DefaultLog">DefaultLog</span> <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a></pre>
+			
+				
+				<pre>var <span id="ErrTransportClosed">ErrTransportClosed</span> = <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#Errorf">Errorf</a>(&#34;Transport is closed&#34;)</pre>
+			
+		
+		
+			
+			
+			<h2 id="Detach">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=1768:1800#L78">Detach</a>
+				<a class="permalink" href="index.html#Detach">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Detach(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>)</pre>
+			<p>By default, a Driver will only service one incoming call at a time.
+Calling Detach on the Context from within server-side code for a
+call will allow the Loop thread to service another call before the
+first call replies.
+
+			
+			
+
+		
+			
+			
+			<h2 id="GetPeer">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=774:814#L32">GetPeer</a>
+				<a class="permalink" href="index.html#GetPeer">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func GetPeer(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>) <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+			<p>Get the network address associated with a context.
+
+			
+			
+
+		
+			
+			
+			<h2 id="IsSuccess">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=1401:1435#L43">IsSuccess</a>
+				<a class="permalink" href="index.html#IsSuccess">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func IsSuccess(rmsg *<a href="index.html#Rpc_msg">Rpc_msg</a>) <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+			<p>Returns true iff rmsg is an accepted REPLY with status SUCCESS.
+
+			
+			
+
+		
+			
+			
+			<h2 id="ReceiveChan">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=2097:2163#L88">ReceiveChan</a>
+				<a class="permalink" href="index.html#ReceiveChan">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ReceiveChan(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>, t <a href="index.html#Transport">Transport</a>) &lt;-chan *<a href="index.html#Message">Message</a></pre>
+			<p>Create a channel that return received messages from a Transport.
+Creates a thread that closes the channel and exits when the Context
+is Done or when the transport returns an error.  Does not close the
+Transport.
+
+			
+			
+
+		
+			
+			
+			<h2 id="SendChan">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=2675:2744#L114">SendChan</a>
+				<a class="permalink" href="index.html#SendChan">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func SendChan(t <a href="index.html#Transport">Transport</a>, onErr func(<a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)) chan&lt;- *<a href="index.html#Message">Message</a></pre>
+			<p>Create a channel for sending messages through a Transport.  Creates
+a thread that won&apos;t exit until the returned channel is closed.
+Does not close the underlying Transport.
+
+			
+			
+
+		
+			
+			
+			<h2 id="SetStat">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=1172:1216#L36">SetStat</a>
+				<a class="permalink" href="index.html#SetStat">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func SetStat(msg *<a href="index.html#Rpc_msg">Rpc_msg</a>, stat <a href="index.html#Accept_stat">Accept_stat</a>)</pre>
+			<p>Sets an rpc_message to be an accepted reply with a particular
+status.
+
+			
+			
+
+		
+			
+			
+			<h2 id="WithPeer">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=989:1052#L42">WithPeer</a>
+				<a class="permalink" href="index.html#WithPeer">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func WithPeer(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>, peer <a href="http://localhost:6666/pkg/builtin/#string">string</a>) <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a></pre>
+			<p>Associate the network address of a peer with a context.
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="Accept_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=895:917#L36">Accept_stat</a>
+				<a class="permalink" href="index.html#Accept_stat">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Given that a call message was accepted, the following is the status
+<pre>of an attempt to call a remote procedure.
+</pre>
+
+			<pre>type Accept_stat <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span class="comment">/* RPC executed successfully       */</span>
+    <span id="SUCCESS">SUCCESS</span> <a href="index.html#Accept_stat">Accept_stat</a> = 0
+    <span class="comment">/* remote hasn&#39;t exported program  */</span>
+    <span id="PROG_UNAVAIL">PROG_UNAVAIL</span> <a href="index.html#Accept_stat">Accept_stat</a> = 1
+    <span class="comment">/* remote can&#39;t support version #  */</span>
+    <span id="PROG_MISMATCH">PROG_MISMATCH</span> <a href="index.html#Accept_stat">Accept_stat</a> = 2
+    <span class="comment">/* program can&#39;t support procedure */</span>
+    <span id="PROC_UNAVAIL">PROC_UNAVAIL</span> <a href="index.html#Accept_stat">Accept_stat</a> = 3
+    <span class="comment">/* procedure can&#39;t decode params   */</span>
+    <span id="GARBAGE_ARGS">GARBAGE_ARGS</span> <a href="index.html#Accept_stat">Accept_stat</a> = 4
+    <span class="comment">/* e.g. memory allocation failure  */</span>
+    <span id="SYSTEM_ERR">SYSTEM_ERR</span> <a href="index.html#Accept_stat">Accept_stat</a> = 5
+)</pre>
+			
+				<p>Fake accept stat to represent a cancelled call
+
+				<pre>const <span id="CANCELED">CANCELED</span> <a href="index.html#Accept_stat">Accept_stat</a> = 98</pre>
+			
+				<p>Fake accept stat to represent a response we can&apos;t unmarshal
+
+				<pre>const <span id="GARBAGE_RET">GARBAGE_RET</span> <a href="index.html#Accept_stat">Accept_stat</a> = 99</pre>
+			
+				<p>Fake accept stat for when we can&apos;t send a message
+
+				<pre>const <span id="SEND_ERR">SEND_ERR</span> <a href="index.html#Accept_stat">Accept_stat</a> = 97</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Accept_stat">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10924:10973#L367">XDR_Accept_stat</a>
+					<a class="permalink" href="index.html#XDR_Accept_stat">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Accept_stat(v *<a href="index.html#Accept_stat">Accept_stat</a>) *<a href="index.html#Accept_stat">Accept_stat</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Accept_stat.GetU32">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10505:10541#L360">GetU32</a>
+					<a class="permalink" href="index.html#Accept_stat.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Accept_stat">Accept_stat</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.Scan">func (*Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10037:10095#L343">Scan</a>
+					<a class="permalink" href="index.html#Accept_stat.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accept_stat">Accept_stat</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.SetU32">func (*Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10563:10601#L361">SetU32</a>
+					<a class="permalink" href="index.html#Accept_stat.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accept_stat">Accept_stat</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.String">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9890:9926#L337">String</a>
+					<a class="permalink" href="index.html#Accept_stat.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Accept_stat">Accept_stat</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrEnumComments">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=11364:11419#L376">XdrEnumComments</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrEnumComments">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (e <a href="index.html#Accept_stat">Accept_stat</a>) XdrEnumComments() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrEnumNames">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9805:9855#L334">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Accept_stat">Accept_stat</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrMarshal">func (*Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10808:10860#L365">XdrMarshal</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accept_stat">Accept_stat</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrPointer">func (*Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10626:10672#L362">XdrPointer</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accept_stat">Accept_stat</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrTypeName">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10686:10725#L363">XdrTypeName</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Accept_stat">Accept_stat</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accept_stat.XdrValue">func (Accept_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10751:10794#L364">XdrValue</a>
+					<a class="permalink" href="index.html#Accept_stat.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Accept_stat">Accept_stat</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Accepted_reply">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=2847:2941#L108">Accepted_reply</a>
+				<a class="permalink" href="index.html#Accepted_reply">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Reply to an RPC call that was accepted by the server:
+
+			<pre>type Accepted_reply struct {
+<span id="Accepted_reply.Verf"></span>    Verf       <a href="index.html#Opaque_auth">Opaque_auth</a>
+<span id="Accepted_reply.Reply_data"></span>    Reply_data <a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Accepted_reply">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22369:22427#L656">XDR_Accepted_reply</a>
+					<a class="permalink" href="index.html#XDR_Accepted_reply">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Accepted_reply(v *<a href="index.html#Accepted_reply">Accepted_reply</a>) *<a href="index.html#Accepted_reply">Accepted_reply</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Accepted_reply.XdrMarshal">func (*Accepted_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22016:22071#L648">XdrMarshal</a>
+					<a class="permalink" href="index.html#Accepted_reply.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accepted_reply">Accepted_reply</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accepted_reply.XdrPointer">func (*Accepted_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21822:21871#L645">XdrPointer</a>
+					<a class="permalink" href="index.html#Accepted_reply.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accepted_reply">Accepted_reply</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accepted_reply.XdrRecurse">func (*Accepted_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22095:22150#L649">XdrRecurse</a>
+					<a class="permalink" href="index.html#Accepted_reply.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Accepted_reply">Accepted_reply</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accepted_reply.XdrTypeName">func (Accepted_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21885:21927#L646">XdrTypeName</a>
+					<a class="permalink" href="index.html#Accepted_reply.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Accepted_reply">Accepted_reply</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Accepted_reply.XdrValue">func (Accepted_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21956:22002#L647">XdrValue</a>
+					<a class="permalink" href="index.html#Accepted_reply.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Accepted_reply">Accepted_reply</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Auth_flavor">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=271:293#L6">Auth_flavor</a>
+				<a class="permalink" href="index.html#Auth_flavor">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Auth_flavor <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="AUTH_NONE">AUTH_NONE</span>  <a href="index.html#Auth_flavor">Auth_flavor</a> = 0
+    <span id="AUTH_SYS">AUTH_SYS</span>   <a href="index.html#Auth_flavor">Auth_flavor</a> = 1
+    <span id="AUTH_SHORT">AUTH_SHORT</span> <a href="index.html#Auth_flavor">Auth_flavor</a> = 2
+    <span id="AUTH_DH">AUTH_DH</span>    <a href="index.html#Auth_flavor">Auth_flavor</a> = 3
+    <span id="RPCSEC_GSS">RPCSEC_GSS</span> <a href="index.html#Auth_flavor">Auth_flavor</a> = 6
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Auth_flavor">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5915:5964#L220">XDR_Auth_flavor</a>
+					<a class="permalink" href="index.html#XDR_Auth_flavor">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Auth_flavor(v *<a href="index.html#Auth_flavor">Auth_flavor</a>) *<a href="index.html#Auth_flavor">Auth_flavor</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Auth_flavor.GetU32">func (Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5496:5532#L213">GetU32</a>
+					<a class="permalink" href="index.html#Auth_flavor.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_flavor">Auth_flavor</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.Scan">func (*Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5028:5086#L196">Scan</a>
+					<a class="permalink" href="index.html#Auth_flavor.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_flavor">Auth_flavor</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.SetU32">func (*Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5554:5592#L214">SetU32</a>
+					<a class="permalink" href="index.html#Auth_flavor.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_flavor">Auth_flavor</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.String">func (Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=4881:4917#L190">String</a>
+					<a class="permalink" href="index.html#Auth_flavor.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_flavor">Auth_flavor</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.XdrEnumNames">func (Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=4796:4846#L187">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Auth_flavor.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Auth_flavor">Auth_flavor</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.XdrMarshal">func (*Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5799:5851#L218">XdrMarshal</a>
+					<a class="permalink" href="index.html#Auth_flavor.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_flavor">Auth_flavor</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.XdrPointer">func (*Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5617:5663#L215">XdrPointer</a>
+					<a class="permalink" href="index.html#Auth_flavor.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_flavor">Auth_flavor</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.XdrTypeName">func (Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5677:5716#L216">XdrTypeName</a>
+					<a class="permalink" href="index.html#Auth_flavor.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Auth_flavor">Auth_flavor</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_flavor.XdrValue">func (Auth_flavor) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5742:5785#L217">XdrValue</a>
+					<a class="permalink" href="index.html#Auth_flavor.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_flavor">Auth_flavor</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Auth_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=1589:1609#L62">Auth_stat</a>
+				<a class="permalink" href="index.html#Auth_stat">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Why authentication failed:
+
+			<pre>type Auth_stat <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span class="comment">/* success                        */</span>
+    <span id="AUTH_OK">AUTH_OK</span> <a href="index.html#Auth_stat">Auth_stat</a> = 0
+    <span class="comment">/* bad credential (seal broken)   */</span>
+    <span id="AUTH_BADCRED">AUTH_BADCRED</span> <a href="index.html#Auth_stat">Auth_stat</a> = 1
+    <span class="comment">/* client must begin new session  */</span>
+    <span id="AUTH_REJECTEDCRED">AUTH_REJECTEDCRED</span> <a href="index.html#Auth_stat">Auth_stat</a> = 2
+    <span class="comment">/* bad verifier (seal broken)     */</span>
+    <span id="AUTH_BADVERF">AUTH_BADVERF</span> <a href="index.html#Auth_stat">Auth_stat</a> = 3
+    <span class="comment">/* verifier expired or replayed   */</span>
+    <span id="AUTH_REJECTEDVERF">AUTH_REJECTEDVERF</span> <a href="index.html#Auth_stat">Auth_stat</a> = 4
+    <span class="comment">/* rejected for security reasons  */</span>
+    <span id="AUTH_TOOWEAK">AUTH_TOOWEAK</span> <a href="index.html#Auth_stat">Auth_stat</a> = 5
+    <span class="comment">/* bogus response verifier        */</span>
+    <span id="AUTH_INVALIDRESP">AUTH_INVALIDRESP</span> <a href="index.html#Auth_stat">Auth_stat</a> = 6
+    <span class="comment">/* reason unknown                 */</span>
+    <span id="AUTH_FAILED">AUTH_FAILED</span> <a href="index.html#Auth_stat">Auth_stat</a> = 7
+    <span class="comment">/* kerberos generic error */</span>
+    <span id="AUTH_KERB_GENERIC">AUTH_KERB_GENERIC</span> <a href="index.html#Auth_stat">Auth_stat</a> = 8
+    <span class="comment">/* time of credential expired */</span>
+    <span id="AUTH_TIMEEXPIRE">AUTH_TIMEEXPIRE</span> <a href="index.html#Auth_stat">Auth_stat</a> = 9
+    <span class="comment">/* problem with ticket file */</span>
+    <span id="AUTH_TKT_FILE">AUTH_TKT_FILE</span> <a href="index.html#Auth_stat">Auth_stat</a> = 10
+    <span class="comment">/* can&#39;t decode authenticator */</span>
+    <span id="AUTH_DECODE">AUTH_DECODE</span> <a href="index.html#Auth_stat">Auth_stat</a> = 11
+    <span class="comment">/* wrong net address in ticket */</span>
+    <span id="AUTH_NET_ADDR">AUTH_NET_ADDR</span> <a href="index.html#Auth_stat">Auth_stat</a> = 12
+    <span class="comment">/* no credentials for user */</span>
+    <span id="RPCSEC_GSS_CREDPROBLEM">RPCSEC_GSS_CREDPROBLEM</span> <a href="index.html#Auth_stat">Auth_stat</a> = 13
+    <span class="comment">/* problem with context */</span>
+    <span id="RPCSEC_GSS_CTXPROBLEM">RPCSEC_GSS_CTXPROBLEM</span> <a href="index.html#Auth_stat">Auth_stat</a> = 14
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Auth_stat">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15586:15629#L495">XDR_Auth_stat</a>
+					<a class="permalink" href="index.html#XDR_Auth_stat">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Auth_stat(v *<a href="index.html#Auth_stat">Auth_stat</a>) *<a href="index.html#Auth_stat">Auth_stat</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Auth_stat.GetU32">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15187:15221#L488">GetU32</a>
+					<a class="permalink" href="index.html#Auth_stat.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_stat">Auth_stat</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.Scan">func (*Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=14729:14785#L471">Scan</a>
+					<a class="permalink" href="index.html#Auth_stat.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_stat">Auth_stat</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.SetU32">func (*Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15243:15279#L489">SetU32</a>
+					<a class="permalink" href="index.html#Auth_stat.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_stat">Auth_stat</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.String">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=14588:14622#L465">String</a>
+					<a class="permalink" href="index.html#Auth_stat.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_stat">Auth_stat</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrEnumComments">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16471:16524#L513">XdrEnumComments</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrEnumComments">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (e <a href="index.html#Auth_stat">Auth_stat</a>) XdrEnumComments() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrEnumNames">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=14507:14555#L462">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Auth_stat">Auth_stat</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrMarshal">func (*Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15476:15526#L493">XdrMarshal</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_stat">Auth_stat</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrPointer">func (*Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15302:15346#L490">XdrPointer</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Auth_stat">Auth_stat</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrTypeName">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15360:15397#L491">XdrTypeName</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Auth_stat">Auth_stat</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Auth_stat.XdrValue">func (Auth_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15421:15462#L492">XdrValue</a>
+					<a class="permalink" href="index.html#Auth_stat.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Auth_stat">Auth_stat</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="CallKey">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/decode.go?s=56:104#L1">CallKey</a>
+				<a class="permalink" href="index.html#CallKey">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type CallKey struct {
+<span id="CallKey.Xid"></span>    Xid  <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="CallKey.Peer"></span>    Peer <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="CallSet">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=2050:2137#L68">CallSet</a>
+				<a class="permalink" href="index.html#CallSet">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A CallSet represents a set of pending calls.  Its methods can be
+called concurrently from multiple threads.
+
+			<pre>type CallSet struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="CallSet.Cancel">func (*CallSet) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=3449:3508#L115">Cancel</a>
+					<a class="permalink" href="index.html#CallSet.Cancel">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (cs *<a href="index.html#CallSet">CallSet</a>) Cancel(xid <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>, reason ...<a href="index.html#Accept_stat">Accept_stat</a>)</pre>
+				<p>Cancel a pending call and return a fake Rpc_msg with the the
+CANCELED pseudo-error (by default) or another pseudo-error if
+reason is supplied.  The only lengths that make sense for reason
+are 0 (use default) and 1 (supply Accept_stat).
+
+				
+				
+				
+			
+				
+				<h3 id="CallSet.CancelAll">func (*CallSet) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=3780:3810#L130">CancelAll</a>
+					<a class="permalink" href="index.html#CallSet.CancelAll">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (cs *<a href="index.html#CallSet">CallSet</a>) CancelAll()</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="CallSet.Delete">func (*CallSet) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=3095:3132#L105">Delete</a>
+					<a class="permalink" href="index.html#CallSet.Delete">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (cs *<a href="index.html#CallSet">CallSet</a>) Delete(xid <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				<p>Delete a pending call without making its callback.
+
+				
+				
+				
+			
+				
+				<h3 id="CallSet.GetReply">func (*CallSet) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=4106:4189#L144">GetReply</a>
+					<a class="permalink" href="index.html#CallSet.GetReply">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (cs *<a href="index.html#CallSet">CallSet</a>) GetReply(server <a href="http://localhost:6666/pkg/builtin/#string">string</a>, rmsg *<a href="index.html#Rpc_msg">Rpc_msg</a>,
+    in <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XDR">XDR</a>) *<a href="index.html#PendingCall">PendingCall</a></pre>
+				<p>Attempt to match a reply with a pending call.  If it returns
+a non-nil pc, you should call pc.Cb(rmsg).
+
+				
+				
+				
+			
+				
+				<h3 id="CallSet.NewCall">func (*CallSet) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=2464:2552#L79">NewCall</a>
+					<a class="permalink" href="index.html#CallSet.NewCall">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (cs *<a href="index.html#CallSet">CallSet</a>) NewCall(server <a href="http://localhost:6666/pkg/builtin/#string">string</a>, proc <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrProc">XdrProc</a>,
+    cb func(*<a href="index.html#Rpc_msg">Rpc_msg</a>)) *<a href="index.html#Rpc_msg">Rpc_msg</a></pre>
+				<p>Allocate a new XID and create a message header for an outgoing RPC
+call.  The server string is just an arbitrary name for the server
+to avoid interpreting messages from one server as replies to RPC
+sent to a different server.  If the CallSet is only used for one
+server, the server string can always be empty.
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Call_body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=2637:2785#L97">Call_body</a>
+				<a class="permalink" href="index.html#Call_body">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Body of an RPC call:
+
+			<pre>type Call_body struct {
+    <span class="comment">/* must be equal to two (2) */</span>
+<span id="Call_body.Rpcvers"></span>    Rpcvers <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="Call_body.Prog"></span>    Prog    <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="Call_body.Vers"></span>    Vers    <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="Call_body.Proc"></span>    Proc    <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="Call_body.Cred"></span>    Cred    <a href="index.html#Opaque_auth">Opaque_auth</a>
+<span id="Call_body.Verf"></span>    Verf    <a href="index.html#Opaque_auth">Opaque_auth</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Call_body">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17321:17364#L532">XDR_Call_body</a>
+					<a class="permalink" href="index.html#XDR_Call_body">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Call_body(v *<a href="index.html#Call_body">Call_body</a>) *<a href="index.html#Call_body">Call_body</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Call_body.XdrMarshal">func (*Call_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16770:16820#L520">XdrMarshal</a>
+					<a class="permalink" href="index.html#Call_body.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Call_body">Call_body</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Call_body.XdrPointer">func (*Call_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16596:16640#L517">XdrPointer</a>
+					<a class="permalink" href="index.html#Call_body.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Call_body">Call_body</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Call_body.XdrRecurse">func (*Call_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16844:16894#L521">XdrRecurse</a>
+					<a class="permalink" href="index.html#Call_body.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Call_body">Call_body</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Call_body.XdrTypeName">func (Call_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16654:16691#L518">XdrTypeName</a>
+					<a class="permalink" href="index.html#Call_body.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Call_body">Call_body</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Call_body.XdrValue">func (Call_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16715:16756#L519">XdrValue</a>
+					<a class="permalink" href="index.html#Call_body.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Call_body">Call_body</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Driver">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=3751:5072#L150">Driver</a>
+				<a class="permalink" href="index.html#Driver">&#xb6;</a>
+				
+				
+			</h2>
+			<p>RPC driver implements all Transport-agnostic logic for handling
+incoming and outgoing RPCs.
+<p>You must create a Driver with NewDriver().  A new Driver will not
+process messages until you call the Go() method.  On a server, you
+will often want to call Go() in the main thread.  In a client, you
+will need to invoke Go in its own goroutine.
+<p>Between the time you create a Driver and the time you call its Go()
+method, you may want to do any of the following to customize the
+driver:
+<p>* On a server, register services that you are providing by calling
+the Register() method.
+<p>* Set the Lock field to allow more or less concurrent handling of
+incoming requests.
+<p>* Set the Log field to a non-nil io.Writer.
+
+			<pre>type Driver struct {
+<span id="Driver.Lock"></span>    <span class="comment">// Lock preventing concurrent handling of incoming RPCs on a</span>
+    <span class="comment">// server.  By default, this field is set to a new sync.Mutex,</span>
+    <span class="comment">// meaning that only one call at a time is handled.  A long</span>
+    <span class="comment">// running call can decide to complete asynchronously, however, by</span>
+    <span class="comment">// calling Detach() its context, which immediately releases Lock</span>
+    <span class="comment">// and allows the next call to be dispatched in parallel.</span>
+    <span class="comment">//</span>
+    <span class="comment">// To process all calls in parallel, you can set Lock to nil.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Conversely, to serialize calls on multiple drivers, they can</span>
+    <span class="comment">// all share the same Lock.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Never release this lock from within a server-side RPC routine,</span>
+    <span class="comment">// as otherwise the same thread will release it a second time when</span>
+    <span class="comment">// you return from the RPC.  Instead, use Detach() to free the</span>
+    <span class="comment">// lock, as this ensures Lock will only be freed once.</span>
+    Lock <a href="http://localhost:6666/pkg/sync/">sync</a>.<a href="http://localhost:6666/pkg/sync/#Locker">Locker</a>
+
+    <span class="comment">// If set to non-nil, a human-readable trace of all incoming and</span>
+    <span class="comment">// outgoing RPCs will be written there.  Set the global DefaultLog</span>
+    <span class="comment">// if you want to trace all Drivers by default.</span>
+<span id="Driver.Log"></span>    Log <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a>
+
+    <span class="comment">// If non-nil, all panics arising from service method implementations are passed to PanicHandle.</span>
+<span id="Driver.PanicHandler"></span>    PanicHandler <a href="index.html#PanicHandler">PanicHandler</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewDriver">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=5884:5940#L216">NewDriver</a>
+					<a class="permalink" href="index.html#NewDriver">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewDriver(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>, t <a href="index.html#Transport">Transport</a>) *<a href="index.html#Driver">Driver</a></pre>
+				<p>Allocate a Driver for a transport.  NewDriver takes ownership of
+the Transport it and will Close it when Done.  Do not use a
+Transport after you have passed it to Driver.
+<p>If you will never need to cancel the driver, or plan to do so by
+calling Close(), then you may supply a nil ctx.
+
+				
+				
+			
+
+			
+				
+				<h3 id="Driver.Close">func (*Driver) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=6624:6648#L248">Close</a>
+					<a class="permalink" href="index.html#Driver.Close">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (r *<a href="index.html#Driver">Driver</a>) Close()</pre>
+				<p>Free a Driver, close its transport, and cancel any pending calls
+(which will return with errors).  Calling this will have the same
+effect as canceling the context that was passed to NewDriver.
+
+				
+				
+				
+			
+				
+				<h3 id="Driver.Go">func (*Driver) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=8316:8337#L313">Go</a>
+					<a class="permalink" href="index.html#Driver.Go">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (r *<a href="index.html#Driver">Driver</a>) Go()</pre>
+				<p>The main loop for handling incoming requests.  On a server, you
+will likely want to call this in the main thread after calling
+Register on one or more services.  On a client, you will want to
+start this in its own goroutine to handle incoming replies.
+
+				
+				
+				
+			
+				
+				<h3 id="Driver.Register">func (*Driver) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=6354:6395#L241">Register</a>
+					<a class="permalink" href="index.html#Driver.Register">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (r *<a href="index.html#Driver">Driver</a>) Register(srv <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrSrv">XdrSrv</a>)</pre>
+				<p>Register an RPC server.
+
+				
+				
+				
+			
+				
+				<h3 id="Driver.SendCall">func (*Driver) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=6978:7054#L264">SendCall</a>
+					<a class="permalink" href="index.html#Driver.SendCall">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (r *<a href="index.html#Driver">Driver</a>) SendCall(ctx <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>, proc <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrProc">XdrProc</a>) (err <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				<p>Driver implements the XdrSendCall interface, allowing it to be
+used as the Send field of generated RPC client structures.
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Message">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=119:169#L4">Message</a>
+				<a class="permalink" href="index.html#Message">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Message struct {
+    <a href="http://localhost:6666/pkg/bytes/">bytes</a>.<a href="http://localhost:6666/pkg/bytes/#Buffer">Buffer</a>
+<span id="Message.Peer"></span>    Peer <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Message.In">func (*Message) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=171:201#L9">In</a>
+					<a class="permalink" href="index.html#Message.In">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (m *<a href="index.html#Message">Message</a>) In() <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XDR">XDR</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Message.Out">func (*Message) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=228:259#L13">Out</a>
+					<a class="permalink" href="index.html#Message.Out">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (m *<a href="index.html#Message">Message</a>) Out() <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XDR">XDR</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Message.Serialize">func (*Message) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=457:502#L25">Serialize</a>
+					<a class="permalink" href="index.html#Message.Serialize">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (m *<a href="index.html#Message">Message</a>) Serialize(vs ...<a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrType">XdrType</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Message.Xid">func (*Message) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=287:317#L17">Xid</a>
+					<a class="permalink" href="index.html#Message.Xid">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (m *<a href="index.html#Message">Message</a>) Xid() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Msg_type">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=514:533#L20">Msg_type</a>
+				<a class="permalink" href="index.html#Msg_type">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Msg_type <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="CALL">CALL</span>  <a href="index.html#Msg_type">Msg_type</a> = 0
+    <span id="REPLY">REPLY</span> <a href="index.html#Msg_type">Msg_type</a> = 1
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Msg_type">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7824:7864#L275">XDR_Msg_type</a>
+					<a class="permalink" href="index.html#XDR_Msg_type">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Msg_type(v *<a href="index.html#Msg_type">Msg_type</a>) *<a href="index.html#Msg_type">Msg_type</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Msg_type.GetU32">func (Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7435:7468#L268">GetU32</a>
+					<a class="permalink" href="index.html#Msg_type.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Msg_type">Msg_type</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.Scan">func (*Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6982:7037#L251">Scan</a>
+					<a class="permalink" href="index.html#Msg_type.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Msg_type">Msg_type</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.SetU32">func (*Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7490:7525#L269">SetU32</a>
+					<a class="permalink" href="index.html#Msg_type.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Msg_type">Msg_type</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.String">func (Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6844:6877#L245">String</a>
+					<a class="permalink" href="index.html#Msg_type.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Msg_type">Msg_type</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.XdrEnumNames">func (Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6765:6812#L242">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Msg_type.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Msg_type">Msg_type</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.XdrMarshal">func (*Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7717:7766#L273">XdrMarshal</a>
+					<a class="permalink" href="index.html#Msg_type.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Msg_type">Msg_type</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.XdrPointer">func (*Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7547:7590#L270">XdrPointer</a>
+					<a class="permalink" href="index.html#Msg_type.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Msg_type">Msg_type</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.XdrTypeName">func (Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7604:7640#L271">XdrTypeName</a>
+					<a class="permalink" href="index.html#Msg_type.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Msg_type">Msg_type</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Msg_type.XdrValue">func (Msg_type) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7663:7703#L272">XdrValue</a>
+					<a class="permalink" href="index.html#Msg_type.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Msg_type">Msg_type</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Opaque_auth">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=439:512#L15">Opaque_auth</a>
+				<a class="permalink" href="index.html#Opaque_auth">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type Opaque_auth struct {
+<span id="Opaque_auth.Flavor"></span>    Flavor <a href="index.html#Auth_flavor">Auth_flavor</a>
+<span id="Opaque_auth.Body"></span>    Body   []<a href="http://localhost:6666/pkg/builtin/#byte">byte</a> <span class="comment">// bound 400</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Opaque_auth">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6519:6568#L233">XDR_Opaque_auth</a>
+					<a class="permalink" href="index.html#XDR_Opaque_auth">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Opaque_auth(v *<a href="index.html#Opaque_auth">Opaque_auth</a>) *<a href="index.html#Opaque_auth">Opaque_auth</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Opaque_auth.XdrMarshal">func (*Opaque_auth) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6200:6252#L225">XdrMarshal</a>
+					<a class="permalink" href="index.html#Opaque_auth.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Opaque_auth">Opaque_auth</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Opaque_auth.XdrPointer">func (*Opaque_auth) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6018:6064#L222">XdrPointer</a>
+					<a class="permalink" href="index.html#Opaque_auth.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Opaque_auth">Opaque_auth</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Opaque_auth.XdrRecurse">func (*Opaque_auth) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6276:6328#L226">XdrRecurse</a>
+					<a class="permalink" href="index.html#Opaque_auth.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Opaque_auth">Opaque_auth</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Opaque_auth.XdrTypeName">func (Opaque_auth) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6078:6117#L223">XdrTypeName</a>
+					<a class="permalink" href="index.html#Opaque_auth.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Opaque_auth">Opaque_auth</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Opaque_auth.XdrValue">func (Opaque_auth) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=6143:6186#L224">XdrValue</a>
+					<a class="permalink" href="index.html#Opaque_auth.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Opaque_auth">Opaque_auth</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PanicHandler">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=5164:5247#L187">PanicHandler</a>
+				<a class="permalink" href="index.html#PanicHandler">&#xb6;</a>
+				
+				
+			</h2>
+			<p>PanicHandler defines a handler for panics arising from service method implementations.
+
+			<pre>type PanicHandler interface {
+
+    <span class="comment">// PanicHandler must not panic.</span>
+    PanicHandle(<a href="http://localhost:6666/pkg/builtin/#any">any</a>)
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="PanicHandlerFunc">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=5249:5280#L193">PanicHandlerFunc</a>
+				<a class="permalink" href="index.html#PanicHandlerFunc">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type PanicHandlerFunc func(<a href="http://localhost:6666/pkg/builtin/#any">any</a>)</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="PanicHandlerFunc.PanicHandle">func (PanicHandlerFunc) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/driver.go?s=5282:5326#L195">PanicHandle</a>
+					<a class="permalink" href="index.html#PanicHandlerFunc.PanicHandle">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (h <a href="index.html#PanicHandlerFunc">PanicHandlerFunc</a>) PanicHandle(r <a href="http://localhost:6666/pkg/builtin/#any">any</a>)</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="PendingCall">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=1855:1934#L60">PendingCall</a>
+				<a class="permalink" href="index.html#PendingCall">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type PendingCall struct {
+<span id="PendingCall.Proc"></span>    Proc   <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrProc">XdrProc</a>
+<span id="PendingCall.Cb"></span>    Cb     func(*<a href="index.html#Rpc_msg">Rpc_msg</a>)
+<span id="PendingCall.Server"></span>    Server <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Reject_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=1384:1406#L53">Reject_stat</a>
+				<a class="permalink" href="index.html#Reject_stat">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Reasons why a call message was rejected:
+
+			<pre>type Reject_stat <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span class="comment">/* RPC version number != 2          */</span>
+    <span id="RPC_MISMATCH">RPC_MISMATCH</span> <a href="index.html#Reject_stat">Reject_stat</a> = 0
+    <span class="comment">/* remote can&#39;t authenticate caller */</span>
+    <span id="AUTH_ERROR">AUTH_ERROR</span> <a href="index.html#Reject_stat">Reject_stat</a> = 1
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Reject_stat">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12817:12866#L420">XDR_Reject_stat</a>
+					<a class="permalink" href="index.html#XDR_Reject_stat">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Reject_stat(v *<a href="index.html#Reject_stat">Reject_stat</a>) *<a href="index.html#Reject_stat">Reject_stat</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Reject_stat.GetU32">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12398:12434#L413">GetU32</a>
+					<a class="permalink" href="index.html#Reject_stat.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reject_stat">Reject_stat</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.Scan">func (*Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=11930:11988#L396">Scan</a>
+					<a class="permalink" href="index.html#Reject_stat.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reject_stat">Reject_stat</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.SetU32">func (*Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12456:12494#L414">SetU32</a>
+					<a class="permalink" href="index.html#Reject_stat.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reject_stat">Reject_stat</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.String">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=11783:11819#L390">String</a>
+					<a class="permalink" href="index.html#Reject_stat.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reject_stat">Reject_stat</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrEnumComments">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=13037:13092#L425">XdrEnumComments</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrEnumComments">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (e <a href="index.html#Reject_stat">Reject_stat</a>) XdrEnumComments() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrEnumNames">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=11698:11748#L387">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Reject_stat">Reject_stat</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrMarshal">func (*Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12701:12753#L418">XdrMarshal</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reject_stat">Reject_stat</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrPointer">func (*Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12519:12565#L415">XdrPointer</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reject_stat">Reject_stat</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrTypeName">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12579:12618#L416">XdrTypeName</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Reject_stat">Reject_stat</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reject_stat.XdrValue">func (Reject_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12644:12687#L417">XdrValue</a>
+					<a class="permalink" href="index.html#Reject_stat.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reject_stat">Reject_stat</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Rejected_reply">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=3409:3669#L129">Rejected_reply</a>
+				<a class="permalink" href="index.html#Rejected_reply">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Reply to an RPC call that was rejected by the server:
+
+			<pre>type Rejected_reply struct {
+    <span class="comment">// The union discriminant Stat selects among the following arms:</span>
+    <span class="comment">//   RPC_MISMATCH:</span>
+    <span class="comment">//      Mismatch_info() *XdrAnon_Rejected_reply_Mismatch_info</span>
+    <span class="comment">//   AUTH_ERROR:</span>
+    <span class="comment">//      Rj_why() *Auth_stat</span>
+<span id="Rejected_reply.Stat"></span>    Stat <a href="index.html#Reject_stat">Reject_stat</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Rejected_reply">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25671:25729#L758">XDR_Rejected_reply</a>
+					<a class="permalink" href="index.html#XDR_Rejected_reply">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Rejected_reply(v *<a href="index.html#Rejected_reply">Rejected_reply</a>) *<a href="index.html#Rejected_reply">Rejected_reply</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Rejected_reply.Mismatch_info">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=23500:23578#L677">Mismatch_info</a>
+					<a class="permalink" href="index.html#Rejected_reply.Mismatch_info">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) Mismatch_info() *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.Rj_why">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=23895:23939#L692">Rj_why</a>
+					<a class="permalink" href="index.html#Rejected_reply.Rj_why">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) Rj_why() *<a href="index.html#Auth_stat">Auth_stat</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrMarshal">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25103:25158#L742">XdrMarshal</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrPointer">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24909:24958#L739">XdrPointer</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrRecurse">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25182:25237#L743">XdrRecurse</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrTypeName">func (Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24972:25014#L740">XdrTypeName</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrUnionBody">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24470:24517#L720">XdrUnionBody</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrUnionBody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrUnionBody() <a href="index.html#XdrType">XdrType</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrUnionBodyName">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24696:24746#L729">XdrUnionBodyName</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrUnionBodyName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrUnionBodyName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrUnionTag">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24316:24363#L714">XdrUnionTag</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrUnionTag">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrUnionTag() <a href="index.html#XdrNum32">XdrNum32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrUnionTagName">func (*Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24401:24450#L717">XdrUnionTagName</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrUnionTagName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Rejected_reply">Rejected_reply</a>) XdrUnionTagName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrValid">func (Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24193:24232#L707">XdrValid</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrValid">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u <a href="index.html#Rejected_reply">Rejected_reply</a>) XdrValid() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrValidTags">func (Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=23410:23463#L674">XdrValidTags</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrValidTags">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (_ <a href="index.html#Rejected_reply">Rejected_reply</a>) XdrValidTags() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rejected_reply.XdrValue">func (Rejected_reply) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25043:25089#L741">XdrValue</a>
+					<a class="permalink" href="index.html#Rejected_reply.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Rejected_reply">Rejected_reply</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Reply_body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=3787:4018#L144">Reply_body</a>
+				<a class="permalink" href="index.html#Reply_body">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Body of a reply to an RPC call:
+
+			<pre>type Reply_body struct {
+    <span class="comment">// The union discriminant Stat selects among the following arms:</span>
+    <span class="comment">//   MSG_ACCEPTED:</span>
+    <span class="comment">//      Areply() *Accepted_reply</span>
+    <span class="comment">//   MSG_DENIED:</span>
+    <span class="comment">//      Rreply() *Rejected_reply</span>
+<span id="Reply_body.Stat"></span>    Stat <a href="index.html#Reply_stat">Reply_stat</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Reply_body">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27898:27944#L847">XDR_Reply_body</a>
+					<a class="permalink" href="index.html#XDR_Reply_body">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Reply_body(v *<a href="index.html#Reply_body">Reply_body</a>) *<a href="index.html#Reply_body">Reply_body</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Reply_body.Areply">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25928:25973#L766">Areply</a>
+					<a class="permalink" href="index.html#Reply_body.Areply">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) Areply() *<a href="index.html#Accepted_reply">Accepted_reply</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.Rreply">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=26235:26280#L781">Rreply</a>
+					<a class="permalink" href="index.html#Reply_body.Rreply">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) Rreply() *<a href="index.html#Rejected_reply">Rejected_reply</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrMarshal">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27374:27425#L831">XdrMarshal</a>
+					<a class="permalink" href="index.html#Reply_body.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_body">Reply_body</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrPointer">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27196:27241#L828">XdrPointer</a>
+					<a class="permalink" href="index.html#Reply_body.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_body">Reply_body</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrRecurse">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27449:27500#L832">XdrRecurse</a>
+					<a class="permalink" href="index.html#Reply_body.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrTypeName">func (Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27255:27293#L829">XdrTypeName</a>
+					<a class="permalink" href="index.html#Reply_body.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Reply_body">Reply_body</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrUnionBody">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=26804:26847#L809">XdrUnionBody</a>
+					<a class="permalink" href="index.html#Reply_body.XdrUnionBody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) XdrUnionBody() <a href="index.html#XdrType">XdrType</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrUnionBodyName">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27002:27048#L818">XdrUnionBodyName</a>
+					<a class="permalink" href="index.html#Reply_body.XdrUnionBodyName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) XdrUnionBodyName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrUnionTag">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=26659:26702#L803">XdrUnionTag</a>
+					<a class="permalink" href="index.html#Reply_body.XdrUnionTag">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) XdrUnionTag() <a href="index.html#XdrNum32">XdrNum32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrUnionTagName">func (*Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=26739:26784#L806">XdrUnionTagName</a>
+					<a class="permalink" href="index.html#Reply_body.XdrUnionTagName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#Reply_body">Reply_body</a>) XdrUnionTagName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrValid">func (Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=26540:26575#L796">XdrValid</a>
+					<a class="permalink" href="index.html#Reply_body.XdrValid">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u <a href="index.html#Reply_body">Reply_body</a>) XdrValid() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrValidTags">func (Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=25846:25895#L763">XdrValidTags</a>
+					<a class="permalink" href="index.html#Reply_body.XdrValidTags">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (_ <a href="index.html#Reply_body">Reply_body</a>) XdrValidTags() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_body.XdrValue">func (Reply_body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27318:27360#L830">XdrValue</a>
+					<a class="permalink" href="index.html#Reply_body.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reply_body">Reply_body</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Reply_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=687:708#L28">Reply_stat</a>
+				<a class="permalink" href="index.html#Reply_stat">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A reply to a call message can take on two forms: the message was
+<pre>either accepted or rejected.
+</pre>
+
+			<pre>type Reply_stat <a href="http://localhost:6666/pkg/builtin/#int32">int32</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="MSG_ACCEPTED">MSG_ACCEPTED</span> <a href="index.html#Reply_stat">Reply_stat</a> = 0
+    <span id="MSG_DENIED">MSG_DENIED</span>   <a href="index.html#Reply_stat">Reply_stat</a> = 1
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_Reply_stat">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9216:9262#L317">XDR_Reply_stat</a>
+					<a class="permalink" href="index.html#XDR_Reply_stat">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Reply_stat(v *<a href="index.html#Reply_stat">Reply_stat</a>) *<a href="index.html#Reply_stat">Reply_stat</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Reply_stat.GetU32">func (Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8807:8842#L310">GetU32</a>
+					<a class="permalink" href="index.html#Reply_stat.GetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reply_stat">Reply_stat</a>) GetU32() <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.Scan">func (*Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8344:8401#L293">Scan</a>
+					<a class="permalink" href="index.html#Reply_stat.Scan">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_stat">Reply_stat</a>) Scan(ss <a href="http://localhost:6666/pkg/fmt/">fmt</a>.<a href="http://localhost:6666/pkg/fmt/#ScanState">ScanState</a>, _ <a href="http://localhost:6666/pkg/builtin/#rune">rune</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.SetU32">func (*Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8864:8901#L311">SetU32</a>
+					<a class="permalink" href="index.html#Reply_stat.SetU32">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_stat">Reply_stat</a>) SetU32(n <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.String">func (Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8200:8235#L287">String</a>
+					<a class="permalink" href="index.html#Reply_stat.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reply_stat">Reply_stat</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.XdrEnumNames">func (Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8117:8166#L284">XdrEnumNames</a>
+					<a class="permalink" href="index.html#Reply_stat.XdrEnumNames">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Reply_stat">Reply_stat</a>) XdrEnumNames() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.XdrMarshal">func (*Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9103:9154#L315">XdrMarshal</a>
+					<a class="permalink" href="index.html#Reply_stat.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_stat">Reply_stat</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.XdrPointer">func (*Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8925:8970#L312">XdrPointer</a>
+					<a class="permalink" href="index.html#Reply_stat.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Reply_stat">Reply_stat</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.XdrTypeName">func (Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=8984:9022#L313">XdrTypeName</a>
+					<a class="permalink" href="index.html#Reply_stat.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Reply_stat">Reply_stat</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Reply_stat.XdrValue">func (Reply_stat) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9047:9089#L314">XdrValue</a>
+					<a class="permalink" href="index.html#Reply_stat.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Reply_stat">Reply_stat</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="RpcDecoder">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/decode.go?s=336:393#L7">RpcDecoder</a>
+				<a class="permalink" href="index.html#RpcDecoder">&#xb6;</a>
+				
+				
+			</h2>
+			<p>An RPC message decoder that relies on XdrCatalog and keeps track of
+XID values to may replies to calls.  Primarily intended for
+analyzing RPC traces, since it is not connected to any
+implementations of RPC interfaces.
+
+			<pre>type RpcDecoder struct {
+<span id="RpcDecoder.Calls"></span>    Calls map[<a href="index.html#CallKey">CallKey</a>]<a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrProc">XdrProc</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="RpcDecoder.Decode">func (*RpcDecoder) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/decode.go?s=777:840#L17">Decode</a>
+					<a class="permalink" href="index.html#RpcDecoder.Decode">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (d *<a href="index.html#RpcDecoder">RpcDecoder</a>) Decode(m *<a href="index.html#Message">Message</a>) (*<a href="index.html#Rpc_msg">Rpc_msg</a>, <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrProc">XdrProc</a>)</pre>
+				<p>Return decoded calls and replies from a trace.  The call types are
+looked up based on the Prog, Vers, and Proc in the message header.
+Reply types are taken from a cache based on the calls.  If the type
+of the argument or result cannot be found, or unmarshalling fails,
+returns a nil XdrProc.  If there is a problem with the message
+header, returns a nil *Rpc_msg.
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="RpcSrv">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=4632:4693#L166">RpcSrv</a>
+				<a class="permalink" href="index.html#RpcSrv">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Container for a server implementing a set of program/version
+interfaces.
+
+			<pre>type RpcSrv struct {
+<span id="RpcSrv.Srvs"></span>    Srvs map[<a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>]map[<a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>]<a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrSrv">XdrSrv</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="RpcSrv.GetProc">func (RpcSrv) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=5327:5416#L189">GetProc</a>
+					<a class="permalink" href="index.html#RpcSrv.GetProc">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (s <a href="index.html#RpcSrv">RpcSrv</a>) GetProc(cmsg *<a href="index.html#Rpc_msg">Rpc_msg</a>, in <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XDR">XDR</a>) (
+    rmsg *<a href="index.html#Rpc_msg">Rpc_msg</a>, proc <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrSrvProc">XdrSrvProc</a>)</pre>
+				<p>Receive an RPC call in a server, and format the reply header.  Does
+not actually perform the requested remote procedure call.  To
+perform the call, you should call proc.Do() (maybe in a goroutine)
+when this function returns a non-NULL proc.
+<p>If in == nil, then this function skips unmarshalling the arguments.
+
+				
+				
+				
+			
+				
+				<h3 id="RpcSrv.Register">func (*RpcSrv) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=4742:4783#L171">Register</a>
+					<a class="permalink" href="index.html#RpcSrv.Register">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (s *<a href="index.html#RpcSrv">RpcSrv</a>) Register(srv <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XdrSrv">XdrSrv</a>)</pre>
+				<p>Register a service that receives RPC calls.
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Rpc_msg">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=4043:4105#L155">Rpc_msg</a>
+				<a class="permalink" href="index.html#Rpc_msg">&#xb6;</a>
+				
+				
+			</h2>
+			<p>The RPC message:
+
+			<pre>type Rpc_msg struct {
+<span id="Rpc_msg.Xid"></span>    Xid  <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="Rpc_msg.Body"></span>    Body <a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="GetMsg">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=1707:1748#L52">GetMsg</a>
+					<a class="permalink" href="index.html#GetMsg">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func GetMsg(in <a href="../xdr/index.html">xdr</a>.<a href="../xdr/index.html#XDR">XDR</a>) (*<a href="index.html#Rpc_msg">Rpc_msg</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				<p>Unmarshal an Rpc_msg header, returning an error instead of throwing
+an exception if the bytes are garbage.
+
+				
+				
+			
+				
+				<h3 id="XDR_Rpc_msg">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30794:30831#L949">XDR_Rpc_msg</a>
+					<a class="permalink" href="index.html#XDR_Rpc_msg">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_Rpc_msg(v *<a href="index.html#Rpc_msg">Rpc_msg</a>) *<a href="index.html#Rpc_msg">Rpc_msg</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="Rpc_msg.Error">func (*Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/util.go?s=6506:6538#L233">Error</a>
+					<a class="permalink" href="index.html#Rpc_msg.Error">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (m *<a href="index.html#Rpc_msg">Rpc_msg</a>) Error() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				<p>An *Rpc_msg can represent an error.  Call IsSuccess to see if there
+was actually an error.
+
+				
+				
+				
+			
+				
+				<h3 id="Rpc_msg.XdrMarshal">func (*Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30487:30535#L941">XdrMarshal</a>
+					<a class="permalink" href="index.html#Rpc_msg.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Rpc_msg">Rpc_msg</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rpc_msg.XdrPointer">func (*Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30321:30363#L938">XdrPointer</a>
+					<a class="permalink" href="index.html#Rpc_msg.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Rpc_msg">Rpc_msg</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rpc_msg.XdrRecurse">func (*Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30559:30607#L942">XdrRecurse</a>
+					<a class="permalink" href="index.html#Rpc_msg.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#Rpc_msg">Rpc_msg</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rpc_msg.XdrTypeName">func (Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30377:30412#L939">XdrTypeName</a>
+					<a class="permalink" href="index.html#Rpc_msg.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#Rpc_msg">Rpc_msg</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Rpc_msg.XdrValue">func (Rpc_msg) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30434:30473#L940">XdrValue</a>
+					<a class="permalink" href="index.html#Rpc_msg.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#Rpc_msg">Rpc_msg</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="StreamTransport">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=1573:2163#L59">StreamTransport</a>
+				<a class="permalink" href="index.html#StreamTransport">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Implements RFC5531 record-marking protocol for stream sockets
+
+			<pre>type StreamTransport struct {
+<span id="StreamTransport.MaxMsgSize"></span>    MaxMsgSize <a href="http://localhost:6666/pkg/builtin/#int">int</a>
+<span id="StreamTransport.Conn"></span>    Conn       <a href="http://localhost:6666/pkg/net/">net</a>.<a href="http://localhost:6666/pkg/net/#Conn">Conn</a>
+
+    <span class="comment">// Since a StreamTransport is connected, we ignore Peer in sent</span>
+    <span class="comment">// messages, but can hardcode a value for incoming messages.</span>
+<span id="StreamTransport.Peer"></span>    Peer <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="NewStreamTransport">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=2358:2410#L79">NewStreamTransport</a>
+					<a class="permalink" href="index.html#NewStreamTransport">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func NewStreamTransport(c <a href="http://localhost:6666/pkg/net/">net</a>.<a href="http://localhost:6666/pkg/net/#Conn">Conn</a>) *<a href="index.html#StreamTransport">StreamTransport</a></pre>
+				<p>Create a stream transport from a connected stream socket.  This is
+the only valid way to initialize a StreamTransport.  You can
+manually adjust MaxMsgSize after calling this function.
+
+				
+				
+			
+
+			
+				
+				<h3 id="StreamTransport.Close">func (*StreamTransport) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=2928:2962#L108">Close</a>
+					<a class="permalink" href="index.html#StreamTransport.Close">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (tx *<a href="index.html#StreamTransport">StreamTransport</a>) Close()</pre>
+				<p>Close the transport and underlying Conn if it hasn&apos;t been closed
+yet.  Subsequent calls to Close() have no effect.
+
+				
+				
+				
+			
+				
+				<h3 id="StreamTransport.IsConnected">func (*StreamTransport) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=4157:4202#L167">IsConnected</a>
+					<a class="permalink" href="index.html#StreamTransport.IsConnected">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (tx *<a href="index.html#StreamTransport">StreamTransport</a>) IsConnected() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="StreamTransport.Receive">func (*StreamTransport) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=3533:3587#L141">Receive</a>
+					<a class="permalink" href="index.html#StreamTransport.Receive">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (tx *<a href="index.html#StreamTransport">StreamTransport</a>) Receive() (*<a href="index.html#Message">Message</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="StreamTransport.Send">func (*StreamTransport) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=3028:3077#L114">Send</a>
+					<a class="permalink" href="index.html#StreamTransport.Send">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (tx *<a href="index.html#StreamTransport">StreamTransport</a>) Send(m *<a href="index.html#Message">Message</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Transport">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/transport.go?s=812:1446#L36">Transport</a>
+				<a class="permalink" href="index.html#Transport">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Abstraction for an RPC transport.  Note that Send() should not be
+called multiple times concurrently and Receive() should not be
+called multiple times concurrently, but it is okay to call Send()
+concurrently with Receive().
+
+			<pre>type Transport interface {
+    <span class="comment">// Send a message.</span>
+    Send(*<a href="index.html#Message">Message</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a>
+
+    <span class="comment">// Receive the next incoming message.  Blocks until a message is</span>
+    <span class="comment">// available.</span>
+    Receive() (*<a href="index.html#Message">Message</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)
+
+    <span class="comment">// Close the underlying file descriptor and make subsequent calls</span>
+    <span class="comment">// to Send and Receive return errors.  Note that transports must</span>
+    <span class="comment">// allow multiple calls to Close (unlike most io.Closer types,</span>
+    <span class="comment">// which don&#39;t guaratnee this).</span>
+    Close()
+
+    <span class="comment">// Returns true if the Peer field of Message does not matter</span>
+    <span class="comment">// because each instance of the transport is connected to a single</span>
+    <span class="comment">// endpoint (like TCP and unlike an unconnected UDP socket).</span>
+    IsConnected() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>
+}</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrAnon_Accepted_reply_Reply_data">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=2942:3258#L112">XdrAnon_Accepted_reply_Reply_data</a>
+				<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrAnon_Accepted_reply_Reply_data struct {
+    <span class="comment">// The union discriminant Stat selects among the following arms:</span>
+    <span class="comment">//   SUCCESS:</span>
+    <span class="comment">//      Results() *[0]byte</span>
+    <span class="comment">//   PROG_MISMATCH:</span>
+    <span class="comment">//      Mismatch_info() *XdrAnon_Accepted_reply_Reply_data_Mismatch_info</span>
+    <span class="comment">//   default:</span>
+    <span class="comment">//      void</span>
+<span id="XdrAnon_Accepted_reply_Reply_data.Stat"></span>    Stat <a href="index.html#Accept_stat">Accept_stat</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_XdrAnon_Accepted_reply_Reply_data">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21648:21763#L643">XDR_XdrAnon_Accepted_reply_Reply_data</a>
+					<a class="permalink" href="index.html#XDR_XdrAnon_Accepted_reply_Reply_data">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_XdrAnon_Accepted_reply_Reply_data(v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.Mismatch_info">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=19502:19610#L578">Mismatch_info</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.Mismatch_info">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) Mismatch_info() *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.Results">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=19173:19235#L563">Results</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.Results">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) Results() *[0]<a href="http://localhost:6666/pkg/builtin/#byte">byte</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrMarshal">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21061:21135#L626">XdrMarshal</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrPointer">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20791:20859#L623">XdrPointer</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrRecurse">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21159:21233#L627">XdrRecurse</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrTypeName">func (XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20873:20934#L624">XdrTypeName</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrUnionBody">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20237:20303#L602">XdrUnionBody</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionBody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrUnionBody() <a href="index.html#XdrType">XdrType</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrUnionBodyName">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20511:20580#L612">XdrUnionBodyName</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionBodyName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrUnionBodyName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrUnionTag">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20045:20111#L596">XdrUnionTag</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionTag">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrUnionTag() <a href="index.html#XdrNum32">XdrNum32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrUnionTagName">func (*XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20149:20217#L599">XdrUnionTagName</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrUnionTagName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrUnionTagName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrValid">func (XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=19969:20027#L593">XdrValid</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValid">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u <a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrValid() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrValidTags">func (XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=19084:19156#L560">XdrValidTags</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValidTags">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (_ <a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrValidTags() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data.XdrValue">func (XdrAnon_Accepted_reply_Reply_data) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20982:21047#L625">XdrValue</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=3259:3347#L123">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>
+				<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrAnon_Accepted_reply_Reply_data_Mismatch_info struct {
+<span id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.Low"></span>    Low  <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.High"></span>    High <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=18189:18346#L545">XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>
+					<a class="permalink" href="index.html#XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_XdrAnon_Accepted_reply_Reply_data_Mismatch_info(v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrMarshal">func (*XdrAnon_Accepted_reply_Reply_data_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17816:17904#L537">XdrMarshal</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrPointer">func (*XdrAnon_Accepted_reply_Reply_data_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17490:17572#L534">XdrPointer</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrRecurse">func (*XdrAnon_Accepted_reply_Reply_data_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17928:18016#L538">XdrRecurse</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrTypeName">func (XdrAnon_Accepted_reply_Reply_data_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17586:17661#L535">XdrTypeName</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrValue">func (XdrAnon_Accepted_reply_Reply_data_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17723:17802#L536">XdrValue</a>
+					<a class="permalink" href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="XdrAnon_Rejected_reply_Mismatch_info">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=3670:3747#L138">XdrAnon_Rejected_reply_Mismatch_info</a>
+				<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrAnon_Rejected_reply_Mismatch_info struct {
+<span id="XdrAnon_Rejected_reply_Mismatch_info.Low"></span>    Low  <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+<span id="XdrAnon_Rejected_reply_Mismatch_info.High"></span>    High <a href="http://localhost:6666/pkg/builtin/#uint32">uint32</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_XdrAnon_Rejected_reply_Mismatch_info">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=23164:23288#L669">XDR_XdrAnon_Rejected_reply_Mismatch_info</a>
+					<a class="permalink" href="index.html#XDR_XdrAnon_Rejected_reply_Mismatch_info">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_XdrAnon_Rejected_reply_Mismatch_info(v *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="XdrAnon_Rejected_reply_Mismatch_info.XdrMarshal">func (*XdrAnon_Rejected_reply_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22813:22890#L661">XdrMarshal</a>
+					<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rejected_reply_Mismatch_info.XdrPointer">func (*XdrAnon_Rejected_reply_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22531:22602#L658">XdrPointer</a>
+					<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rejected_reply_Mismatch_info.XdrRecurse">func (*XdrAnon_Rejected_reply_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22914:22991#L662">XdrRecurse</a>
+					<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rejected_reply_Mismatch_info.XdrTypeName">func (XdrAnon_Rejected_reply_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22616:22680#L659">XdrTypeName</a>
+					<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rejected_reply_Mismatch_info.XdrValue">func (XdrAnon_Rejected_reply_Mismatch_info) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22731:22799#L660">XdrValue</a>
+					<a class="permalink" href="index.html#XdrAnon_Rejected_reply_Mismatch_info.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="XdrAnon_Rpc_msg_Body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=4106:4323#L159">XdrAnon_Rpc_msg_Body</a>
+				<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrAnon_Rpc_msg_Body struct {
+    <span class="comment">// The union discriminant Mtype selects among the following arms:</span>
+    <span class="comment">//   CALL:</span>
+    <span class="comment">//      Cbody() *Call_body</span>
+    <span class="comment">//   REPLY:</span>
+    <span class="comment">//      Rbody() *Reply_body</span>
+<span id="XdrAnon_Rpc_msg_Body.Mtype"></span>    Mtype <a href="index.html#Msg_type">Msg_type</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="XDR_XdrAnon_Rpc_msg_Body">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30200:30276#L936">XDR_XdrAnon_Rpc_msg_Body</a>
+					<a class="permalink" href="index.html#XDR_XdrAnon_Rpc_msg_Body">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func XDR_XdrAnon_Rpc_msg_Body(v *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a></pre>
+				
+				
+				
+			
+
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.Cbody">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28160:28209#L855">Cbody</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.Cbody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) Cbody() *<a href="index.html#Call_body">Call_body</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.Rbody">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28465:28515#L870">Rbody</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.Rbody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) Rbody() *<a href="index.html#Reply_body">Reply_body</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrMarshal">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29669:29730#L920">XdrMarshal</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrMarshal">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrMarshal(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrPointer">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29451:29506#L917">XdrPointer</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrPointer">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrPointer() interface{}</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrRecurse">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29754:29815#L921">XdrRecurse</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrRecurse">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrRecurse(x <a href="index.html#XDR">XDR</a>, name <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrTypeName">func (XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29520:29568#L918">XdrTypeName</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrTypeName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrTypeName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrUnionBody">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29056:29109#L898">XdrUnionBody</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionBody">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrUnionBody() <a href="index.html#XdrType">XdrType</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrUnionBodyName">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29241:29297#L907">XdrUnionBodyName</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionBodyName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrUnionBodyName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrUnionTag">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28891:28944#L892">XdrUnionTag</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionTag">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrUnionTag() <a href="index.html#XdrNum32">XdrNum32</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrUnionTagName">func (*XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28980:29035#L895">XdrUnionTagName</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrUnionTagName">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrUnionTagName() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrValid">func (XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28774:28819#L885">XdrValid</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrValid">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (u <a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrValid() <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrValidTags">func (XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=28058:28117#L852">XdrValidTags</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrValidTags">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (_ <a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrValidTags() map[<a href="http://localhost:6666/pkg/builtin/#int32">int32</a>]<a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="XdrAnon_Rpc_msg_Body.XdrValue">func (XdrAnon_Rpc_msg_Body) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29603:29655#L919">XdrValue</a>
+					<a class="permalink" href="index.html#XdrAnon_Rpc_msg_Body.XdrValue">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (v <a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a>) XdrValue() interface{}</pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="XdrType_Accept_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=10884:10923#L366">XdrType_Accept_stat</a>
+				<a class="permalink" href="index.html#XdrType_Accept_stat">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Accept_stat = *<a href="index.html#Accept_stat">Accept_stat</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Accepted_reply">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=21776:21821#L644">XdrType_Accepted_reply</a>
+				<a class="permalink" href="index.html#XdrType_Accepted_reply">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Accepted_reply = *<a href="index.html#Accepted_reply">Accepted_reply</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Auth_flavor">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5875:5914#L219">XdrType_Auth_flavor</a>
+				<a class="permalink" href="index.html#XdrType_Auth_flavor">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Auth_flavor = *<a href="index.html#Auth_flavor">Auth_flavor</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Auth_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=15550:15585#L494">XdrType_Auth_stat</a>
+				<a class="permalink" href="index.html#XdrType_Auth_stat">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Auth_stat = *<a href="index.html#Auth_stat">Auth_stat</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Call_body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=16560:16595#L516">XdrType_Call_body</a>
+				<a class="permalink" href="index.html#XdrType_Call_body">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Call_body = *<a href="index.html#Call_body">Call_body</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Msg_type">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=7790:7823#L274">XdrType_Msg_type</a>
+				<a class="permalink" href="index.html#XdrType_Msg_type">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Msg_type = *<a href="index.html#Msg_type">Msg_type</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Opaque_auth">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=5978:6017#L221">XdrType_Opaque_auth</a>
+				<a class="permalink" href="index.html#XdrType_Opaque_auth">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Opaque_auth = *<a href="index.html#Opaque_auth">Opaque_auth</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Reject_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=12777:12816#L419">XdrType_Reject_stat</a>
+				<a class="permalink" href="index.html#XdrType_Reject_stat">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Reject_stat = *<a href="index.html#Reject_stat">Reject_stat</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Rejected_reply">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=24863:24908#L738">XdrType_Rejected_reply</a>
+				<a class="permalink" href="index.html#XdrType_Rejected_reply">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Rejected_reply = *<a href="index.html#Rejected_reply">Rejected_reply</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Reply_body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=27158:27195#L827">XdrType_Reply_body</a>
+				<a class="permalink" href="index.html#XdrType_Reply_body">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Reply_body = *<a href="index.html#Reply_body">Reply_body</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Reply_stat">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=9178:9215#L316">XdrType_Reply_stat</a>
+				<a class="permalink" href="index.html#XdrType_Reply_stat">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Reply_stat = *<a href="index.html#Reply_stat">Reply_stat</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_Rpc_msg">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=30289:30320#L937">XdrType_Rpc_msg</a>
+				<a class="permalink" href="index.html#XdrType_Rpc_msg">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_Rpc_msg = *<a href="index.html#Rpc_msg">Rpc_msg</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_XdrAnon_Accepted_reply_Reply_data">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=20707:20790#L622">XdrType_XdrAnon_Accepted_reply_Reply_data</a>
+				<a class="permalink" href="index.html#XdrType_XdrAnon_Accepted_reply_Reply_data">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_XdrAnon_Accepted_reply_Reply_data = *<a href="index.html#XdrAnon_Accepted_reply_Reply_data">XdrAnon_Accepted_reply_Reply_data</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=17378:17489#L533">XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a>
+				<a class="permalink" href="index.html#XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_XdrAnon_Accepted_reply_Reply_data_Mismatch_info = *<a href="index.html#XdrAnon_Accepted_reply_Reply_data_Mismatch_info">XdrAnon_Accepted_reply_Reply_data_Mismatch_info</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_XdrAnon_Rejected_reply_Mismatch_info">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=22441:22530#L657">XdrType_XdrAnon_Rejected_reply_Mismatch_info</a>
+				<a class="permalink" href="index.html#XdrType_XdrAnon_Rejected_reply_Mismatch_info">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_XdrAnon_Rejected_reply_Mismatch_info = *<a href="index.html#XdrAnon_Rejected_reply_Mismatch_info">XdrAnon_Rejected_reply_Mismatch_info</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="XdrType_XdrAnon_Rpc_msg_Body">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/rpc/rpc_msg.go?s=29393:29450#L916">XdrType_XdrAnon_Rpc_msg_Body</a>
+				<a class="permalink" href="index.html#XdrType_XdrAnon_Rpc_msg_Body">&#xb6;</a>
+				
+				
+			</h2>
+			
+			<pre>type XdrType_XdrAnon_Rpc_msg_Body = *<a href="index.html#XdrAnon_Rpc_msg_Body">XdrAnon_Rpc_msg_Body</a></pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>printf - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package printf
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package printf defines an Analyzer that checks consistency
+of Printf format strings and arguments.
+<h3 id="hdr-Analyzer_printf">Analyzer printf</h3>
+<p>printf: check consistency of Printf format strings and arguments
+<p>The check applies to calls of the formatting functions such as
+<a href="http://localhost:6666/fmt#Printf">fmt.Printf</a> and <a href="http://localhost:6666/fmt#Sprintf">fmt.Sprintf</a>, as well as any detected wrappers of
+those functions such as <a href="http://localhost:6666/log#Printf">log.Printf</a>. It reports a variety of
+mistakes such as syntax errors in the format string and mismatches
+(of number and type) between the verbs and their arguments.
+<p>See the documentation of the fmt package for the complete set of
+format operators and their operand types.
+<h3 id="hdr-Examples">Examples</h3>
+<p>The %d format operator requires an integer operand.
+Here it is incorrectly applied to a string:
+<pre>fmt.Printf(&quot;%d&quot;, &quot;hello&quot;) // fmt.Printf format %d has arg &quot;hello&quot; of wrong type string
+</pre>
+<p>A call to Printf must have as many operands as there are &quot;verbs&quot; in
+the format string, not too few:
+<pre>fmt.Printf(&quot;%d&quot;) // fmt.Printf format reads arg 1, but call has 0 args
+</pre>
+<p>nor too many:
+<pre>fmt.Printf(&quot;%d&quot;, 1, 2) // fmt.Printf call needs 1 arg, but has 2 args
+</pre>
+<p>Explicit argument indexes must be no greater than the number of
+arguments:
+<pre>fmt.Printf(&quot;%[3]d&quot;, 1, 2) // fmt.Printf call has invalid argument index 3
+</pre>
+<p>The checker also uses a heuristic to report calls to Print-like
+functions that appear to have been intended for their Printf-like
+counterpart:
+<pre>log.Print(&quot;%d&quot;, 123) // log.Print call has possible formatting directive %d
+</pre>
+<p>Conversely, it also reports calls to Printf-like functions with a
+non-constant format string and no other arguments:
+<pre>fmt.Printf(message) // non-constant format string in call to fmt.Printf
+</pre>
+<p>Such calls may have been intended for the function&apos;s Print-like
+counterpart: if the value of message happens to contain &quot;%&quot;,
+misformatting will occur. In this case, the checker additionally
+suggests a fix to turn the call into:
+<pre>fmt.Printf(&quot;%s&quot;, message)
+</pre>
+<h3 id="hdr-Inferred_printf_wrappers">Inferred printf wrappers</h3>
+<p>Functions that delegate their arguments to fmt.Printf are
+considered &quot;printf wrappers&quot;; calls to them are subject to the same
+checking. In this example, logf is a printf wrapper:
+<pre>func logf(level int, format string, args ...any) {
+	if enabled(level) {
+		log.Printf(format, args...)
+	}
+}
+
+logf(3, &quot;invalid request: %v&quot;) // logf format reads arg 1, but call has 0 args
+</pre>
+<p>To enable printf checking on a function that is not found by this
+analyzer&apos;s heuristics (for example, because control is obscured by
+dynamic method calls), insert a bogus call:
+<pre>func MyPrintf(format string, args ...any) {
+	if false {
+		_ = fmt.Sprintf(format, args...) // enable printf checking
+	}
+	...
+}
+</pre>
+<h3 id="hdr-Specifying_printf_wrappers_by_flag">Specifying printf wrappers by flag</h3>
+<p>The -funcs flag specifies a comma-separated list of names of
+additional known formatting functions or methods. (This legacy flag
+is rarely used due to the automatic inference described above.)
+<p>If the name contains a period, it must denote a specific function
+using one of the following forms:
+<pre>dir/pkg.Function
+dir/pkg.Type.Method
+(*dir/pkg.Type).Method
+</pre>
+<p>Otherwise the name is interpreted as a case-insensitive unqualified
+identifier such as &quot;errorf&quot;. Either way, if a listed name ends in f, the
+function is assumed to be Printf-like, taking a format string before the
+argument list. Otherwise it is assumed to be Print-like, taking a list
+of arguments with no format string.
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+				<dd><a href="index.html#pkg-variables">Variables</a></dd>
+			
+			
+			
+				
+				<dd><a href="index.html#Kind">type Kind</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Kind.String">func (kind Kind) String() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Result">type Result</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Result.Kind">func (r *Result) Kind(fn *types.Func) Kind</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/doc.go">doc.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/printf.go">printf.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/types.go">types.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+			<h2 id="pkg-variables">Variables</h2>
+			
+				
+				<pre>var <span id="Analyzer">Analyzer</span> = &amp;<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer">Analyzer</a>{
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.Name">Name</a>:       &#34;printf&#34;,
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.Doc">Doc</a>:        <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/passes/internal/analysisutil/">analysisutil</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/passes/internal/analysisutil/#MustExtractDoc">MustExtractDoc</a>(doc, &#34;printf&#34;),
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.URL">URL</a>:        &#34;https://pkg.go.dev/golang.org/x/tools/go/analysis/passes/printf&#34;,
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.Requires">Requires</a>:   []*<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer">Analyzer</a>{<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/passes/inspect/">inspect</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/passes/inspect/#Analyzer">Analyzer</a>},
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.Run">Run</a>:        run,
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.ResultType">ResultType</a>: <a href="http://localhost:6666/pkg/reflect/">reflect</a>.<a href="http://localhost:6666/pkg/reflect/#TypeOf">TypeOf</a>((*<a href="index.html#Result">Result</a>)(<a href="http://localhost:6666/pkg/builtin/#nil">nil</a>)),
+    <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer.FactTypes">FactTypes</a>:  []<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Fact">Fact</a>{<a href="http://localhost:6666/pkg/builtin/#new">new</a>(isWrapper)},
+}</pre>
+			
+		
+		
+		
+			
+			
+			<h2 id="Kind">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/printf.go?s=1239:1252#L38">Kind</a>
+				<a class="permalink" href="index.html#Kind">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Kind is a kind of fmt function behavior.
+
+			<pre>type Kind <a href="http://localhost:6666/pkg/builtin/#int">int</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="KindNone">KindNone</span>   <a href="index.html#Kind">Kind</a> = <a href="http://localhost:6666/pkg/builtin/#iota">iota</a> <span class="comment">// not a fmt wrapper function</span>
+    <span id="KindPrint">KindPrint</span>              <span class="comment">// function behaves like fmt.Print</span>
+    <span id="KindPrintf">KindPrintf</span>             <span class="comment">// function behaves like fmt.Printf</span>
+    <span id="KindErrorf">KindErrorf</span>             <span class="comment">// function behaves like fmt.Errorf</span>
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Kind.String">func (Kind) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/printf.go?s=1498:1530#L47">String</a>
+					<a class="permalink" href="index.html#Kind.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (kind <a href="index.html#Kind">Kind</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Result">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/printf.go?s=1817:1867#L61">Result</a>
+				<a class="permalink" href="index.html#Result">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Result is the printf analyzer&apos;s result type. Clients may query the result
+to learn whether a function behaves like fmt.Print or fmt.Printf.
+
+			<pre>type Result struct {
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Result.Kind">func (*Result) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/passes/printf/printf.go?s=1934:1976#L66">Kind</a>
+					<a class="permalink" href="index.html#Result.Kind">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (r *<a href="index.html#Result">Result</a>) Kind(fn *<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Func">Func</a>) <a href="index.html#Kind">Kind</a></pre>
+				<p>Kind reports whether fn behaves like fmt.Print or fmt.Printf.
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

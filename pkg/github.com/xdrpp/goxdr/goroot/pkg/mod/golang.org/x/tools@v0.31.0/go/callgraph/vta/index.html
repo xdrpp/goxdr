@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>vta - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package vta
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+				<dd><a href="index.html#pkg-subdirectories">Subdirectories</a></dd>
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package vta computes the call graph of a Go program using the Variable
+Type Analysis (VTA) algorithm originally described in &quot;Practical Virtual
+Method Call Resolution for Java,&quot; Vijay Sundaresan, Laurie Hendren,
+Chrislain Razafimahefa, Raja Vallée-Rai, Patrick Lam, Etienne Gagnon, and
+Charles Godin.
+<p>Note: this package is in experimental phase and its interface is
+subject to change.
+TODO(zpavlinovic): reiterate on documentation.
+<p>The VTA algorithm overapproximates the set of types (and function literals)
+a variable can take during runtime by building a global type propagation
+graph and propagating types (and function literals) through the graph.
+<p>A type propagation is a directed, labeled graph. A node can represent
+one of the following:
+<ul>
+<li>A field of a struct type.
+<li>A local (SSA) variable of a method/function.
+<li>All pointers to a non-interface type.
+<li>The return value of a method.
+<li>All elements in an array.
+<li>All elements in a slice.
+<li>All elements in a map.
+<li>All elements in a channel.
+<li>A global variable.
+</ul>
+<p>In addition, the implementation used in this package introduces
+a few Go specific kinds of nodes:
+<ul>
+<li>(De)references of nested pointers to interfaces are modeled
+as a unique nestedPtrInterface node in the type propagation graph.
+<li>Each function literal is represented as a function node whose
+internal value is the (SSA) representation of the function. This
+is done to precisely infer flow of higher-order functions.
+</ul>
+<p>Edges in the graph represent flow of types (and function literals) through
+the program. That is, the model 1) typing constraints that are induced by
+assignment statements or function and method calls and 2) higher-order flow
+of functions in the program.
+<p>The labeling function maps each node to a set of types and functions that
+can intuitively reach the program construct the node represents. Initially,
+every node is assigned a type corresponding to the program construct it
+represents. Function nodes are also assigned the function they represent.
+The labeling function then propagates types and function through the graph.
+<p>The result of VTA is a type propagation graph in which each node is labeled
+with a conservative overapproximation of the set of types (and functions)
+it may have. This information is then used to construct the call graph.
+For each unresolved call site, vta uses the set of types and functions
+reaching the node representing the call site to create a set of callees.
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+				
+				<dd><a href="index.html#CallGraph">func CallGraph(funcs map[*ssa.Function]bool, initial *callgraph.Graph) *callgraph.Graph</a></dd>
+			
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/graph.go">graph.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/initial.go">initial.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/propagation.go">propagation.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/utils.go">utils.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/vta.go">vta.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+			
+			
+			<h2 id="CallGraph">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/callgraph/vta/vta.go?s=3539:3626#L66">CallGraph</a>
+				<a class="permalink" href="index.html#CallGraph">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func CallGraph(funcs map[*<a href="http://localhost:6666/pkg/golang.org/x/tools/go/ssa/">ssa</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/ssa/#Function">Function</a>]<a href="http://localhost:6666/pkg/builtin/#bool">bool</a>, initial *<a href="http://localhost:6666/pkg/golang.org/x/tools/go/callgraph/">callgraph</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/callgraph/#Graph">Graph</a>) *<a href="http://localhost:6666/pkg/golang.org/x/tools/go/callgraph/">callgraph</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/callgraph/#Graph">Graph</a></pre>
+			<p>CallGraph uses the VTA algorithm to compute call graph for all functions
+f:true in funcs. VTA refines the results of initial call graph and uses it
+to establish interprocedural type flow. If initial is nil, VTA uses a more
+efficient approach to construct a CHA call graph.
+<p>The resulting graph does not have a root node.
+<p>CallGraph does not make any assumptions on initial types global variables
+and function/method inputs can have. CallGraph is then sound, modulo use of
+reflection and unsafe, if the initial call graph is sound.
+
+			
+			
+
+		
+		
+	
+
+	
+
+
+
+
+
+	
+	
+		<h2 id="pkg-subdirectories">Subdirectories</h2>
+	
+	<div class="pkg-dir">
+		<table>
+			<tr>
+				<th class="pkg-name">Name</th>
+				<th class="pkg-synopsis">Synopsis</th>
+			</tr>
+
+			
+			<tr>
+				<td colspan="2"><a href="../index.html">..</a></td>
+			</tr>
+			
+
+			
+		</table>
+	</div>
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

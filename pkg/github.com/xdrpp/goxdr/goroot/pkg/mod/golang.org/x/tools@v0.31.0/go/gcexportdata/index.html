@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>gcexportdata - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package gcexportdata
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+				<dd><a href="index.html#pkg-examples" class="examplesLink">Examples</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package gcexportdata provides functions for reading and writing
+export data, which is a serialized description of the API of a Go
+package including the names, kinds, types, and locations of all
+exported declarations.
+<p>The standard Go compiler (cmd/compile) writes an export data file
+for each package it compiles, which it later reads when compiling
+packages that import the earlier one. The compiler must thus
+contain logic to both write and read export data.
+(See the &quot;Export&quot; section in the cmd/compile/README file.)
+<p>The <a href="index.html#Read">Read</a> function in this package can read files produced by the
+compiler, producing <a href="http://localhost:6666/go/types">go/types</a> data structures. As a matter of
+policy, Read supports export data files produced by only the last
+two Go releases plus tip; see <a href="https://go.dev/issue/68898">https://go.dev/issue/68898</a>. The
+export data files produced by the compiler contain additional
+details related to generics, inlining, and other optimizations that
+cannot be decoded by the <a href="index.html#Read">Read</a> function.
+<p>In files written by the compiler, the export data is not at the
+start of the file. Before calling Read, use <a href="index.html#NewReader">NewReader</a> to locate
+the desired portion of the file.
+<p>The <a href="index.html#Write">Write</a> function in this package encodes the exported API of a
+Go package (<a href="http://localhost:6666/go/types#Package">types.Package</a>) as a file. Such files can be later
+decoded by Read, but cannot be consumed by the compiler.
+<h3 id="hdr-Future_changes">Future changes</h3>
+<p>Although Read supports the formats written by both Write and the
+compiler, the two are quite different, and there is an open
+proposal (<a href="https://go.dev/issue/69491">https://go.dev/issue/69491</a>) to separate these APIs.
+<p>Under that proposal, this package would ultimately provide only the
+Read operation for compiler export data, which must be defined in
+this module (golang.org/x/tools), not in the standard library, to
+avoid version skew for developer tools that need to read compiler
+export data both before and after a Go release, such as from Go
+1.23 to Go 1.24. Because this package lives in the tools module,
+clients can update their version of the module some time before the
+Go 1.24 release and rebuild and redeploy their tools, which will
+then be able to consume both Go 1.23 and Go 1.24 export data files,
+so they will work before and after the Go update. (See discussion
+at <a href="https://go.dev/issue/15651">https://go.dev/issue/15651</a>.)
+<p>The operations to import and export <a href="http://localhost:6666/go/types">go/types</a> data structures
+would be defined in the go/types package as Import and Export.
+<a href="index.html#Write">Write</a> would (eventually) delegate to Export,
+and <a href="index.html#Read">Read</a>, when it detects a file produced by Export,
+would delegate to Import.
+<h3 id="hdr-Deprecations">Deprecations</h3>
+<p>The <a href="index.html#NewImporter">NewImporter</a> and <a href="index.html#Find">Find</a> functions are deprecated and should
+not be used in new code. The <a href="index.html#WriteBundle">WriteBundle</a> and <a href="index.html#ReadBundle">ReadBundle</a>
+functions are experimental, and there is an open proposal to
+deprecate them (<a href="https://go.dev/issue/69573">https://go.dev/issue/69573</a>).
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+				
+				<dd><a href="index.html#Find">func Find(importPath, srcDir string) (filename, path string)</a></dd>
+			
+				
+				<dd><a href="index.html#NewImporter">func NewImporter(fset *token.FileSet, imports map[string]*types.Package) types.ImporterFrom</a></dd>
+			
+				
+				<dd><a href="index.html#NewReader">func NewReader(r io.Reader) (io.Reader, error)</a></dd>
+			
+				
+				<dd><a href="index.html#Read">func Read(in io.Reader, fset *token.FileSet, imports map[string]*types.Package, path string) (*types.Package, error)</a></dd>
+			
+				
+				<dd><a href="index.html#ReadBundle">func ReadBundle(in io.Reader, fset *token.FileSet, imports map[string]*types.Package) ([]*types.Package, error)</a></dd>
+			
+				
+				<dd><a href="index.html#Write">func Write(out io.Writer, fset *token.FileSet, pkg *types.Package) error</a></dd>
+			
+				
+				<dd><a href="index.html#WriteBundle">func WriteBundle(out io.Writer, fset *token.FileSet, pkgs []*types.Package) error</a></dd>
+			
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+		<div id="pkg-examples">
+			<h3>Examples</h3>
+			<div class="js-expandAll expandAll collapsed">(Expand All)</div>
+			<dl>
+			
+			<dd><a class="exampleLink" href="index.html#example_NewImporter">NewImporter</a></dd>
+			
+			<dd><a class="exampleLink" href="index.html#example_Read">Read</a></dd>
+			
+			</dl>
+		</div>
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go">gcexportdata.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/importer.go">importer.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+			
+			
+			<h2 id="Find">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=3721:3781#L79">Find</a>
+				<a class="permalink" href="index.html#Find">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Find(importPath, srcDir <a href="http://localhost:6666/pkg/builtin/#string">string</a>) (filename, path <a href="http://localhost:6666/pkg/builtin/#string">string</a>)</pre>
+			<p>Find returns the name of an object (.o) or archive (.a) file
+containing type information for the specified import path,
+using the go command.
+If no file was found, an empty filename is returned.
+<p>A relative srcDir is interpreted relative to the current working directory.
+<p>Find also returns the package&apos;s resolved (canonical) import path,
+reflecting the effects of srcDir and vendoring on importPath.
+<p>Deprecated: Use the higher-level API in golang.org/x/tools/go/packages,
+which is more efficient.
+
+			
+			
+
+		
+			
+			
+			<h2 id="NewImporter">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/importer.go?s=876:967#L18">NewImporter</a>
+				<a class="permalink" href="index.html#NewImporter">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func NewImporter(fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, imports map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>]*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>) <a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#ImporterFrom">ImporterFrom</a></pre>
+			<p>NewImporter returns a new instance of the types.Importer interface
+that reads type information from export data files written by gc.
+The Importer also satisfies types.ImporterFrom.
+<p>Export data files are located using &quot;go build&quot; workspace conventions
+and the build.Default context.
+<p>Use this importer instead of go/importer.For(&quot;gc&quot;, ...) to avoid the
+version-skew problems described in the documentation of this package,
+or to control the FileSet or access the imports map populated during
+package loading.
+<p>Deprecated: Use the higher-level API in golang.org/x/tools/go/packages,
+which is more efficient.
+
+			<div id="example_NewImporter" class="toggle">
+	<div class="collapsed">
+		<p class="exampleHeading toggleButton">▹ <span class="text">Example</span></p>
+	</div>
+	<div class="expanded">
+		<p class="exampleHeading toggleButton">▾ <span class="text">Example</span></p>
+		<p>ExampleNewImporter demonstrates usage of NewImporter to provide type
+information for dependencies when type-checking Go source code.
+</p>
+		
+		
+			<p>Code:</p>
+			<pre class="code">const src = `package myrpc
+
+// choosing a package that doesn&#39;t change across releases
+import &#34;net/rpc&#34;
+
+const serverError rpc.ServerError = &#34;&#34;
+`
+fset := token.NewFileSet()
+f, err := parser.ParseFile(fset, &#34;myrpc.go&#34;, src, 0)
+if err != nil {
+    log.Fatal(err)
+}
+
+packages := make(map[string]*types.Package)
+imp := gcexportdata.NewImporter(fset, packages)
+conf := types.Config{Importer: imp}
+pkg, err := conf.Check(&#34;myrpc&#34;, fset, []*ast.File{f}, nil)
+if err != nil {
+    log.Fatal(err)
+}
+
+<span class="comment">// object from imported package</span>
+pi := packages[&#34;net/rpc&#34;].Scope().Lookup(&#34;ServerError&#34;)
+fmt.Printf(&#34;type %s.%s %s // %s\n&#34;,
+    pi.Pkg().Path(),
+    pi.Name(),
+    pi.Type().Underlying(),
+    slashify(fset.Position(pi.Pos())),
+)
+
+<span class="comment">// object in source package</span>
+twopi := pkg.Scope().Lookup(&#34;serverError&#34;)
+fmt.Printf(&#34;const %s %s = %s // %s\n&#34;,
+    twopi.Name(),
+    twopi.Type(),
+    twopi.(*types.Const).Val(),
+    slashify(fset.Position(twopi.Pos())),
+)
+
+<span class="comment"></pre>
+			
+			<p>Output:</p>
+			<pre class="output">
+type net/rpc.ServerError string // $GOROOT/src/net/rpc/client.go:20:1
+const serverError net/rpc.ServerError = &#34;&#34; // myrpc.go:6:7
+</pre>
+			
+		
+	</div>
+</div>
+
+			
+
+		
+			
+			
+			<h2 id="NewReader">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=4271:4317#L97">NewReader</a>
+				<a class="permalink" href="index.html#NewReader">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func NewReader(r <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Reader">Reader</a>) (<a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Reader">Reader</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+			<p>NewReader returns a reader for the export data section of an object
+(.o) or archive (.a) file read from r.  The new reader may provide
+additional trailing data beyond the end of the export data.
+
+			
+			
+
+		
+			
+			
+			<h2 id="Read">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=6081:6197#L147">Read</a>
+				<a class="permalink" href="index.html#Read">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Read(in <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Reader">Reader</a>, fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, imports map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>]*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>, path <a href="http://localhost:6666/pkg/builtin/#string">string</a>) (*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+			<p>Read reads export data from in, decodes it, and returns type
+information for the package.
+<p>Read is capable of reading export data produced by <a href="index.html#Write">Write</a> at the
+same source code version, or by the last two Go releases (plus tip)
+of the standard Go compiler. Reading files from older compilers may
+produce an error.
+<p>The package path (effectively its linker symbol prefix) is
+specified by path, since unlike the package name, this information
+may not be recorded in the export data.
+<p>File position information is added to fset.
+<p>Read may inspect and add to the imports map to ensure that references
+within the export data to other packages are consistent.  The caller
+must ensure that imports[path] does not exist, or exists but is
+incomplete (see types.Package.Complete), and Read inserts the
+resulting package into this map entry.
+<p>On return, the state of the reader is undefined.
+
+			<div id="example_Read" class="toggle">
+	<div class="collapsed">
+		<p class="exampleHeading toggleButton">▹ <span class="text">Example</span></p>
+	</div>
+	<div class="expanded">
+		<p class="exampleHeading toggleButton">▾ <span class="text">Example</span></p>
+		<p>ExampleRead uses gcexportdata.Read to load type information for the
+&#34;fmt&#34; package from the fmt.a file produced by the gc compiler.
+</p>
+		
+		
+			<p>Code:</p>
+			<pre class="code"><span class="comment">// Find the export data file.</span>
+filename, path := gcexportdata.Find(&#34;fmt&#34;, &#34;&#34;)
+if filename == &#34;&#34; {
+    log.Fatalf(&#34;can&#39;t find export data for fmt&#34;)
+}
+fmt.Printf(&#34;Package path:       %s\n&#34;, path)
+
+<span class="comment">// Open and read the file.</span>
+f, err := os.Open(filename)
+if err != nil {
+    log.Fatal(err)
+}
+defer f.Close()
+r, err := gcexportdata.NewReader(f)
+if err != nil {
+    log.Fatalf(&#34;reading export data %s: %v&#34;, filename, err)
+}
+
+<span class="comment">// Decode the export data.</span>
+fset := token.NewFileSet()
+imports := make(map[string]*types.Package)
+pkg, err := gcexportdata.Read(r, fset, imports, path)
+if err != nil {
+    log.Fatal(err)
+}
+
+<span class="comment">// We can see all the names in Names.</span>
+members := pkg.Scope().Names()
+foundPrintln := false
+for _, member := range members {
+    if member == &#34;Println&#34; {
+        foundPrintln = true
+        break
+    }
+}
+fmt.Print(&#34;Package members:    &#34;)
+if foundPrintln {
+    fmt.Println(&#34;Println found&#34;)
+} else {
+    fmt.Println(&#34;Println not found&#34;)
+}
+
+<span class="comment">// We can also look up a name directly using Lookup.</span>
+println := pkg.Scope().Lookup(&#34;Println&#34;)
+<span class="comment">// go 1.18+ uses the &#39;any&#39; alias</span>
+typ := strings.ReplaceAll(println.Type().String(), &#34;interface{}&#34;, &#34;any&#34;)
+fmt.Printf(&#34;Println type:       %s\n&#34;, typ)
+posn := fset.Position(println.Pos())
+<span class="comment">// make example deterministic</span>
+posn.Line = 123
+fmt.Printf(&#34;Println location:   %s\n&#34;, slashify(posn))
+
+<span class="comment"></pre>
+			
+			<p>Output:</p>
+			<pre class="output">
+Package path:       fmt
+Package members:    Println found
+Println type:       func(a ...any) (n int, err error)
+Println location:   $GOROOT/src/fmt/print.go:123:1
+</pre>
+			
+		
+	</div>
+</div>
+
+			
+
+		
+			
+			
+			<h2 id="ReadBundle">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=8589:8700#L215">ReadBundle</a>
+				<a class="permalink" href="index.html#ReadBundle">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func ReadBundle(in <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Reader">Reader</a>, fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, imports map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>]*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>) ([]*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+			<p>ReadBundle reads an export bundle from in, decodes it, and returns type
+information for the packages.
+File position information is added to fset.
+<p>ReadBundle may inspect and add to the imports map to ensure that references
+within the export bundle to other packages are consistent.
+<p>On return, the state of the reader is undefined.
+<p>Experimental: This API is experimental and may change in the future.
+
+			
+			
+
+		
+			
+			
+			<h2 id="Write">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=7966:8038#L198">Write</a>
+				<a class="permalink" href="index.html#Write">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Write(out <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a>, fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, pkg *<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+			<p>Write writes encoded type information for the specified package to out.
+The FileSet provides file position information for named objects.
+
+			
+			
+
+		
+			
+			
+			<h2 id="WriteBundle">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/gcexportdata/gcexportdata.go?s=9091:9172#L227">WriteBundle</a>
+				<a class="permalink" href="index.html#WriteBundle">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func WriteBundle(out <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a>, fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, pkgs []*<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+			<p>WriteBundle writes encoded type information for the specified packages to out.
+The FileSet provides file position information for named objects.
+<p>Experimental: This API is experimental and may change in the future.
+
+			
+			
+
+		
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

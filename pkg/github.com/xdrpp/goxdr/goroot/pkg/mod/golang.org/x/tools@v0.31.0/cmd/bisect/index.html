@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>bisect - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Command bisect
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<p>Bisect finds changes responsible for causing a failure.
+A typical use is to identify the source locations in a program
+that are miscompiled by a given compiler optimization.
+<p>Usage:
+<pre>bisect [flags] [var=value...] command [arguments...]
+</pre>
+<p>Bisect operates on a target command line – the target – that can be
+run with various changes individually enabled or disabled. With none
+of the changes enabled, the target is known to succeed (exit with exit
+code zero). With all the changes enabled, the target is known to fail
+(exit any other way). Bisect repeats the target with different sets of
+changes enabled, using binary search to find (non-overlapping) minimal
+change sets that provoke the failure.
+<p>The target must cooperate with bisect by accepting a change pattern
+and then enabling and reporting the changes that match that pattern.
+The change pattern is passed to the target by substituting it anywhere
+the string PATTERN appears in the environment values or the command
+arguments. For each change that matches the pattern, the target must
+enable that change and also print one or more “match lines”
+(to standard output or standard error) describing the change.
+The <a href="http://localhost:6666/golang.org/x/tools/internal/bisect">golang.org/x/tools/internal/bisect</a> package provides functions to help
+targets implement this protocol. We plan to publish that package
+in a non-internal location after finalizing its API.
+<p>Bisect starts by running the target with no changes enabled and then
+with all changes enabled. It expects the former to succeed and the latter to fail,
+and then it will search for the minimal set of changes that must be enabled
+to provoke the failure. If the situation is reversed – the target fails with no
+changes enabled and succeeds with all changes enabled – then bisect
+automatically runs in reverse as well, searching for the minimal set of changes
+that must be disabled to provoke the failure.
+<p>Bisect prints tracing logs to standard error and the minimal change sets
+to standard output.
+<h3 id="hdr-Command_Line_Flags">Command Line Flags</h3>
+<p>Bisect supports the following command-line flags:
+<pre>-max=M
+</pre>
+<p>Stop after finding M minimal change sets. The default is no maximum, meaning to run until
+all changes that provoke a failure have been identified.
+<pre>-maxset=S
+</pre>
+<p>Disallow change sets larger than S elements. The default is no maximum.
+<pre>-timeout=D
+</pre>
+<p>If the target runs for longer than duration D, stop the target and interpret that as a failure.
+The default is no timeout.
+<pre>-count=N
+</pre>
+<p>Run each trial N times (default 2), checking for consistency.
+<pre>-v
+</pre>
+<p>Print verbose output, showing each run and its match lines.
+<p>In addition to these general flags,
+bisect supports a few “shortcut” flags that make it more convenient
+to use with specific targets.
+<pre>-compile=&lt;rewrite&gt;
+</pre>
+<p>This flag is equivalent to adding an environment variable
+“GOCOMPILEDEBUG=&lt;rewrite&gt;hash=PATTERN”,
+which, as discussed in more detail in the example below,
+allows bisect to identify the specific source locations where the
+compiler rewrite causes the target to fail.
+<pre>-godebug=&lt;name&gt;=&lt;value&gt;
+</pre>
+<p>This flag is equivalent to adding an environment variable
+“GODEBUG=&lt;name&gt;=&lt;value&gt;#PATTERN”,
+which allows bisect to identify the specific call stacks where
+the changed <a href="https://tip.golang.org/doc/godebug">GODEBUG setting</a> value causes the target to fail.
+<h3 id="hdr-Example">Example</h3>
+<p>The Go compiler provides support for enabling or disabling certain rewrites
+and optimizations to allow bisect to identify specific source locations where
+the rewrite causes the program to fail. For example, to bisect a failure caused
+by the new loop variable semantics:
+<pre>bisect go test -gcflags=all=-d=loopvarhash=PATTERN
+</pre>
+<p>The -gcflags=all= instructs the go command to pass the -d=... to the Go compiler
+when compiling all packages. Bisect varies PATTERN to determine the minimal set of changes
+needed to reproduce the failure.
+<p>The go command also checks the GOCOMPILEDEBUG environment variable for flags
+to pass to the compiler, so the above command is equivalent to:
+<pre>bisect GOCOMPILEDEBUG=loopvarhash=PATTERN go test
+</pre>
+<p>Finally, as mentioned earlier, the -compile flag allows shortening this command further:
+<pre>bisect -compile=loopvar go test
+</pre>
+<h3 id="hdr-Defeating_Build_Caches">Defeating Build Caches</h3>
+<p>Build systems cache build results, to avoid repeating the same compilations
+over and over. When using a cached build result, the go command (correctly)
+reprints the cached standard output and standard error associated with that
+command invocation. (This makes commands like &apos;go build -gcflags=-S&apos; for
+printing an assembly listing work reliably.)
+<p>Unfortunately, most build systems, including Bazel, are not as careful
+as the go command about reprinting compiler output. If the compiler is
+what prints match lines, a build system that suppresses compiler
+output when using cached compiler results will confuse bisect.
+To defeat such build caches, bisect replaces the literal text “RANDOM”
+in environment values and command arguments with a random 64-bit value
+during each invocation. The Go compiler conveniently accepts a
+-d=ignore=... debug flag that ignores its argument, so to run the
+previous example using Bazel, the invocation is:
+<pre>bazel test --define=gc_goopts=-d=loopvarhash=PATTERN,unused=RANDOM //path/to:test
+</pre>
+
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

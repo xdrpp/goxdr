@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>cfg - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package cfg
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package cfg constructs a simple control-flow graph (CFG) of the
+statements and expressions within a single function.
+<p>Use cfg.New to construct the CFG for a function body.
+<p>The blocks of the CFG contain all the function&apos;s non-control
+statements.  The CFG does not contain control statements such as If,
+Switch, Select, and Branch, but does contain their subexpressions;
+also, each block records the control statement (Block.Stmt) that
+gave rise to it and its relationship (Block.Kind) to that statement.
+<p>For example, this source code:
+<pre>if x := f(); x != nil {
+	T()
+} else {
+	F()
+}
+</pre>
+<p>produces this CFG:
+<pre>1:  x := f()		Body
+    x != nil
+    succs: 2, 3
+2:  T()			IfThen
+    succs: 4
+3:  F()			IfElse
+    succs: 4
+4:			IfDone
+</pre>
+<p>The CFG does contain Return statements; even implicit returns are
+materialized (at the position of the function&apos;s closing brace).
+<p>The CFG does not record conditions associated with conditional branch
+edges, nor the short-circuit semantics of the &amp;&amp; and || operators,
+nor abnormal control flow caused by panic.  If you need this
+information, use golang.org/x/tools/go/ssa instead.
+
+				
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="index.html#Block">type Block</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Block.Return">func (b *Block) Return() (ret *ast.ReturnStmt)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Block.String">func (b *Block) String() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#BlockKind">type BlockKind</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#BlockKind.String">func (kind BlockKind) String() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#CFG">type CFG</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#New">func New(body *ast.BlockStmt, mayReturn func(*ast.CallExpr) bool) *CFG</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CFG.Dot">func (g *CFG) Dot(fset *token.FileSet) string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#CFG.Format">func (g *CFG) Format(fset *token.FileSet) string</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/builder.go">builder.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go">cfg.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="Block">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=2013:2410#L56">Block</a>
+				<a class="permalink" href="index.html#Block">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A Block represents a basic block: a list of statements and
+expressions that are always evaluated sequentially.
+<p>A block may have 0-2 successors: zero for a return block or a block
+that calls a function such as panic that never returns; one for a
+normal (jump) block; and two for a conditional (if) block.
+
+			<pre>type Block struct {
+<span id="Block.Nodes"></span>    Nodes []<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#Node">Node</a> <span class="comment">// statements, expressions, and ValueSpecs</span>
+<span id="Block.Succs"></span>    Succs []*<a href="index.html#Block">Block</a>   <span class="comment">// successor nodes in the graph</span>
+<span id="Block.Index"></span>    Index <a href="http://localhost:6666/pkg/builtin/#int32">int32</a>      <span class="comment">// index within CFG.Blocks</span>
+<span id="Block.Live"></span>    Live  <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>       <span class="comment">// block is reachable from entry</span>
+<span id="Block.Kind"></span>    Kind  <a href="index.html#BlockKind">BlockKind</a>  <span class="comment">// block kind</span>
+<span id="Block.Stmt"></span>    Stmt  <a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#Stmt">Stmt</a>   <span class="comment">// statement that gave rise to this block (see BlockKind for details)</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Block.Return">func (*Block) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=6010:6056#L177">Return</a>
+					<a class="permalink" href="index.html#Block.Return">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (b *<a href="index.html#Block">Block</a>) Return() (ret *<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#ReturnStmt">ReturnStmt</a>)</pre>
+				<p>Return returns the return statement at the end of this block if present, nil
+otherwise.
+<p>When control falls off the end of the function, the ReturnStmt is synthetic
+and its <a href="http://localhost:6666/go/ast#Node.End">ast.Node.End</a> position may be beyond the end of the file.
+
+				
+				
+				
+			
+				
+				<h3 id="Block.String">func (*Block) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=5473:5504#L160">String</a>
+					<a class="permalink" href="index.html#Block.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (b *<a href="index.html#Block">Block</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="BlockKind">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=2522:2542#L69">BlockKind</a>
+				<a class="permalink" href="index.html#BlockKind">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A BlockKind identifies the purpose of a block.
+It also determines the possible types of its Stmt field.
+
+			<pre>type BlockKind <a href="http://localhost:6666/pkg/builtin/#uint8">uint8</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="KindInvalid">KindInvalid</span> <a href="index.html#BlockKind">BlockKind</a> = <a href="http://localhost:6666/pkg/builtin/#iota">iota</a> <span class="comment">// Stmt=nil</span>
+
+    <span id="KindUnreachable">KindUnreachable</span>     <span class="comment">// unreachable block after {Branch,Return}Stmt / no-return call ExprStmt</span>
+    <span id="KindBody">KindBody</span>            <span class="comment">// function body BlockStmt</span>
+    <span id="KindForBody">KindForBody</span>         <span class="comment">// body of ForStmt</span>
+    <span id="KindForDone">KindForDone</span>         <span class="comment">// block after ForStmt</span>
+    <span id="KindForLoop">KindForLoop</span>         <span class="comment">// head of ForStmt</span>
+    <span id="KindForPost">KindForPost</span>         <span class="comment">// post condition of ForStmt</span>
+    <span id="KindIfDone">KindIfDone</span>          <span class="comment">// block after IfStmt</span>
+    <span id="KindIfElse">KindIfElse</span>          <span class="comment">// else block of IfStmt</span>
+    <span id="KindIfThen">KindIfThen</span>          <span class="comment">// then block of IfStmt</span>
+    <span id="KindLabel">KindLabel</span>           <span class="comment">// labeled block of BranchStmt (Stmt may be nil for dangling label)</span>
+    <span id="KindRangeBody">KindRangeBody</span>       <span class="comment">// body of RangeStmt</span>
+    <span id="KindRangeDone">KindRangeDone</span>       <span class="comment">// block after RangeStmt</span>
+    <span id="KindRangeLoop">KindRangeLoop</span>       <span class="comment">// head of RangeStmt</span>
+    <span id="KindSelectCaseBody">KindSelectCaseBody</span>  <span class="comment">// body of SelectStmt</span>
+    <span id="KindSelectDone">KindSelectDone</span>      <span class="comment">// block after SelectStmt</span>
+    <span id="KindSelectAfterCase">KindSelectAfterCase</span> <span class="comment">// block after a CommClause</span>
+    <span id="KindSwitchCaseBody">KindSwitchCaseBody</span>  <span class="comment">// body of CaseClause</span>
+    <span id="KindSwitchDone">KindSwitchDone</span>      <span class="comment">// block after {Type.}SwitchStmt</span>
+    <span id="KindSwitchNextCase">KindSwitchNextCase</span>  <span class="comment">// secondary expression of a multi-expression CaseClause</span>
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="BlockKind.String">func (BlockKind) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=3580:3617#L95">String</a>
+					<a class="permalink" href="index.html#BlockKind.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (kind <a href="index.html#BlockKind">BlockKind</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="CFG">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=1582:1689#L45">CFG</a>
+				<a class="permalink" href="index.html#CFG">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A CFG represents the control-flow graph of a single function.
+<p>The entry point is Blocks[0]; there may be multiple return blocks.
+
+			<pre>type CFG struct {
+<span id="CFG.Blocks"></span>    Blocks []*<a href="index.html#Block">Block</a> <span class="comment">// block[0] is entry; order otherwise undefined</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="New">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=4783:4853#L128">New</a>
+					<a class="permalink" href="index.html#New">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func New(body *<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#BlockStmt">BlockStmt</a>, mayReturn func(*<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#CallExpr">CallExpr</a>) <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>) *<a href="index.html#CFG">CFG</a></pre>
+				<p>New returns a new control-flow graph for the specified function body,
+which must be non-nil.
+<p>The CFG builder calls mayReturn to determine whether a given function
+call may return.  For example, calls to panic, os.Exit, and log.Fatal
+do not return, so the builder can remove infeasible graph edges
+following such calls.  The builder calls mayReturn only for a
+CallExpr beneath an ExprStmt.
+
+				
+				
+			
+
+			
+				
+				<h3 id="CFG.Dot">func (*CFG) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=7055:7100#L210">Dot</a>
+					<a class="permalink" href="index.html#CFG.Dot">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (g *<a href="index.html#CFG">CFG</a>) Dot(fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>) <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				<p>Dot returns the control-flow graph in the [Dot graph description language].
+Use a command such as &apos;dot -Tsvg&apos; to render it in a form viewable in a browser.
+This method is provided as a debugging aid; the details of the
+output are unspecified and may change.
+<p>[Dot graph description language]: ​​<a href="https://en.wikipedia.org/wiki/DOT_(graph_description_language)">https://en.wikipedia.org/wiki/DOT_(graph_description_language)</a>
+
+				
+				
+				
+			
+				
+				<h3 id="CFG.Format">func (*CFG) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/cfg/cfg.go?s=6213:6261#L185">Format</a>
+					<a class="permalink" href="index.html#CFG.Format">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (g *<a href="index.html#CFG">CFG</a>) Format(fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>) <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				<p>Format formats the control-flow graph for ease of debugging.
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

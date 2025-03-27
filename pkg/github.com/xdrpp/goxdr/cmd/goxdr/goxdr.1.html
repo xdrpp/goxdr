@@ -1,0 +1,1515 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang xml:lang>
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="David Mazières" />
+  <title>goxdr(1)</title>
+  <style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+  <style type="text/css">body {
+margin: 0;
+font-family: Arial, sans-serif;
+background-color: #fff;
+line-height: 1.3;
+text-align: center;
+color: #222;
+}
+textarea {
+
+color: inherit;
+}
+pre,
+code {
+font-family: Menlo, monospace;
+font-size: 0.875rem;
+}
+pre {
+line-height: 1.4;
+overflow-x: auto;
+}
+pre .comment {
+color: #006600;
+}
+pre .highlight,
+pre .highlight-comment,
+pre .selection-highlight,
+pre .selection-highlight-comment {
+background: #ffff00;
+}
+pre .selection,
+pre .selection-comment {
+background: #ff9632;
+}
+pre .ln {
+color: #999;
+background: #efefef;
+}
+.ln {
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+
+display: inline-block;
+width: 8ch;
+}
+.search-nav {
+margin-left: 1.25rem;
+font-size: 0.875rem;
+column-gap: 1.25rem;
+column-fill: auto;
+column-width: 14rem;
+}
+.search-nav .indent {
+margin-left: 1.25rem;
+}
+a,
+.exampleHeading .text,
+.expandAll {
+color: #375eab;
+text-decoration: none;
+}
+a:hover,
+.exampleHeading .text:hover,
+.expandAll:hover {
+text-decoration: underline;
+}
+.article a {
+text-decoration: underline;
+}
+.article .title a {
+text-decoration: none;
+}
+.permalink {
+display: none;
+}
+:hover > .permalink {
+display: inline;
+}
+p,
+li {
+max-width: 50rem;
+word-wrap: break-word;
+}
+p,
+pre,
+ul,
+ol {
+margin: 1.25rem;
+}
+pre {
+background: #efefef;
+padding: 0.625rem;
+border-radius: 0.3125rem;
+}
+h1,
+h2,
+h3,
+h4,
+.rootHeading {
+margin: 1.25rem 0 1.25rem;
+padding: 0;
+color: #375eab;
+font-weight: bold;
+}
+h1 {
+font-size: 1.75rem;
+line-height: 1;
+}
+h1 .text-muted {
+color: #777;
+}
+h2 {
+font-size: 1.25rem;
+background: #e0ebf5;
+padding: 0.5rem;
+line-height: 1.25;
+font-weight: normal;
+overflow: auto;
+overflow-wrap: break-word;
+}
+h2 a {
+font-weight: bold;
+}
+h3 {
+font-size: 1.25rem;
+line-height: 1.25;
+overflow: auto;
+overflow-wrap: break-word;
+}
+h3,
+h4 {
+margin: 1.25rem 0.3125rem;
+}
+h4 {
+font-size: 1rem;
+}
+.rootHeading {
+font-size: 1.25rem;
+margin: 0;
+}
+h2 > span,
+h3 > span {
+float: right;
+margin: 0 25px 0 0;
+font-weight: normal;
+color: #5279c7;
+}
+dl {
+margin: 1.25rem;
+}
+dd {
+margin: 0 0 0 1.25rem;
+}
+dl,
+dd {
+font-size: 0.875rem;
+}
+div#nav table td {
+vertical-align: top;
+}
+#pkg-index h3 {
+font-size: 1rem;
+}
+.pkg-dir {
+padding: 0 0.625rem;
+}
+.pkg-dir table {
+border-collapse: collapse;
+border-spacing: 0;
+}
+.pkg-name {
+padding-right: 0.625rem;
+}
+.alert {
+color: #aa0000;
+}
+.top-heading {
+float: left;
+padding: 1.313rem 0;
+font-size: 1.25rem;
+font-weight: normal;
+}
+.top-heading a {
+color: #222;
+text-decoration: none;
+}
+#pkg-examples h3 {
+float: left;
+}
+#pkg-examples dl {
+clear: both;
+}
+.expandAll {
+cursor: pointer;
+float: left;
+margin: 1.25rem 0;
+}
+div#topbar {
+background: #e0ebf5;
+height: 4rem;
+overflow: hidden;
+}
+div#page {
+width: 100%;
+}
+div#page > .container,
+div#topbar > .container {
+text-align: left;
+margin-left: auto;
+margin-right: auto;
+padding: 0 1.25rem;
+}
+div#topbar > .container,
+div#page > .container {
+max-width: 59.38rem;
+}
+div#page.wide > .container,
+div#topbar.wide > .container {
+max-width: none;
+}
+div#plusone {
+float: right;
+clear: right;
+margin-top: 0.3125rem;
+}
+div#footer {
+text-align: center;
+color: #666;
+font-size: 0.875rem;
+margin: 2.5rem 0;
+}
+div#menu > a,
+input#search,
+div#learn .buttons a,
+div.play .buttons a,
+div#blog .read a,
+#menu-button {
+padding: 0.625rem;
+text-decoration: none;
+font-size: 1rem;
+border-radius: 0.3125rem;
+}
+div#playground .buttons a,
+div#menu > a,
+input#search,
+#menu-button {
+border: 0.0625rem solid #375eab;
+}
+div#playground .buttons a,
+div#menu > a,
+#menu-button {
+color: white;
+background: #375eab;
+}
+#playgroundButton.active {
+background: white;
+color: #375eab;
+}
+a#start,
+div#learn .buttons a,
+div.play .buttons a,
+div#blog .read a {
+color: #222;
+border: 0.0625rem solid #375eab;
+background: #e0ebf5;
+}
+.download {
+width: 9.375rem;
+}
+div#menu {
+text-align: right;
+padding: 0.625rem;
+white-space: nowrap;
+max-height: 0;
+-moz-transition: max-height 0.25s linear;
+transition: max-height 0.25s linear;
+width: 100%;
+}
+div#menu.menu-visible {
+max-height: 31.25rem;
+}
+div#menu > a,
+#menu-button {
+margin: 0.625rem 0.125rem;
+padding: 0.625rem;
+}
+::-webkit-input-placeholder {
+color: #7f7f7f;
+opacity: 1;
+}
+::placeholder {
+color: #7f7f7f;
+opacity: 1;
+}
+#menu .search-box {
+display: inline-flex;
+width: 8.75rem;
+}
+input#search {
+background: white;
+color: #222;
+box-sizing: border-box;
+-webkit-appearance: none;
+border-top-right-radius: 0;
+border-bottom-right-radius: 0;
+border-right: 0;
+margin-right: 0;
+flex-grow: 1;
+max-width: 100%;
+min-width: 5.625rem;
+}
+input#search:-webkit-search-decoration {
+-webkit-appearance: none;
+}
+input#search:-moz-ui-invalid {
+box-shadow: unset;
+}
+input#search + button {
+display: inline;
+font-size: 1em;
+background-color: #375eab;
+color: white;
+border: 0.0625rem solid #375eab;
+border-top-left-radius: 0;
+border-top-right-radius: 0.3125rem;
+border-bottom-left-radius: 0;
+border-bottom-right-radius: 0.3125rem;
+margin-left: 0;
+cursor: pointer;
+}
+input#search + button span {
+display: flex;
+}
+input#search + button svg {
+fill: white;
+}
+#menu-button {
+display: none;
+position: absolute;
+right: 0.3125rem;
+top: 0;
+margin-right: 0.3125rem;
+}
+#menu-button-arrow {
+display: inline-block;
+}
+.vertical-flip {
+transform: rotate(-180deg);
+}
+div.left {
+float: left;
+clear: left;
+margin-right: 2.5%;
+}
+div.right {
+float: right;
+clear: right;
+margin-left: 2.5%;
+}
+div.left,
+div.right {
+width: 45%;
+}
+div#learn,
+div#about {
+padding-top: 1.25rem;
+}
+div#learn h2,
+div#about {
+margin: 0;
+}
+div#about {
+font-size: 1.25rem;
+margin: 0 auto 1.875rem;
+}
+a#start {
+display: block;
+padding: 0.625rem;
+text-align: center;
+text-decoration: none;
+border-radius: 0.3125rem;
+}
+a#start .big {
+display: block;
+font-weight: bold;
+font-size: 1.25rem;
+}
+a#start .desc {
+display: block;
+font-size: 0.875rem;
+font-weight: normal;
+margin-top: 0.3125rem;
+}
+div#learn .popout {
+float: right;
+display: block;
+cursor: pointer;
+font-size: 0.75rem;
+background: url(data:text/html; charset=utf-8;charset=utf-8,%3C%21DOCTYPE%20html%3E%0A%3Chtml%3E%0A%3Chead%3E%0A%3Cmeta%20http%2Dequiv%3D%22Content%2DType%22%20content%3D%22text%2Fhtml%3B%20charset%3Dutf%2D8%22%3E%0A%3Cmeta%20name%3D%22viewport%22%20content%3D%22width%3Ddevice%2Dwidth%2C%20initial%2Dscale%3D1%22%3E%0A%3Cmeta%20name%3D%22theme%2Dcolor%22%20content%3D%22%23375EAB%22%3E%0A%0A%20%20%3Ctitle%3EFile%20doc%2Fshare%2Epng%20%2D%20Go%20Documentation%20Server%3C%2Ftitle%3E%0A%0A%3Clink%20type%3D%22text%2Fcss%22%20rel%3D%22stylesheet%22%20href%3D%22%2Flib%2Fgodoc%2Fstyle%2Ecss%22%3E%0A%0A%3Cscript%3Ewindow%2EinitFuncs%20%3D%20%5B%5D%3B%3C%2Fscript%3E%0A%3Cscript%20src%3D%22%2Flib%2Fgodoc%2Fjquery%2Ejs%22%20defer%3E%3C%2Fscript%3E%0A%0A%0A%0A%3Cscript%3Evar%20goVersion%20%3D%20%22go1%2E24%2E1%22%3B%3C%2Fscript%3E%0A%3Cscript%20src%3D%22%2Flib%2Fgodoc%2Fgodocs%2Ejs%22%20defer%3E%3C%2Fscript%3E%0A%3C%2Fhead%3E%0A%3Cbody%3E%0A%0A%3Cdiv%20id%3D%27lowframe%27%20style%3D%22position%3A%20fixed%3B%20bottom%3A%200%3B%20left%3A%200%3B%20height%3A%200%3B%20width%3A%20100%25%3B%20border%2Dtop%3A%20thin%20solid%20grey%3B%20background%2Dcolor%3A%20white%3B%20overflow%3A%20auto%3B%22%3E%0A%2E%2E%2E%0A%3C%2Fdiv%3E%3C%21%2D%2D%20%23lowframe%20%2D%2D%3E%0A%0A%3Cdiv%20id%3D%22topbar%22%20class%3D%22wide%22%3E%3Cdiv%20class%3D%22container%22%3E%0A%3Cdiv%20class%3D%22top%2Dheading%22%20id%3D%22heading%2Dwide%22%3E%3Ca%20href%3D%22%2Fpkg%2F%22%3EGo%20Documentation%20Server%3C%2Fa%3E%3C%2Fdiv%3E%0A%3Cdiv%20class%3D%22top%2Dheading%22%20id%3D%22heading%2Dnarrow%22%3E%3Ca%20href%3D%22%2Fpkg%2F%22%3EGoDoc%3C%2Fa%3E%3C%2Fdiv%3E%0A%3Ca%20href%3D%22%23%22%20id%3D%22menu%2Dbutton%22%3E%3Cspan%20id%3D%22menu%2Dbutton%2Darrow%22%3E%26%239661%3B%3C%2Fspan%3E%3C%2Fa%3E%0A%3Cform%20method%3D%22GET%22%20action%3D%22%2Fsearch%22%3E%0A%3Cdiv%20id%3D%22menu%22%3E%0A%0A%3Cspan%20class%3D%22search%2Dbox%22%3E%3Cinput%20type%3D%22search%22%20id%3D%22search%22%20name%3D%22q%22%20placeholder%3D%22Search%22%20aria%2Dlabel%3D%22Search%22%20required%3E%3Cbutton%20type%3D%22submit%22%3E%3Cspan%3E%3C%21%2D%2D%20magnifying%20glass%3A%20%2D%2D%3E%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%3E%3Ctitle%3Esubmit%20search%3C%2Ftitle%3E%3Cpath%20d%3D%22M15%2E5%2014h%2D%2E79l%2D%2E28%2D%2E27C15%2E41%2012%2E59%2016%2011%2E11%2016%209%2E5%2016%205%2E91%2013%2E09%203%209%2E5%203S3%205%2E91%203%209%2E5%205%2E91%2016%209%2E5%2016c1%2E61%200%203%2E09%2D%2E59%204%2E23%2D1%2E57l%2E27%2E28v%2E79l5%204%2E99L20%2E49%2019l%2D4%2E99%2D5zm%2D6%200C7%2E01%2014%205%2011%2E99%205%209%2E5S7%2E01%205%209%2E5%205%2014%207%2E01%2014%209%2E5%2011%2E99%2014%209%2E5%2014z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E%3C%2Fspan%3E%3C%2Fbutton%3E%3C%2Fspan%3E%0A%3C%2Fdiv%3E%0A%3C%2Fform%3E%0A%0A%3C%2Fdiv%3E%3C%2Fdiv%3E%0A%0A%0A%0A%3Cdiv%20id%3D%22page%22%20class%3D%22wide%22%3E%0A%3Cdiv%20class%3D%22container%22%3E%0A%0A%0A%20%20%3Ch1%3E%0A%20%20%20%20File%20doc%2Fshare%2Epng%0A%20%20%20%20%3Cspan%20class%3D%22text%2Dmuted%22%3E%3C%2Fspan%3E%0A%20%20%3C%2Fh1%3E%0A%0A%0A%0A%20%20%3Ch2%3Edoc%2Fshare%2Epng%3C%2Fh2%3E%0A%0A%0A%0A%0A%0A%3Cdiv%20id%3D%22nav%22%3E%3C%2Fdiv%3E%0A%0A%0A%3C%21%2D%2D%0A%09Copyright%202009%20The%20Go%20Authors%2E%20All%20rights%20reserved%2E%0A%09Use%20of%20this%20source%20code%20is%20governed%20by%20a%20BSD%2Dstyle%0A%09license%20that%20can%20be%20found%20in%20the%20LICENSE%20file%2E%0A%2D%2D%3E%0A%0A%3Cp%3E%0A%3Cspan%20class%3D%22alert%22%20style%3D%22font%2Dsize%3A120%25%22%3Elstat%20%2E%2E%2F%2E%2E%2Fhome%2Fdm%2Fhack%2Fgoxdr%2Fgoroot%2Fdoc%2Fshare%2Epng%3A%20no%20such%20file%20or%20directory%3C%2Fspan%3E%0A%3C%2Fp%3E%0A%0A%0A%3Cdiv%20id%3D%22footer%22%3E%0ABuild%20version%20go1%2E24%2E1%2E%3Cbr%3E%0AExcept%20as%20%3Ca%20href%3D%22https%3A%2F%2Fdevelopers%2Egoogle%2Ecom%2Fsite%2Dpolicies%23restrictions%22%3Enoted%3C%2Fa%3E%2C%0Athe%20content%20of%20this%20page%20is%20licensed%20under%20the%0ACreative%20Commons%20Attribution%203%2E0%20License%2C%0Aand%20code%20is%20licensed%20under%20a%20%3Ca%20href%3D%22%2FLICENSE%22%3EBSD%20license%3C%2Fa%3E%2E%3Cbr%3E%0A%3Ca%20href%3D%22https%3A%2F%2Fgolang%2Eorg%2Fdoc%2Ftos%2Ehtml%22%3ETerms%20of%20Service%3C%2Fa%3E%20%7C%0A%3Ca%20href%3D%22https%3A%2F%2Fwww%2Egoogle%2Ecom%2Fintl%2Fen%2Fpolicies%2Fprivacy%2F%22%3EPrivacy%20Policy%3C%2Fa%3E%0A%3C%2Fdiv%3E%0A%0A%3C%2Fdiv%3E%3C%21%2D%2D%20%2Econtainer%20%2D%2D%3E%0A%3C%2Fdiv%3E%3C%21%2D%2D%20%23page%20%2D%2D%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E%0A) no-repeat;
+background-position: right center;
+padding: 0.375rem 1.688rem;
+}
+div#learn pre,
+div#learn textarea {
+padding: 0;
+margin: 0;
+font-family: Menlo, monospace;
+font-size: 0.875rem;
+}
+div#learn .input {
+padding: 0.625rem;
+margin-top: 0.625rem;
+height: 9.375rem;
+border-top-left-radius: 0.3125rem;
+border-top-right-radius: 0.3125rem;
+}
+div#learn .input textarea {
+width: 100%;
+height: 100%;
+border: none;
+outline: none;
+resize: none;
+}
+div#learn .output {
+border-top: none !important;
+padding: 0.625rem;
+height: 3.688rem;
+overflow: auto;
+border-bottom-right-radius: 0.3125rem;
+border-bottom-left-radius: 0.3125rem;
+}
+div#learn .output pre {
+padding: 0;
+border-radius: 0;
+}
+div#learn .input,
+div#learn .input textarea,
+div#learn .output,
+div#learn .output pre {
+background: #ffffd8;
+}
+div#learn .input,
+div#learn .output {
+border: 0.0625rem solid #375eab;
+}
+div#learn .buttons {
+float: right;
+padding: 1.25rem 0 0.625rem 0;
+text-align: right;
+}
+div#learn .buttons a {
+height: 1rem;
+margin-left: 0.3125rem;
+padding: 0.625rem;
+}
+div#learn .toys {
+margin-top: 0.5rem;
+}
+div#learn .toys select {
+font-size: 0.875rem;
+border: 0.0625rem solid #375eab;
+margin: 0;
+}
+div#learn .output .exit {
+display: none;
+}
+div#video {
+max-width: 100%;
+}
+div#blog,
+div#video {
+margin-top: 2.5rem;
+}
+div#blog > a,
+div#blog > div,
+div#blog > h2,
+div#video > a,
+div#video > div,
+div#video > h2 {
+margin-bottom: 0.625rem;
+}
+div#blog .title,
+div#video .title {
+display: block;
+font-size: 1.25rem;
+}
+div#blog .when {
+color: #666;
+font-size: 0.875rem;
+}
+div#blog .read {
+text-align: right;
+}
+@supports (--c: 0) {
+[style*='--aspect-ratio-padding:'] {
+position: relative;
+overflow: hidden;
+padding-top: var(--aspect-ratio-padding);
+}
+[style*='--aspect-ratio-padding:'] > * {
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+}
+}
+.toggleButton {
+cursor: pointer;
+}
+.toggle > .collapsed {
+display: block;
+}
+.toggle > .expanded {
+display: none;
+}
+.toggleVisible > .collapsed {
+display: none;
+}
+.toggleVisible > .expanded {
+display: block;
+}
+table.codetable {
+margin-left: auto;
+margin-right: auto;
+border-style: none;
+}
+table.codetable td {
+padding-right: 0.625rem;
+}
+hr {
+border-style: none;
+border-top: 0.0625rem solid black;
+}
+img.gopher {
+float: right;
+margin-left: 0.625rem;
+margin-top: -2.5rem;
+margin-bottom: 0.625rem;
+z-index: -1;
+}
+h2 {
+clear: right;
+}
+
+div.play {
+padding: 0 1.25rem 2.5rem 1.25rem;
+}
+div.play pre,
+div.play textarea,
+div.play .lines {
+padding: 0;
+margin: 0;
+font-family: Menlo, monospace;
+font-size: 0.875rem;
+}
+div.play .input {
+padding: 0.625rem;
+margin-top: 0.625rem;
+border-top-left-radius: 0.3125rem;
+border-top-right-radius: 0.3125rem;
+overflow: hidden;
+}
+div.play .input textarea {
+width: 100%;
+height: 100%;
+border: none;
+outline: none;
+resize: none;
+overflow: hidden;
+}
+div#playground .input textarea {
+overflow: auto;
+resize: auto;
+}
+div.play .output {
+border-top: none !important;
+padding: 0.625rem;
+max-height: 12.5rem;
+overflow: auto;
+border-bottom-right-radius: 0.3125rem;
+border-bottom-left-radius: 0.3125rem;
+}
+div.play .output pre {
+padding: 0;
+border-radius: 0;
+}
+div.play .input,
+div.play .input textarea,
+div.play .output,
+div.play .output pre {
+background: #ffffd8;
+}
+div.play .input,
+div.play .output {
+border: 0.0625rem solid #375eab;
+}
+div.play .buttons {
+float: right;
+padding: 1.25rem 0 0.625rem 0;
+text-align: right;
+}
+div.play .buttons a {
+height: 1rem;
+margin-left: 0.3125rem;
+padding: 0.625rem;
+cursor: pointer;
+}
+.output .stderr {
+color: #933;
+}
+.output .system {
+color: #999;
+}
+
+div#playground {
+
+display: none;
+}
+div#playground {
+position: absolute;
+top: 3.938rem;
+right: 1.25rem;
+padding: 0 0.625rem 0.625rem 0.625rem;
+z-index: 1;
+text-align: left;
+background: #e0ebf5;
+border: 0.0625rem solid #b0bbc5;
+border-top: none;
+border-bottom-left-radius: 0.3125rem;
+border-bottom-right-radius: 0.3125rem;
+}
+div#playground .code {
+width: 32.5rem;
+height: 12.5rem;
+}
+div#playground .output {
+height: 6.25rem;
+}
+
+#content .code pre,
+#content .playground pre,
+#content .output pre {
+margin: 0;
+padding: 0;
+background: none;
+border: none;
+outline: 0 solid transparent;
+overflow: auto;
+}
+#content .playground .number,
+#content .code .number {
+color: #999;
+}
+#content .code,
+#content .playground,
+#content .output {
+width: auto;
+margin: 1.25rem;
+padding: 0.625rem;
+border-radius: 0.3125rem;
+}
+#content .code,
+#content .playground {
+background: #e9e9e9;
+}
+#content .output {
+background: #202020;
+}
+#content .output .stdout,
+#content .output pre {
+color: #e6e6e6;
+}
+#content .output .stderr,
+#content .output .error {
+color: rgb(244, 74, 63);
+}
+#content .output .system,
+#content .output .exit {
+color: rgb(255, 209, 77);
+}
+#content .buttons {
+position: relative;
+float: right;
+top: -3.125rem;
+right: 1.875rem;
+}
+#content .output .buttons {
+top: -3.75rem;
+right: 0;
+height: 0;
+}
+#content .buttons .kill {
+display: none;
+visibility: hidden;
+}
+a.error {
+font-weight: bold;
+color: white;
+background-color: darkred;
+border-bottom-left-radius: 0.25rem;
+border-bottom-right-radius: 0.25rem;
+border-top-left-radius: 0.25rem;
+border-top-right-radius: 0.25rem;
+padding: 0.125rem 0.25rem 0.125rem 0.25rem; 
+}
+#heading-narrow {
+display: none;
+}
+.downloading {
+background: #f9f9be;
+padding: 0.625rem;
+text-align: center;
+border-radius: 0.3125rem;
+}
+@media (max-width: 58.125em) {
+#heading-wide {
+display: none;
+}
+#heading-narrow {
+display: block;
+}
+}
+@media (max-width: 47.5em) {
+.container .left,
+.container .right {
+width: auto;
+float: none;
+}
+div#about {
+max-width: 31.25rem;
+text-align: center;
+}
+}
+@media (min-width: 43.75em) and (max-width: 62.5em) {
+div#menu > a {
+margin: 0.3125rem 0;
+font-size: 0.875rem;
+}
+input#search {
+font-size: 0.875rem;
+}
+}
+@media (max-width: 43.75em) {
+body {
+font-size: 0.9375rem;
+}
+div#playground {
+left: 0;
+right: 0;
+}
+pre,
+code {
+font-size: 0.866rem;
+}
+div#page > .container {
+padding: 0 0.625rem;
+}
+div#topbar {
+height: auto;
+padding: 0.625rem;
+}
+div#topbar > .container {
+padding: 0;
+}
+#heading-wide {
+display: block;
+}
+#heading-narrow {
+display: none;
+}
+.top-heading {
+float: none;
+display: inline-block;
+padding: 0.75rem;
+}
+div#menu {
+padding: 0;
+min-width: 0;
+text-align: left;
+float: left;
+}
+div#menu > a {
+display: block;
+margin-left: 0;
+margin-right: 0;
+}
+#menu .search-box {
+display: flex;
+width: 100%;
+}
+#menu-button {
+display: inline-block;
+}
+p,
+pre,
+ul,
+ol {
+margin: 0.625rem;
+}
+.pkg-synopsis {
+display: none;
+}
+img.gopher {
+display: none;
+}
+}
+@media (max-width: 30em) {
+#heading-wide {
+display: none;
+}
+#heading-narrow {
+display: block;
+}
+}
+@media print {
+pre {
+background: #fff;
+border: 0.0625rem solid #bbb;
+white-space: pre-wrap;
+}
+}
+div#topbar {
+visibility: hidden;
+}
+</style>
+  <style type="text/css">body {
+margin: 1in;
+text-align: left;
+}
+</style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">goxdr(1)</h1>
+<p class="author">David Mazières</p>
+</header>
+<h1 id="name">NAME</h1>
+<p>goxdr - Go XDR compiler</p>
+<h1 id="synopsis">SYNOPSIS</h1>
+<p>goxdr [-b|-B] [-fmt] [-i <em>import</em>] [-p <em>package</em>]<br />
+      [-o <em>output.go</em>] [<em>file.x</em> …]</p>
+<h1 id="description">DESCRIPTION</h1>
+<p>goxdr compiles an RFC4506 XDR interface file to a set of go data
+structures that can be either marshaled to or unmarshaled from standard
+XDR binary format or traversed for other purposes such as
+pretty-printing. It does not rely on go’s reflection facilities, and so
+can be used to special-case handling of different XDR typedefs that
+represent identical go types.</p>
+<p>Because go’s type system is not very extensible, goxdr uses a
+<em>dual type system</em>. Every type <code>T</code> declared in an XDR
+file compiles to two corresponding go types, a <em>native type</em>
+<code>T</code> convenient for programming, and an <em>XdrType</em>,
+<code>XdrType_T</code>, with methods that facilitate generic traversal
+and marshaling. <code>XdrType_T</code> is equivalent to <code>*T</code>
+when it is possible to implement appropriate methods on <code>T</code>,
+but this is not always the case. However, for all XDR types
+<code>T</code>, there is a method <code>XDR_T(*T)XdrType_T</code> to
+cast a value to its XdrType.</p>
+<p>goxdr’s native types map to the most intuitive go equivalent: strings
+map to strings, pointers map to pointers, fixed-size arrays map to
+arrays, and variable-length arrays map to slices, without new type
+declarations that might complicate assignment. E.g., the XDR
+<code>typedef string mystring&lt;32&gt;</code> is just a string, and so
+can be assigned from a string. This does mean you can assign a string
+longer than 32 bytes, but length limits are enforced during both
+marshaling and unmarshaling.</p>
+<h2 id="type-representations">Type representations</h2>
+<p>To be consistent with go’s symbol export policy, all types, enum
+constants, and struct/union fields defined in an XDR file are
+capitalized in the corresponding go representation. Source XDR types are
+mapped to their equivalent go types as follows (note that <code>T</code>
+cannot be <code>opaque</code> or <code>string</code> in this table):</p>
+<pre><code>Source type     Native type    notes
+--------------  ------------   ------------------------------
+bool            bool           use capital TRUE and FALSE
+int             int32
+unsigned int    uint32
+hyper           int64
+unsigned hyper  uint64
+float           float32
+double          float64
+quadruple       float128       but float128 is not defined
+string&lt;n&gt;       string
+opaque&lt;n&gt;       []byte
+opaque[n]       [n]byte
+enum T          type T int32
+T*              *T             for any XDR type T
+T&lt;n&gt;            []T            for any XDR type T
+T[n]            [n]T           for any XDR type T</code></pre>
+<p>Each XDR <code>typedef</code> is compiled to a go type alias
+(<code>type Alias = Original</code>). However, each has its own XdrType,
+allowing generic traversal code to special-case the use of type aliases.
+Among other places, this is useful for pretty-printing code that
+displays the same underlying type in different ways. For example, if
+your XDR source specifies:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">int</span> meters<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">typedef</span> <span class="dt">int</span> seconds<span class="op">;</span></span></code></pre></div>
+<p>it will compile to native types:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Meters <span class="op">=</span> <span class="dt">int32</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Seconds <span class="op">=</span> <span class="dt">int32</span></span></code></pre></div>
+<p>But you can treat instances of each specially in your marshaling
+function by testing for type <code>XdrType_Meters</code> or
+<code>XdrType_Seconds</code>. Alternatively, you can also use the
+<code>XdrTypeName()string</code> method to obtain the string “Meters” or
+“Seconds.”</p>
+<p>Each XDR <code>enum</code> declaration compiles to a defined type
+whose representation is an <code>int32</code>. The constants of the enum
+are defined as go constants of the new defined type.</p>
+<p>RFC4506 defines <code>bool</code> in XDR source as equivalent to an
+<code>enum</code> with name identifiers <code>TRUE</code> and
+<code>FALSE</code>. goxdr translates XDR’s <code>bool</code> to go’s
+native <code>bool</code> type. However, following the RFC, goxdr still
+requires you to use capital <code>TRUE</code> and <code>FALSE</code>.
+(The identifiers <code>true</code> and <code>false</code> will get
+translated to exported go identifiers <code>True</code> and
+<code>False</code>, which is probably not what you want.)</p>
+<p>An XDR <code>struct</code> is compiled to a defined type represented
+as a go struct containing each field of the XDR struct.</p>
+<p>An XDR <code>union</code> is compiled to a data structure with one
+public field for the discriminant and one method for each non-void “arm
+declaration” (i.e., declaration in a case statement) that returns a
+pointer to a value of the appropriate type. There is no need to
+initialize the union when setting the discriminant; changing its value
+just causes the appropriate method to return a non-nil pointer. Invoking
+the wrong method for the current discriminant value calls panic.</p>
+<p>As an example, the following XDR source:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">enum</span> myenum <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    tag1 <span class="op">=</span> <span class="dv">1</span><span class="op">,</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    tag2 <span class="op">=</span> <span class="dv">2</span><span class="op">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    tag3 <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> myunion <span class="cf">switch</span> <span class="op">(</span>myenum discriminant<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> tag1<span class="op">:</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">int</span> one<span class="op">;</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> tag2<span class="op">:</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        string two<span class="op">&lt;&gt;;</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">void</span><span class="op">;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="op">};</span></span></code></pre></div>
+<p>compiles to this go code:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Myenum <span class="dt">int32</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> <span class="op">(</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    Tag1 Myenum <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    Tag2 Myenum <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    Tag3 Myenum <span class="op">=</span> <span class="dv">3</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> XDR_Myenum<span class="op">(</span>v <span class="op">*</span>Myenum<span class="op">)</span> <span class="op">*</span>Myenum <span class="op">{</span> <span class="cf">return</span> v <span class="op">}</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Myunion <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    Discriminant Myenum</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">...</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>u <span class="op">*</span>Myunion<span class="op">)</span> One<span class="op">()</span> <span class="op">*</span><span class="dt">int32</span> <span class="op">{...}</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>u <span class="op">*</span>Myunion<span class="op">)</span> Two<span class="op">()</span> <span class="op">*</span><span class="dt">string</span> <span class="op">{...}</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> XDR_Myunion<span class="op">(</span>x XDR<span class="op">)</span> <span class="op">*</span>Myunion <span class="op">{</span> <span class="cf">return</span> v <span class="op">}</span></span></code></pre></div>
+<h2 id="convenience-methods">Convenience methods</h2>
+<p>XDR <code>union</code> types have an <code>XdrValid() bool</code>
+method that returns whether the discriminant is in a valid state. If the
+<code>union</code> type does not have a default case, another method
+<code>XdrValidTags() map[uint32]bool</code> specifies the set of valid
+discriminant values. For <code>union</code> types that are not valid by
+default, because go’s default 0 value does not correspond to a valid
+discriminant, a method <code>XdrInitialize()</code> places them in a
+valid state. Similarly, <code>enum</code> types that can’t be statically
+verified to be valid with value 0 (either because no name is assigned to
+constant 0, or because names are assigned to constants in a different
+file), have an <code>XdrInitialize()</code> method that sets them to the
+first name in the <code>enum</code> definition.</p>
+<h2 id="the-xdr-interface">The XDR interface</h2>
+<p>As previously mentioned, for every native type <code>T</code>
+generated by goxdr (where <code>T</code> is the capitalized go type),
+including typedefs, there is a corresponding XdrType into which one can
+cast the native type by means of a generated function:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> XDR_T<span class="op">(</span>v <span class="op">*</span>T<span class="op">)</span> XdrType_T <span class="op">{...}</span></span></code></pre></div>
+<p>All XdrTypes support the <code>XdrType</code> interface:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrType <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    XdrTypeName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    XdrValue<span class="op">()</span> <span class="kw">interface</span><span class="op">{}</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    XdrPointer<span class="op">()</span> <span class="kw">interface</span><span class="op">{}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    XdrMarshal<span class="op">(</span>XDR<span class="op">,</span> <span class="dt">string</span><span class="op">)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The XdrType can be marshaled, unmarshaled, or otherwise traversed by
+means of the <code>XdrMarshal(x XDR, name string)</code> method. Note
+the <code>name</code> argument has no effect for RFC4506-compliant
+binary marshaling, and can safely be supplied as the empty string
+<code>&quot;&quot;</code>. However, when traversing an XDR type for other purposes
+such as pretty-printing, <code>name</code> will be set to the nested
+name of the field (with components separated by period).</p>
+<p>The argument <code>x</code> implements the XDR interface and
+determines what XDR_T actually does (i.e., marshal or unmarshal). It has
+the following interface:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XDR <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    Marshal<span class="op">(</span>name <span class="dt">string</span><span class="op">,</span> val XdrType<span class="op">)</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    Sprintf<span class="op">(</span><span class="dt">string</span><span class="op">,</span> <span class="op">...</span><span class="kw">interface</span><span class="op">{})</span> <span class="dt">string</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>Sprintf</code> is expected to be a copy of
+<code>fmt.Sprintf</code>. However, XDR back-ends that do not make use of
+the <code>name</code> argument (notably marshaling to RFC4506 binary
+format) can save some overhead by returning an empty string. Hence, the
+two sensible implementations of <code>Sprintf</code> are:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>xp <span class="op">*</span>MyXDR1<span class="op">)</span> Sprintf<span class="op">(</span>f <span class="dt">string</span><span class="op">,</span> args <span class="op">...</span><span class="kw">interface</span><span class="op">{})</span> <span class="dt">string</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fmt<span class="op">.</span>Sprintf<span class="op">(</span>f<span class="op">,</span> args<span class="op">...)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>xp <span class="op">*</span>MyXDR2<span class="op">)</span> Sprintf<span class="op">(</span>f <span class="dt">string</span><span class="op">,</span> args <span class="op">...</span><span class="kw">interface</span><span class="op">{})</span> <span class="dt">string</span> <span class="op">{</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p><code>Marshal</code> is the method that actually does whatever work
+will be applied to the data structure. The second argument,
+<code>val</code>, will be the go value that must be
+marshaled/unmarshaled. To simplify data structure traversal, XdrTypes
+implement various more specific interfaces that extend
+<code>XdrType</code> allowing many different types to be handled
+identically. Specifically:</p>
+<ul>
+<li><p>For bool and all 32-bit numeric types (including the size of
+variable-length arrays), The XdrType implements <code>XdrNum32</code>,
+which allows the value to be extracted and set as a
+<code>uint32</code>.</p></li>
+<li><p>For all 64-bit numeric types, the XdrType imlements
+<code>XdrNum64</code>, which allows the value to be extracted and set as
+a <code>uint64</code>.</p></li>
+<li><p>For <code>struct</code> and <code>union</code> types, the XdrType
+is just a pointer to the type being marshaled. However, these types
+implement the <code>XdrAggregate</code> interface, which extends
+<code>XdrType</code> with the method
+<code>XdrRecurse(x XDR, name string)</code> that recursively marshals
+every field of the type. <code>union</code> types also implement the
+<code>XdrUnion</code> interface.</p></li>
+<li><p>An <code>enum</code> type <code>T</code> also just uses
+<code>*T</code> as its XdrType, but <code>enum</code> types implement
+<code>XdrNum32</code> instead of <code>XdrAggregate</code>. They also
+implement the <code>XdrEnum</code> interface, which provides access to
+symbolic names via the <code>XdrEnumNames() map[int32]string</code>
+method.</p></li>
+<li><p>Fixed-length arrays (other than <code>opaque[]</code>) have a
+generated XdrType that implements the <code>XdrArray</code> interface,
+which extends <code>XdrAggregate</code>. Calling <code>XdrRecurse</code>
+on an array iterates over the array to marshal each element
+individually.</p></li>
+<li><p>Variable-length arrays (other than <code>opaque&lt;&gt;</code>)
+also use a generated XdrType implementing the <code>XdrVec</code>
+interface, which also extends <code>XdrAggregate</code>. The
+<code>XdrRecurse</code> method first calls <code>Marshal</code> on a
+value of <code>XdrSize</code> to get or set the size of the array, then
+calls <code>Marshal</code> on each element of the array as with
+fixed-length arrays.</p></li>
+<li><p>Similar to variable-length arrays, pointers use a generated
+XdrType that implements the <code>XdrPtr</code> interface, which extends
+<code>XdrAggregate</code>. The <code>XdrRecurse</code> method first
+calls <code>Marshal</code> on another generated type that implements the
+<code>XdrNum32</code> interface (capable of containing the value 0 or 1
+to indicate nil or value-present), then, if the pointer is non-nil, it
+calls <code>Marshal</code> on the underlying value.</p></li>
+<li><p><code>string</code> has <code>XdrType</code> of
+<code>XdrString</code>, which also encodes the size bound of the string
+and implements the <code>XdrVarBytes</code> and <code>XdrBytes</code>
+interfaces that extend <code>XdrType</code>.</p></li>
+<li><p><code>opaque&lt;&gt;</code> has an <code>XdrType</code> of
+<code>XdrVecOpaque</code>, which also implements the
+<code>XdrVarBytes</code> and <code>XdrBytes</code> interfaces that
+extend <code>XdrType</code>.</p></li>
+<li><p><code>opaque[]</code> is passed as a generated type implementing
+<code>XdrArrayOpaque</code>, which extends <code>XdrBytes</code> but not
+<code>XdrVarBytes</code>.</p></li>
+</ul>
+<p>For most types, you can recover the native type from the XdrType via
+the the <code>XdrPointer()</code> and <code>XdrValue()</code> methods,
+which return an <code>interface{}</code>. One exception is arrays
+(including <code>opaque[]</code>), for which <code>XdrValue()</code>
+returns a slice to avoid copying the entire array. Also, the fake
+<code>bool</code> on which <code>Marshal</code> is called for a pointer
+type supports <code>XdrValue()</code> but returns <code>nil</code> from
+<code>XdrPointer()</code> since there is no actual <code>bool</code> to
+point to.</p>
+<p>The <code>XdrTypeName()</code> method returns a string describing the
+underlying type as declared in the XDR file, including any
+<code>typedef</code> aliases used. The string returned may have a suffix
+of “*“,”?“,”&lt;&gt;“, or”[]” to indicate pointers, the boolean
+associated with a pointer, a variable-length array, and a fixed-length
+array, respectively. If you want the actual size or bound that would go
+inside the “[]” or “&lt;&gt;”, you will need to obtain these from the
+<code>XdrArraySize()uint32</code> or <code>XdrBound()uint32</code>
+method respectively.</p>
+<p>The table below summarizes the (overlapping) interfaces implemented
+by the the different XdrTypes generated. In the table, <code>T</code>
+stands for a complete standalone XDR type (so not <code>string</code> or
+<code>opaque</code>). Basic marshaling can be performed in a type switch
+statement handling interfaces that cover all types, for instance
+<code>XdrNum32</code>, <code>XdrNum64</code>, <code>XdrBytes</code>, and
+<code>XdrAggregate</code>.</p>
+<pre><code>Interface       Implemented for XDR source types
+-----------     --------------------------------------------
+XdrNum32        bool, [unsigned] int, enums, float,
+                size, pointer present flag
+XdrNum64        [unsigned] hyper, double
+XdrArray        T[n]
+XdrVec          T&lt;n&gt;
+XdrPtr          T*
+XdrEnum         enum T
+XdrUnion        union T
+XdrBytes        string&lt;n&gt;, opaque[n], opaque&lt;n&gt;
+XdrVarBytes     string&lt;n&gt;, opaque&lt;n&gt;
+XdrArrayOpaque  opaque[n]
+XdrAggregate    struct T, union T, T*, T&lt;n&gt;, T[n]
+XdrTypedef      typedef BaseT T
+fmt.Stringer    all types in XdrNum{32,64} and XdrBytes
+fmt.Scanner     all types in XdrNum{32,64} and XdrBytes
+XdrType         all XDR types</code></pre>
+<h2 id="xdr-functions">XDR functions</h2>
+<p>As previously mentioned, each (capitalized) type <code>T</code>
+output by goxdr also has function <code>XDR_T</code> that returns an
+instance of <code>XdrType</code>. For <code>struct</code>,
+<code>union</code>, and <code>enum</code> types, this function is the
+identity function:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> XDR_T<span class="op">(</span>v <span class="op">*</span>T<span class="op">)</span> XdrType_T <span class="op">{</span> <span class="cf">return</span> v <span class="op">}</span></span></code></pre></div>
+<p>For other types, however, this returns a defined type implementing
+the interfaces described in the previous subsection. As an example, the
+following function in the pre-defined boilerplate casts an ordinary
+<code>*int32</code> into the defined type <code>*XdrInt32</code>, which
+implements the <code>XdrNum32</code> interface:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrInt32 <span class="dt">int32</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrType_int32 <span class="op">=</span> <span class="op">*</span>XdrInt32</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">// ... implementation of XdrNum32 methods ...</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>XdrInt32<span class="op">)</span> XdrTypeName<span class="op">()</span> <span class="dt">string</span> <span class="op">{</span> <span class="cf">return</span> <span class="st">&quot;int32&quot;</span> <span class="op">}</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>v <span class="op">*</span>XdrInt32<span class="op">)</span> XdrPointer<span class="op">()</span> <span class="kw">interface</span><span class="op">{}</span> <span class="op">{</span> <span class="cf">return</span> <span class="op">(*</span><span class="dt">int32</span><span class="op">)(</span>v<span class="op">)</span> <span class="op">}</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>v XdrInt32<span class="op">)</span> XdrValue<span class="op">()</span> <span class="kw">interface</span><span class="op">{}</span> <span class="op">{</span> <span class="cf">return</span> <span class="dt">int32</span><span class="op">(</span>v<span class="op">)</span> <span class="op">}</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>v <span class="op">*</span>XdrInt32<span class="op">)</span> XdrMarshal<span class="op">(</span>x XDR<span class="op">,</span> name <span class="dt">string</span><span class="op">)</span> <span class="op">{</span> x<span class="op">.</span>Marshal<span class="op">(</span>name<span class="op">,</span> v<span class="op">)</span> <span class="op">}</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> XDR_int32<span class="op">(</span>v <span class="op">*</span><span class="dt">int32</span><span class="op">)</span> <span class="op">*</span>XdrInt32 <span class="op">{</span> <span class="cf">return</span> <span class="op">(*</span>XdrInt32<span class="op">)(</span>v<span class="op">)</span> <span class="op">}</span></span></code></pre></div>
+<p>The following table lists the concrete types passed to the
+<code>Marshal</code> method. Note that types listed as
+<code>generated</code> get passed as a different defined type for each
+underlying type <code>T</code>. The defined type makes the size bound
+availble via an <code>XdrBound()</code> method, since that information
+cannot conveniently be encoded as part of the go type.</p>
+<pre><code>XDR type        Marshaled as    notes
+--------------  --------------  -------------------------------
+bool            *XdrBool
+int             *XdrInt32
+unsigned int    *XdrUint32
+float           *XdrFloat32
+hyper           *XdrInt64
+unsigned hyper  *XdrUint64
+double          *XdrFloat64
+string&lt;n&gt;       XdrString
+opaque&lt;n&gt;       XdrVecOpaque
+opaque[n]       generated
+T               *T              for struct, enum, union
+T[n]            generated
+T*              generated
+T&lt;n&gt;            generated
+size            *XdrSize        when recursing in T&lt;n&gt;
+typedef         generated       XdrBaseType(v) gives inner type</code></pre>
+<p>Note that an XDR <code>Marshal(name string, v XdrType)</code> method
+can use a type switch to special-case certain interfaces and types. If
+you test <code>v</code> against interfaces (e.g.,
+<code>XdrNum32</code>), it will work regardless of typedefs. If you test
+<code>v</code> for specific types, such as <code>XdrString</code> or
+<code>XdrType_int32</code>, it will not work for typedefs. You can,
+however, switch on <code>XdrBaseType(v)</code> to check the underlying
+base type. You can also, of course, switch on the native type returned
+by v.XdrPointer(), which is not affected by typedefs.
+<code>XdrTypeName()</code> is also useful to check for typedefs, but to
+do so should be called on <code>v</code> rather than
+<code>XdrBaseType(v)</code>.</p>
+<p><code>XdrMarshal</code> methods panic with type <code>XdrError</code>
+(a user-defined string) if the input is invalid or a value is out of
+range.</p>
+<h2 id="pre-defined-xdr-types">Pre-defined XDR types</h2>
+<p>The types <code>XdrOut</code>, <code>XdrIn</code>, and
+<code>XdrPrint</code> in the boilerplate code (by default package
+<code>&quot;github.com/xdrpp/goxdr/xdr&quot;</code>) implement the
+<code>XDR</code> interface and perform RFC4506 binary marshaling,
+RFC4506 binary unmarshaling, and pretty-printing, respectively.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrOut <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    Out io<span class="op">.</span>Writer</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrIn <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    In io<span class="op">.</span>Reader</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrPrint <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    Out io<span class="op">.</span>Writer</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="program-and-version-declarations">Program and version
+declarations</h2>
+<p>Each version declaration inside a program declaration gets compiled
+down to an interface with the same name as the version. For example this
+declaration</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode c"><code class="sourceCode c"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>program my_prog <span class="op">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  version my_vers <span class="op">{</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> null<span class="op">(</span><span class="dt">void</span><span class="op">)</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">int</span> Increment<span class="op">(</span><span class="dt">int</span><span class="op">)</span> <span class="op">=</span> <span class="dv">2</span><span class="op">;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">void</span> MultiArg<span class="op">(</span><span class="dt">int</span><span class="op">,</span> <span class="dt">int</span><span class="op">)</span> <span class="op">=</span> <span class="dv">3</span><span class="op">;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span> <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="op">=</span> <span class="bn">0x20000000</span><span class="op">;</span></span></code></pre></div>
+<p>yields the following interface:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> My_vers <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    Null<span class="op">()</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    Increment<span class="op">(*</span><span class="dt">int32</span><span class="op">)</span> <span class="op">*</span><span class="dt">int32</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    MultiArg<span class="op">(*</span><span class="dt">int32</span><span class="op">,</span> <span class="op">*</span><span class="dt">int32</span><span class="op">)</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>In addition, goxdr creates a type that implements the
+<code>My_vers</code> interface (for use in clients):</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> My_vers_Client <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    XdrSend <span class="kw">func</span><span class="op">(</span>XdrProc<span class="op">)</span> <span class="dt">error</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>c My_vers_Client<span class="op">)</span> Null<span class="op">()</span> <span class="op">{...}</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>c My_vers_Client<span class="op">)</span> Increment<span class="op">(</span>a1 <span class="op">*</span><span class="dt">int32</span><span class="op">)</span> <span class="op">*</span><span class="dt">int32</span> <span class="op">{...}</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>c My_vers_Client<span class="op">)</span> MultiArg<span class="op">(</span>a1 <span class="op">*</span><span class="dt">int32</span><span class="op">,</span> a2 <span class="op">*</span><span class="dt">int32</span><span class="op">)</span> <span class="op">{...}</span></span></code></pre></div>
+<p>The methods all bundle their argument and result types into a type
+implementing <code>XdrProc</code>, and pass it to a function
+<code>XdrSend</code>. An <code>XdrProc</code> instance contains all the
+information necessary to marshal a remote procedure call and its result,
+namely the program, version, and procedure numbers as well as both the
+arguments and results ready to be marshaled in <code>XdrType</code>
+format. <code>GetArg()</code> returns the arguments supplied by the
+user, while <code>GetRes()</code> returns a result type expected to be
+overwritten by the result of the RPC.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrProc <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    Prog<span class="op">()</span> <span class="dt">uint32</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    Vers<span class="op">()</span> <span class="dt">uint32</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    Proc<span class="op">()</span> <span class="dt">uint32</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    ProgName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    VersName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    ProcName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    GetArg<span class="op">()</span> XdrType</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    GetRes<span class="op">()</span> XdrType</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>For the server side, goxdr generates a type
+<code>My_vers_Server</code> that takes an instance of
+<code>My_vers</code> and allows lookup of argument and result types by
+procedure number. Specifically, <code>My_vers_Server</code> just
+requires an instance of <code>My_vers</code>, and then generically
+exposes it through the <code>XdrSrv</code> interface.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> My_vers_Server <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    Srv My_vers</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>s My_vers_Server<span class="op">)</span> GetProc<span class="op">(</span>p <span class="dt">uint32</span><span class="op">)</span> XdrSrvProc <span class="op">{...}</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="kw">var</span> _ XdrSrv <span class="op">=</span> My_vers_Server<span class="op">{}</span>    <span class="co">// implements XdrSrv interface</span></span></code></pre></div>
+<p><code>XdrSrv</code> provides everything an RFC5531 RPC library needs
+to marshal and unmarshal arguments. The <code>Do()</code> method of an
+<code>XdrSrvProc</code> calls the underlying method on
+<code>My_vers_Server</code>. Hence, program-independent RPC code can
+call <code>proc := GetProc()</code> to get the <code>XdrSrvProc</code>,
+then unmarshal <code>proc.GetArg()</code>, then call
+<code>proc.Do()</code> to handle the call, and finally marshal the
+result from <code>proc.GetRes()</code>.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrSrvProc <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    XdrProc</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    Do<span class="op">()</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrSrv <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    Prog<span class="op">()</span> <span class="dt">uint32</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    Vers<span class="op">()</span> <span class="dt">uint32</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    ProgName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    VersName<span class="op">()</span> <span class="dt">string</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    GetProc<span class="op">(</span><span class="dt">uint32</span><span class="op">)</span> XdrSrvProc</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="options">OPTIONS</h1>
+<p>goxdr supports the following options:</p>
+<dl>
+<dt><code>-help</code></dt>
+<dd>
+Print a brief usage message.
+</dd>
+<dt><code>-b</code></dt>
+<dd>
+goxdr by default imports <code>&quot;github.com/xdrpp/goxdr/xdr&quot;</code>, a
+module with boilerplate code to assist in marshaling and unmarshaling
+values, including code for interfaces such as <code>XDR</code> and
+<code>XdrNum32</code> as well as helper types implementing these
+interfaces (<code>XdrInt32</code>, <code>XdrUint32</code>, etc.). This
+option suppresses that default import. This can be useful if you are
+importing another package that includes the boilerplate (see
+<code>-B</code>).
+</dd>
+<dt><code>-B</code></dt>
+<dd>
+Causes goxdr to emit the boilerplate into its output instead of
+importing it. Implies <code>-b</code>. Note only one copy of the
+boilerplate should be included in a package. If you use goxdr to compile
+all XDR input files to a single go file (the recommended usage), then
+you will get only one copy of the boilerplate with <code>-B</code>.
+However, if you compile different XDR files into different go files, you
+will need to specify <code>-b</code> with each XDR input file to avoid
+including the boilerplate, then run goxdr with no input files
+(<code>goxdr -B -o goxdr_boilerplate.go</code>) to get one copy of the
+boilerplate. You should also use <code>-b</code> if you are importing
+another package that already includes the boilerplate using the
+<code>-i</code> option below.
+</dd>
+<dt><code>-enum-comments</code></dt>
+<dd>
+When an enum has one or more constants annotated with a comment, this
+options causes goxdr to emit a method
+<code>XdrEnumComments() map[int32]string</code> that contains the
+comment turned into a string. The option is useful if, for instance, you
+have an enum encoding various error conditions. In that case you can put
+a human-readable description of the error condition as a comment in the
+XDR source file, and access the text of that comment from your program.
+</dd>
+<dt><code>-fmt</code></dt>
+<dd>
+Pass the generated code through <code>gofmt -s</code> to simplify and
+format it.
+</dd>
+<dt><code>-i</code> <em>import_path</em></dt>
+<dd>
+Add the directive <tt>import . “<em>import_path</em>”</tt> at the top of
+the output file. This is needed when XDR files in the current package
+require XDR structures defined in a different package, since XDR itself
+provides no way to specify package scoping.
+</dd>
+<dt><code>-lax-discriminants</code></dt>
+<dd>
+Cast all discriminants and cases (except bool) to int32, so that you can
+use discriminants and cases that are different enum types.
+</dd>
+<dt><code>-o</code> <em>output.go</em></dt>
+<dd>
+Write the output to file <em>output.go</em> instead of standard output.
+</dd>
+<dt><code>-p</code> <em>package</em></dt>
+<dd>
+Specify the package name to use for the generated code. The default is
+for the generated code to declare <code>package main</code>.
+</dd>
+</dl>
+<h1 id="examples">EXAMPLES</h1>
+<p>To serialize a data structure of type <code>MyType</code>:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> serialize_Mytype<span class="op">(</span>val <span class="op">*</span>MyType<span class="op">)</span> <span class="op">[]</span><span class="dt">byte</span> <span class="op">{</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    buf <span class="op">:=</span> <span class="op">&amp;</span>bytes<span class="op">.</span>Buffer<span class="op">{}</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    XDR_MyType<span class="op">(</span>val<span class="op">).</span>XdrMarshal<span class="op">(&amp;</span>XdrOut<span class="op">{</span> buf <span class="op">},</span> <span class="st">&quot;&quot;</span><span class="op">)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> buf<span class="op">.</span>Bytes<span class="op">()</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>To serialize/unserialize an arbitrary instance of
+<code>XdrType</code>:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> serialize<span class="op">(</span>val XdrType<span class="op">)</span> <span class="op">[]</span><span class="dt">byte</span> <span class="op">{</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    buf <span class="op">:=</span> <span class="op">&amp;</span>bytes<span class="op">.</span>Buffer<span class="op">{}</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    val<span class="op">.</span>XdrMarshal<span class="op">(&amp;</span>XdrOut<span class="op">{</span> buf <span class="op">},</span> <span class="st">&quot;&quot;</span><span class="op">)</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> buf<span class="op">.</span>Bytes<span class="op">()</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> deserialize<span class="op">(</span>val XdrType<span class="op">,</span> in <span class="op">[]</span><span class="dt">byte</span><span class="op">)</span> <span class="op">(</span>e <span class="dt">error</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">defer</span> <span class="kw">func</span><span class="op">()</span> <span class="op">{</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">switch</span> i <span class="op">:=</span> <span class="bu">recover</span><span class="op">().(</span><span class="kw">type</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> <span class="ot">nil</span><span class="op">:</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">case</span> XdrError<span class="op">:</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>            e <span class="op">=</span> i</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>            <span class="bu">panic</span><span class="op">(</span>i<span class="op">)</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="op">}()</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    val<span class="op">.</span>XdrMarshal<span class="op">(&amp;</span>XdrIn<span class="op">{</span> bytes<span class="op">.</span>NewBuffer<span class="op">(</span>in<span class="op">)</span> <span class="op">},</span> <span class="st">&quot;&quot;</span><span class="op">)</span></span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ot">nil</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>To pretty-print an arbitrary XDR-defined data structure, but
+special-case any fields of type <code>MySpecialStruct</code> by
+formatting them with a function called
+<code>MySpecialString(*MySpecialStruct)</code>, you can do the
+following:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> XdrMyPrint <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    Out io<span class="op">.</span>Writer</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>xp <span class="op">*</span>XdrMyPrint<span class="op">)</span> Sprintf<span class="op">(</span>f <span class="dt">string</span><span class="op">,</span> args <span class="op">...</span><span class="kw">interface</span><span class="op">{})</span> <span class="dt">string</span> <span class="op">{</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> fmt<span class="op">.</span>Sprintf<span class="op">(</span>f<span class="op">,</span> args<span class="op">...)</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> <span class="op">(</span>xp <span class="op">*</span>XdrMyPrint<span class="op">)</span> Marshal<span class="op">(</span>name <span class="dt">string</span><span class="op">,</span> i XdrType<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">switch</span> v <span class="op">:=</span> i<span class="op">.(</span><span class="kw">type</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> <span class="op">*</span>MySpecialStruct<span class="op">:</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>xp<span class="op">.</span>Out<span class="op">,</span> <span class="st">&quot;%s: %s</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">,</span> MySpecialString<span class="op">(</span>v<span class="op">))</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> fmt<span class="op">.</span>Stringer<span class="op">:</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>xp<span class="op">.</span>Out<span class="op">,</span> <span class="st">&quot;%s: %s</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">,</span> v<span class="op">.</span>String<span class="op">())</span></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> XdrPtr<span class="op">:</span></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>xp<span class="op">.</span>Out<span class="op">,</span> <span class="st">&quot;%s._present: %v</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">,</span> v<span class="op">.</span>GetPresent<span class="op">())</span></span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>XdrMarshalValue<span class="op">(</span>xp<span class="op">,</span> name<span class="op">)</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> XdrVec<span class="op">:</span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>xp<span class="op">.</span>Out<span class="op">,</span> <span class="st">&quot;%s.len: %d</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">,</span> v<span class="op">.</span>GetVecLen<span class="op">())</span></span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>XdrMarshalN<span class="op">(</span>xp<span class="op">,</span> name<span class="op">,</span> v<span class="op">.</span>GetVecLen<span class="op">())</span></span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">case</span> XdrAggregate<span class="op">:</span></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>        v<span class="op">.</span>XdrRecurse<span class="op">(</span>xp<span class="op">,</span> name<span class="op">)</span></span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">default</span><span class="op">:</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>        fmt<span class="op">.</span>Fprintf<span class="op">(</span>xp<span class="op">.</span>Out<span class="op">,</span> <span class="st">&quot;%s: %v</span><span class="ch">\n</span><span class="st">&quot;</span><span class="op">,</span> name<span class="op">,</span> i<span class="op">)</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a><span class="kw">func</span> MyXdrToString<span class="op">(</span>t XdrType<span class="op">)</span> <span class="dt">string</span> <span class="op">{</span></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    out <span class="op">:=</span> <span class="op">&amp;</span>strings<span class="op">.</span>Builder<span class="op">{}</span></span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    t<span class="op">.</span>XdrMarshal<span class="op">(&amp;</span>XdrMyPrint<span class="op">{</span>out<span class="op">},</span> <span class="st">&quot;&quot;</span><span class="op">)</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> out<span class="op">.</span>String<span class="op">()</span></span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h1 id="see-also">SEE ALSO</h1>
+<p>rpcgen(1), xdrc(1)</p>
+<p><a href="https://tools.ietf.org/html/rfc4506" class="uri">https://tools.ietf.org/html/rfc4506</a>, <a href="https://tools.ietf.org/html/rfc5531" class="uri">https://tools.ietf.org/html/rfc5531</a></p>
+<h1 id="bugs">BUGS</h1>
+<p>goxdr is not hygienic. Because it capitalizes symbols, it could
+produce a name clash if two symbols differ only in the capitalization of
+the first letter. Moreover, it introduces various helper types and
+functions that begin <code>XDR_</code> or <code>Xdr</code>, so could
+produce incorrect code if users employ such identifiers in XDR files.
+Though RFC4506 disallows identifiers that start with underscore, goxdr
+accepts them and produces code with inconsistent export semantics (since
+underscore cannot be capitalized).</p>
+<p>With <code>-lax-discriminants</code>, when unions use type bool as a
+discriminant, goxdr generates incorrect code unless it knows that the
+discriminant is of type bool. (This is because go provides no uniform
+syntax for converting both enums and bools to int32.) goxdr tries to
+figure out when the union discriminant is of type bool by following
+typedefs in the file, but this doesn’t work if you use type aliases
+defined in a different file.</p>
+<p>IEEE 754 floating point allows for many different NaN (not a number)
+values. The marshaling code simply takes whatever binary value go has
+sitting in memory, byteswapping on little-endian machines. Other
+languages and XDR implemenations may produce different NaN values from
+the same code. Hence, in the presence of floating point, the marshaled
+output of seemingly deterministic code may vary across
+implementations.</p>
+</body>
+</html>

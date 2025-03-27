@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>checker - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package checker
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+				<dd><a href="index.html#pkg-examples" class="examplesLink">Examples</a></dd>
+			
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package checker provides an analysis driver based on the
+<a href="http://localhost:6666/golang.org/x/tools/go/packages">golang.org/x/tools/go/packages</a> representation of a set of
+packages and all their dependencies, as produced by
+<a href="http://localhost:6666/golang.org/x/tools/go/packages#Load">packages.Load</a>.
+<p>It is the core of multichecker (the multi-analyzer driver),
+singlechecker (the single-analyzer driver often used to provide a
+convenient command alongside each analyzer), and analysistest, the
+test driver.
+<p>By contrast, the &apos;go vet&apos; command is based on unitchecker, an
+analysis driver that uses separate analysis--analogous to separate
+compilation--with file-based intermediate results. Like separate
+compilation, it is more scalable, especially for incremental
+analysis of large code bases. Commands based on multichecker and
+singlechecker are capable of detecting when they are being invoked
+by &quot;go vet -vettool=exe&quot; and instead dispatching to unitchecker.
+<p>Programs built using this package will, in general, not be usable
+in that way. This package is intended only for use in applications
+that invoke the analysis driver as a subroutine, and need to insert
+additional steps before or after the analysis.
+<p>See the Example of how to build a complete analysis driver program.
+
+				<div id="example_" class="toggle">
+	<div class="collapsed">
+		<p class="exampleHeading toggleButton">▹ <span class="text">Example</span></p>
+	</div>
+	<div class="expanded">
+		<p class="exampleHeading toggleButton">▾ <span class="text">Example</span></p>
+		
+		
+		
+			<p>Code:</p>
+			<pre class="code"><span class="comment">// The example command demonstrates a simple go/packages-based</span>
+<span class="comment">// analysis driver program.</span>
+package checker_test
+
+import (
+    &#34;fmt&#34;
+    &#34;log&#34;
+
+    &#34;golang.org/x/tools/go/analysis&#34;
+    &#34;golang.org/x/tools/go/analysis/checker&#34;
+    &#34;golang.org/x/tools/go/packages&#34;
+)
+
+func Example() {
+    <span class="comment">// Load packages: just this one.</span>
+    <span class="comment">//</span>
+    <span class="comment">// There may be parse or type errors among the</span>
+    <span class="comment">// initial packages or their dependencies,</span>
+    <span class="comment">// but the analysis driver can handle faulty inputs,</span>
+    <span class="comment">// as can some analyzers.</span>
+    cfg := &amp;packages.Config{Mode: packages.LoadAllSyntax}
+    initial, err := packages.Load(cfg, &#34;.&#34;)
+    if err != nil {
+        log.Fatal(err) <span class="comment">// failure to enumerate packages</span>
+    }
+    if len(initial) == 0 {
+        log.Fatalf(&#34;no initial packages&#34;)
+    }
+
+    <span class="comment">// Run analyzers (just one) on packages.</span>
+    analyzers := []*analysis.Analyzer{minmaxpkg}
+    graph, err := checker.Analyze(analyzers, initial, nil)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    <span class="comment">// Print information about the results of each</span>
+    <span class="comment">// analysis action, including all dependencies.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Clients using Go 1.23 can say:</span>
+    <span class="comment">//     for act := range graph.All() { ... }</span>
+    graph.All()(func(act *checker.Action) bool {
+        <span class="comment">// Print information about the Action, e.g.</span>
+        <span class="comment">//</span>
+        <span class="comment">//  act.String()</span>
+        <span class="comment">//  act.Result</span>
+        <span class="comment">//  act.Err</span>
+        <span class="comment">//  act.Diagnostics</span>
+        <span class="comment">//</span>
+        <span class="comment">// (We don&#39;t actually print anything here</span>
+        <span class="comment">// as the output would vary over time,</span>
+        <span class="comment">// which is unsuitable for a test.)</span>
+        return true
+    })
+
+    <span class="comment">// Print the minmaxpkg package fact computed for this package.</span>
+    root := graph.Roots[0]
+    fact := new(minmaxpkgFact)
+    if root.PackageFact(root.Package.Types, fact) {
+        fmt.Printf(&#34;min=%s max=%s&#34;, fact.min, fact.max)
+    }
+    <span class="comment">// Output:</span>
+    <span class="comment">// min=bufio max=unsafe</span>
+}
+
+<span class="comment">// minmaxpkg is a trival example analyzer that uses package facts to</span>
+<span class="comment">// compute information from the entire dependency graph.</span>
+var minmaxpkg = &amp;analysis.Analyzer{
+    Name:      &#34;minmaxpkg&#34;,
+    Doc:       &#34;Finds the min- and max-named packages among our dependencies.&#34;,
+    Run:       run,
+    FactTypes: []analysis.Fact{(*minmaxpkgFact)(nil)},
+}
+
+<span class="comment">// A package fact that records the alphabetically min and max-named</span>
+<span class="comment">// packages among the dependencies of this package.</span>
+<span class="comment">// (This property was chosen because it is relatively stable</span>
+<span class="comment">// as the codebase evolves, avoiding frequent test breakage.)</span>
+type minmaxpkgFact struct{ min, max string }
+
+func (*minmaxpkgFact) AFact() {}
+
+func run(pass *analysis.Pass) (any, error) {
+    <span class="comment">// Compute the min and max of the facts from our direct imports.</span>
+    f := &amp;minmaxpkgFact{min: pass.Pkg.Path(), max: pass.Pkg.Path()}
+    for _, imp := range pass.Pkg.Imports() {
+        if f2 := new(minmaxpkgFact); pass.ImportPackageFact(imp, f2) {
+            if f2.min &lt; f.min {
+                f.min = f2.min
+            }
+            if f2.max &gt; f.max {
+                f.max = f2.max
+            }
+        }
+    }
+    pass.ExportPackageFact(f)
+    return nil, nil
+}
+</pre>
+			
+		
+	</div>
+</div>
+
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+			
+			
+			
+				
+				<dd><a href="index.html#Action">type Action</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Action.AllObjectFacts">func (act *Action) AllObjectFacts() []analysis.ObjectFact</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Action.AllPackageFacts">func (act *Action) AllPackageFacts() []analysis.PackageFact</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Action.ObjectFact">func (act *Action) ObjectFact(obj types.Object, ptr analysis.Fact) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Action.PackageFact">func (act *Action) PackageFact(pkg *types.Package, ptr analysis.Fact) bool</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Action.String">func (act *Action) String() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Graph">type Graph</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Analyze">func Analyze(analyzers []*analysis.Analyzer, pkgs []*packages.Package, opts *Options) (*Graph, error)</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Graph.All">func (g *Graph) All() actionSeq</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Graph.PrintJSON">func (g *Graph) PrintJSON(w io.Writer) error</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Graph.PrintText">func (g *Graph) PrintText(w io.Writer, contextLines int) error</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Options">type Options</a></dd>
+				
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+		<div id="pkg-examples">
+			<h3>Examples</h3>
+			<div class="js-expandAll expandAll collapsed">(Expand All)</div>
+			<dl>
+			
+			<dd><a class="exampleLink" href="index.html#example_">Package</a></dd>
+			
+			</dl>
+		</div>
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go">checker.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/iter_go123.go">iter_go123.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/print.go">print.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+		
+		
+		
+			
+			
+			<h2 id="Action">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=4340:4943#L112">Action</a>
+				<a class="permalink" href="index.html#Action">&#xb6;</a>
+				
+				
+			</h2>
+			<p>An Action represents one unit of analysis work by the driver: the
+application of one analysis to one package. It provides the inputs
+to and records the outputs of a single analysis.Pass.
+<p>Actions form a DAG, both within a package (as different analyzers
+are applied, either in sequence or parallel), and across packages
+(as dependencies are analyzed).
+
+			<pre>type Action struct {
+<span id="Action.Analyzer"></span>    Analyzer    *<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer">Analyzer</a>
+<span id="Action.Package"></span>    Package     *<a href="http://localhost:6666/pkg/golang.org/x/tools/go/packages/">packages</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/packages/#Package">Package</a>
+<span id="Action.IsRoot"></span>    IsRoot      <a href="http://localhost:6666/pkg/builtin/#bool">bool</a> <span class="comment">// whether this is a root node of the graph</span>
+<span id="Action.Deps"></span>    Deps        []*<a href="index.html#Action">Action</a>
+<span id="Action.Result"></span>    Result      <a href="http://localhost:6666/pkg/builtin/#any">any</a>   <span class="comment">// computed result of Analyzer.run, if any (and if IsRoot)</span>
+<span id="Action.Err"></span>    Err         <a href="http://localhost:6666/pkg/builtin/#error">error</a> <span class="comment">// error result of Analyzer.run</span>
+<span id="Action.Diagnostics"></span>    Diagnostics []<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Diagnostic">Diagnostic</a>
+<span id="Action.Duration"></span>    Duration    <a href="http://localhost:6666/pkg/time/">time</a>.<a href="http://localhost:6666/pkg/time/#Duration">Duration</a> <span class="comment">// execution time of this step</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Action.AllObjectFacts">func (*Action) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=17827:17884#L547">AllObjectFacts</a>
+					<a class="permalink" href="index.html#Action.AllObjectFacts">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (act *<a href="index.html#Action">Action</a>) AllObjectFacts() []<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#ObjectFact">ObjectFact</a></pre>
+				<p>AllObjectFacts returns a new slice containing all object facts of
+the analysis&apos;s FactTypes in unspecified order.
+<p>See documentation at AllObjectFacts field of <a href="http://localhost:6666/golang.org/x/tools/go/analysis#Pass">analysis.Pass</a>.
+
+				
+				
+				
+			
+				
+				<h3 id="Action.AllPackageFacts">func (*Action) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=19476:19535#L597">AllPackageFacts</a>
+					<a class="permalink" href="index.html#Action.AllPackageFacts">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (act *<a href="index.html#Action">Action</a>) AllPackageFacts() []<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#PackageFact">PackageFact</a></pre>
+				<p>AllPackageFacts returns a new slice containing all package
+facts of the analysis&apos;s FactTypes in unspecified order.
+<p>See documentation at AllPackageFacts field of <a href="http://localhost:6666/golang.org/x/tools/go/analysis#Pass">analysis.Pass</a>.
+
+				
+				
+				
+			
+				
+				<h3 id="Action.ObjectFact">func (*Action) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=16562:16633#L511">ObjectFact</a>
+					<a class="permalink" href="index.html#Action.ObjectFact">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (act *<a href="index.html#Action">Action</a>) ObjectFact(obj <a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Object">Object</a>, ptr <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Fact">Fact</a>) <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				<p>ObjectFact retrieves a fact associated with obj,
+and returns true if one was found.
+Given a value ptr of type *T, where *T satisfies Fact,
+ObjectFact copies the value to *ptr.
+<p>See documentation at ImportObjectFact field of <a href="http://localhost:6666/golang.org/x/tools/go/analysis#Pass">analysis.Pass</a>.
+
+				
+				
+				
+			
+				
+				<h3 id="Action.PackageFact">func (*Action) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=18271:18345#L559">PackageFact</a>
+					<a class="permalink" href="index.html#Action.PackageFact">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (act *<a href="index.html#Action">Action</a>) PackageFact(pkg *<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a>, ptr <a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Fact">Fact</a>) <a href="http://localhost:6666/pkg/builtin/#bool">bool</a></pre>
+				<p>PackageFact retrieves a fact associated with package pkg,
+which must be this package or one of its dependencies.
+<p>See documentation at ImportObjectFact field of <a href="http://localhost:6666/golang.org/x/tools/go/analysis#Pass">analysis.Pass</a>.
+
+				
+				
+				
+			
+				
+				<h3 id="Action.String">func (*Action) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=4945:4979#L130">String</a>
+					<a class="permalink" href="index.html#Action.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (act *<a href="index.html#Action">Action</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Graph">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=2476:3442#L58">Graph</a>
+				<a class="permalink" href="index.html#Graph">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Graph holds the results of a round of analysis, including the graph
+of requested actions (analyzers applied to packages) plus any
+dependent actions that it was necessary to compute.
+
+			<pre>type Graph struct {
+<span id="Graph.Roots"></span>    <span class="comment">// Roots contains the roots of the action graph.</span>
+    <span class="comment">// Each node (a, p) in the action graph represents the</span>
+    <span class="comment">// application of one analyzer a to one package p.</span>
+    <span class="comment">// (A node thus corresponds to one analysis.Pass instance.)</span>
+    <span class="comment">// Roots holds one action per element of the product</span>
+    <span class="comment">// of the analyzers × packages arguments to Analyze,</span>
+    <span class="comment">// in unspecified order.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Each element of Action.Deps represents an edge in the</span>
+    <span class="comment">// action graph: a dependency from one action to another.</span>
+    <span class="comment">// An edge of the form (a, p) -&gt; (a, p2) indicates that the</span>
+    <span class="comment">// analysis of package p requires information (&#34;facts&#34;) from</span>
+    <span class="comment">// the same analyzer applied to one of p&#39;s dependencies, p2.</span>
+    <span class="comment">// An edge of the form (a, p) -&gt; (a2, p) indicates that the</span>
+    <span class="comment">// analysis of package p requires information (&#34;results&#34;)</span>
+    <span class="comment">// from a different analyzer a2 applied to the same package.</span>
+    <span class="comment">// These two kind of edges are called &#34;vertical&#34; and &#34;horizontal&#34;,</span>
+    <span class="comment">// respectively.</span>
+    Roots []*<a href="index.html#Action">Action</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="Analyze">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=5512:5613#L145">Analyze</a>
+					<a class="permalink" href="index.html#Analyze">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func Analyze(analyzers []*<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/">analysis</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/analysis/#Analyzer">Analyzer</a>, pkgs []*<a href="http://localhost:6666/pkg/golang.org/x/tools/go/packages/">packages</a>.<a href="http://localhost:6666/pkg/golang.org/x/tools/go/packages/#Package">Package</a>, opts *<a href="index.html#Options">Options</a>) (*<a href="index.html#Graph">Graph</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				<p>Analyze runs the specified analyzers on the initial packages.
+<p>The initial packages and all dependencies must have been loaded
+using the <a href="http://localhost:6666/golang.org/x/tools/go/packages#LoadAllSyntax">packages.LoadAllSyntax</a> flag, Analyze may need to run
+some analyzer (those that consume and produce facts) on
+dependencies too.
+<p>On success, it returns a Graph of actions whose Roots hold one
+item per (a, p) in the cross-product of analyzers and pkgs.
+<p>If opts is nil, it is equivalent to new(Options).
+
+				
+				
+			
+
+			
+				
+				<h3 id="Graph.All">func (*Graph) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=3759:3790#L94">All</a>
+					<a class="permalink" href="index.html#Graph.All">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (g *<a href="index.html#Graph">Graph</a>) All() actionSeq</pre>
+				<p>All returns an iterator over the action graph in depth-first postorder.
+<p>Example:
+<pre>for act := range graph.All() {
+	...
+}
+</pre>
+<p>Clients using go1.22 should iterate using the code below and may
+not assume anything else about the result:
+<pre>graph.All()(func (act *Action) bool {
+	...
+})
+</pre>
+
+				
+				
+				
+			
+				
+				<h3 id="Graph.PrintJSON">func (*Graph) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/print.go?s=2108:2152#L63">PrintJSON</a>
+					<a class="permalink" href="index.html#Graph.PrintJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (g *<a href="index.html#Graph">Graph</a>) PrintJSON(w <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				<p>PrintJSON emits diagnostics in JSON form to w.
+Diagnostics are shown only for the root nodes,
+but errors (if any) are shown for all dependencies.
+
+				
+				
+				
+			
+				
+				<h3 id="Graph.PrintText">func (*Graph) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/print.go?s=603:665#L15">PrintText</a>
+					<a class="permalink" href="index.html#Graph.PrintText">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (g *<a href="index.html#Graph">Graph</a>) PrintText(w <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a>, contextLines <a href="http://localhost:6666/pkg/builtin/#int">int</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				<p>PrintText emits diagnostics as plain text to w.
+<p>If contextLines is nonnegative, it also prints the
+offending line, plus that many lines of context
+before and after the line.
+
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Options">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/analysis/checker/checker.go?s=1810:2283#L43">Options</a>
+				<a class="permalink" href="index.html#Options">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Options specifies options that control the analysis driver.
+
+			<pre>type Options struct {
+    <span class="comment">// These options correspond to existing flags exposed by multichecker:</span>
+<span id="Options.Sequential"></span>    Sequential  <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>      <span class="comment">// disable parallelism</span>
+<span id="Options.SanityCheck"></span>    SanityCheck <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>      <span class="comment">// check fact encoding is ok and deterministic</span>
+<span id="Options.FactLog"></span>    FactLog     <a href="http://localhost:6666/pkg/io/">io</a>.<a href="http://localhost:6666/pkg/io/#Writer">Writer</a> <span class="comment">// if non-nil, log each exported fact to it</span>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+	
+
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>packages - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Package packages
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<div id="short-nav">
+			<dl>
+			<dd><code>import "github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages"</code></dd>
+			</dl>
+			<dl>
+			<dd><a href="index.html#pkg-overview" class="overviewLink">Overview</a></dd>
+			<dd><a href="index.html#pkg-index" class="indexLink">Index</a></dd>
+			
+				<dd><a href="index.html#pkg-examples" class="examplesLink">Examples</a></dd>
+			
+			
+				<dd><a href="index.html#pkg-subdirectories">Subdirectories</a></dd>
+			
+			</dl>
+		</div>
+		<!-- The package's Name is printed as title by the top-level template -->
+		<div id="pkg-overview" class="toggleVisible">
+			<div class="collapsed">
+				<h2 class="toggleButton" title="Click to show Overview section">Overview ▹</h2>
+			</div>
+			<div class="expanded">
+				<h2 class="toggleButton" title="Click to hide Overview section">Overview ▾</h2>
+				<p>Package packages loads Go packages for inspection and analysis.
+<p>The <a href="index.html#Load">Load</a> function takes as input a list of patterns and returns a
+list of <a href="index.html#Package">Package</a> values describing individual packages matched by those
+patterns.
+A <a href="index.html#Config">Config</a> specifies configuration options, the most important of which is
+the <a href="index.html#LoadMode">LoadMode</a>, which controls the amount of detail in the loaded packages.
+<p>Load passes most patterns directly to the underlying build tool.
+The default build tool is the go command.
+Its supported patterns are described at
+<a href="https://pkg.go.dev/cmd/go#hdr-Package_lists_and_patterns">https://pkg.go.dev/cmd/go#hdr-Package_lists_and_patterns</a>.
+Other build systems may be supported by providing a &quot;driver&quot;;
+see [The driver protocol].
+<p>All patterns with the prefix &quot;query=&quot;, where query is a
+non-empty string of letters from [a-z], are reserved and may be
+interpreted as query operators.
+<p>Two query operators are currently supported: &quot;file&quot; and &quot;pattern&quot;.
+<p>The query &quot;file=path/to/file.go&quot; matches the package or packages enclosing
+the Go source file path/to/file.go.  For example &quot;file=~/go/src/fmt/print.go&quot;
+might return the packages &quot;fmt&quot; and &quot;fmt [fmt.test]&quot;.
+<p>The query &quot;pattern=string&quot; causes &quot;string&quot; to be passed directly to
+the underlying build tool. In most cases this is unnecessary,
+but an application can use Load(&quot;pattern=&quot; + x) as an escaping mechanism
+to ensure that x is not interpreted as a query operator if it contains &apos;=&apos;.
+<p>All other query operators are reserved for future use and currently
+cause Load to report an error.
+<p>The Package struct provides basic information about the package, including
+<ul>
+<li>ID, a unique identifier for the package in the returned set;
+<li>GoFiles, the names of the package&apos;s Go source files;
+<li>Imports, a map from source import strings to the Packages they name;
+<li>Types, the type information for the package&apos;s exported symbols;
+<li>Syntax, the parsed syntax trees for the package&apos;s source code; and
+<li>TypesInfo, the result of a complete type-check of the package syntax trees.
+</ul>
+<p>(See the documentation for type Package for the complete list of fields
+and more detailed descriptions.)
+<p>For example,
+<pre>Load(nil, &quot;bytes&quot;, &quot;unicode...&quot;)
+</pre>
+<p>returns four Package structs describing the standard library packages
+bytes, unicode, unicode/utf16, and unicode/utf8. Note that one pattern
+can match multiple packages and that a package might be matched by
+multiple patterns: in general it is not possible to determine which
+packages correspond to which patterns.
+<p>Note that the list returned by Load contains only the packages matched
+by the patterns. Their dependencies can be found by walking the import
+graph using the Imports fields.
+<p>The Load function can be configured by passing a pointer to a Config as
+the first argument. A nil Config is equivalent to the zero Config, which
+causes Load to run in <a href="index.html#LoadFiles">LoadFiles</a> mode, collecting minimal information.
+See the documentation for type Config for details.
+<p>As noted earlier, the Config.Mode controls the amount of detail
+reported about the loaded packages. See the documentation for type LoadMode
+for details.
+<p>Most tools should pass their command-line arguments (after any flags)
+uninterpreted to Load, so that it can interpret them
+according to the conventions of the underlying build system.
+<p>See the Example function for typical usage.
+<h3 id="hdr-The_driver_protocol">The driver protocol</h3>
+<p>Load may be used to load Go packages even in Go projects that use
+alternative build systems, by installing an appropriate &quot;driver&quot;
+program for the build system and specifying its location in the
+GOPACKAGESDRIVER environment variable.
+For example,
+<a href="https://github.com/bazelbuild/rules_go/wiki/Editor-and-tool-integration">https://github.com/bazelbuild/rules_go/wiki/Editor-and-tool-integration</a>
+explains how to use the driver for Bazel.
+<p>The driver program is responsible for interpreting patterns in its
+preferred notation and reporting information about the packages that
+those patterns identify. Drivers must also support the special &quot;file=&quot;
+and &quot;pattern=&quot; patterns described above.
+<p>The patterns are provided as positional command-line arguments. A
+JSON-encoded <a href="index.html#DriverRequest">DriverRequest</a> message providing additional information
+is written to the driver&apos;s standard input. The driver must write a
+JSON-encoded <a href="index.html#DriverResponse">DriverResponse</a> message to its standard output. (This
+message differs from the JSON schema produced by &apos;go list&apos;.)
+<p>The value of the PWD environment variable seen by the driver process
+is the preferred name of its working directory. (The working directory
+may have other aliases due to symbolic links; see the comment on the
+Dir field of <a href="http://localhost:6666/os/exec#Cmd">exec.Cmd</a> for related information.)
+When the driver process emits in its response the name of a file
+that is a descendant of this directory, it must use an absolute path
+that has the value of PWD as a prefix, to ensure that the returned
+filenames satisfy the original query.
+
+				<div id="example_" class="toggle">
+	<div class="collapsed">
+		<p class="exampleHeading toggleButton">▹ <span class="text">Example</span></p>
+	</div>
+	<div class="expanded">
+		<p class="exampleHeading toggleButton">▾ <span class="text">Example</span></p>
+		<p>Example demonstrates how to load the packages specified on the
+command line from source syntax.
+</p>
+		
+		
+			<p>Code:</p>
+			<pre class="code">
+flag.Parse()
+
+<span class="comment">// Many tools pass their command-line arguments (after any flags)</span>
+<span class="comment">// uninterpreted to packages.Load so that it can interpret them</span>
+<span class="comment">// according to the conventions of the underlying build system.</span>
+cfg := &amp;packages.Config{Mode: packages.NeedFiles | packages.NeedSyntax}
+pkgs, err := packages.Load(cfg, flag.Args()...)
+if err != nil {
+    fmt.Fprintf(os.Stderr, &#34;load: %v\n&#34;, err)
+    os.Exit(1)
+}
+if packages.PrintErrors(pkgs) &gt; 0 {
+    os.Exit(1)
+}
+
+<span class="comment">// Print the names of the source files</span>
+<span class="comment">// for each package listed on the command line.</span>
+for _, pkg := range pkgs {
+    fmt.Println(pkg.ID, pkg.GoFiles)
+}
+</pre>
+			
+		
+	</div>
+</div>
+
+			</div>
+		</div>
+
+		<div id="pkg-index" class="toggleVisible">
+		<div class="collapsed">
+			<h2 class="toggleButton" title="Click to show Index section">Index ▹</h2>
+		</div>
+		<div class="expanded">
+			<h2 class="toggleButton" title="Click to hide Index section">Index ▾</h2>
+
+		<!-- Table of contents for API; must be named manual-nav to turn off auto nav. -->
+			<div id="manual-nav">
+			<dl>
+			
+				<dd><a href="index.html#pkg-constants">Constants</a></dd>
+			
+			
+			
+				
+				<dd><a href="index.html#PrintErrors">func PrintErrors(pkgs []*Package) int</a></dd>
+			
+				
+				<dd><a href="index.html#Visit">func Visit(pkgs []*Package, pre func(*Package) bool, post func(*Package))</a></dd>
+			
+			
+				
+				<dd><a href="index.html#Config">type Config</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#DriverRequest">type DriverRequest</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#DriverResponse">type DriverResponse</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Error">type Error</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Error.Error">func (err Error) Error() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#ErrorKind">type ErrorKind</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#LoadMode">type LoadMode</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#LoadMode.String">func (mode LoadMode) String() string</a></dd>
+				
+			
+				
+				<dd><a href="index.html#Module">type Module</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#ModuleError">type ModuleError</a></dd>
+				
+				
+			
+				
+				<dd><a href="index.html#Package">type Package</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Load">func Load(cfg *Config, patterns ...string) ([]*Package, error)</a></dd>
+				
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Package.MarshalJSON">func (p *Package) MarshalJSON() ([]byte, error)</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Package.String">func (p *Package) String() string</a></dd>
+				
+					
+					<dd>&nbsp; &nbsp; <a href="index.html#Package.UnmarshalJSON">func (p *Package) UnmarshalJSON(b []byte) error</a></dd>
+				
+			
+			
+			</dl>
+			</div><!-- #manual-nav -->
+
+		
+		<div id="pkg-examples">
+			<h3>Examples</h3>
+			<div class="js-expandAll expandAll collapsed">(Expand All)</div>
+			<dl>
+			
+			<dd><a class="exampleLink" href="index.html#example_">Package</a></dd>
+			
+			</dl>
+		</div>
+		
+
+		
+			<h3>Package files</h3>
+			<p>
+			<span style="font-size:90%">
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/doc.go">doc.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/external.go">external.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/golist.go">golist.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/golist_overlay.go">golist_overlay.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/loadmode_string.go">loadmode_string.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go">packages.go</a>
+			
+				<a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/visit.go">visit.go</a>
+			
+			</span>
+			</p>
+		
+		</div><!-- .expanded -->
+		</div><!-- #pkg-index -->
+
+		
+
+		
+			<h2 id="pkg-constants">Constants</h2>
+			
+				
+				<pre>const (
+    <span class="comment">// LoadFiles loads the name and file names for the initial packages.</span>
+    <span id="LoadFiles">LoadFiles</span> = <a href="index.html#NeedName">NeedName</a> | <a href="index.html#NeedFiles">NeedFiles</a> | <a href="index.html#NeedCompiledGoFiles">NeedCompiledGoFiles</a>
+
+    <span class="comment">// LoadImports loads the name, file names, and import mapping for the initial packages.</span>
+    <span id="LoadImports">LoadImports</span> = <a href="index.html#LoadFiles">LoadFiles</a> | <a href="index.html#NeedImports">NeedImports</a>
+
+    <span class="comment">// LoadTypes loads exported type information for the initial packages.</span>
+    <span id="LoadTypes">LoadTypes</span> = <a href="index.html#LoadImports">LoadImports</a> | <a href="index.html#NeedTypes">NeedTypes</a> | <a href="index.html#NeedTypesSizes">NeedTypesSizes</a>
+
+    <span class="comment">// LoadSyntax loads typed syntax for the initial packages.</span>
+    <span id="LoadSyntax">LoadSyntax</span> = <a href="index.html#LoadTypes">LoadTypes</a> | <a href="index.html#NeedSyntax">NeedSyntax</a> | <a href="index.html#NeedTypesInfo">NeedTypesInfo</a>
+
+    <span class="comment">// LoadAllSyntax loads typed syntax for the initial packages and all dependencies.</span>
+    <span id="LoadAllSyntax">LoadAllSyntax</span> = <a href="index.html#LoadSyntax">LoadSyntax</a> | <a href="index.html#NeedDeps">NeedDeps</a>
+
+    <span class="comment">// Deprecated: NeedExportsFile is a historical misspelling of NeedExportFile.</span>
+    <span class="comment">//</span>
+    <span class="comment">//go:fix inline</span>
+    <span id="NeedExportsFile">NeedExportsFile</span> = <a href="index.html#NeedExportFile">NeedExportFile</a>
+)</pre>
+			
+		
+		
+		
+			
+			
+			<h2 id="PrintErrors">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/visit.go?s=1355:1392#L40">PrintErrors</a>
+				<a class="permalink" href="index.html#PrintErrors">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func PrintErrors(pkgs []*<a href="index.html#Package">Package</a>) <a href="http://localhost:6666/pkg/builtin/#int">int</a></pre>
+			<p>PrintErrors prints to os.Stderr the accumulated errors of all
+packages in the import graph rooted at pkgs, dependencies first.
+PrintErrors returns the number of errors printed.
+
+			
+			
+
+		
+			
+			
+			<h2 id="Visit">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/visit.go?s=573:646#L9">Visit</a>
+				<a class="permalink" href="index.html#Visit">&#xb6;</a>
+				
+				
+			</h2>
+			<pre>func Visit(pkgs []*<a href="index.html#Package">Package</a>, pre func(*<a href="index.html#Package">Package</a>) <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>, post func(*<a href="index.html#Package">Package</a>))</pre>
+			<p>Visit visits all the packages in the import graph whose roots are
+pkgs, calling the optional pre function the first time each package
+is encountered (preorder), and the optional post function after a
+package&apos;s dependencies have been visited (postorder).
+The boolean result of pre(pkg) determines whether
+the imports of package pkg are visited.
+
+			
+			
+
+		
+		
+			
+			
+			<h2 id="Config">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=4148:7816#L143">Config</a>
+				<a class="permalink" href="index.html#Config">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A Config specifies details about how packages should be loaded.
+The zero value is a valid configuration.
+<p>Calls to <a href="index.html#Load">Load</a> do not modify this struct.
+
+			<pre>type Config struct {
+<span id="Config.Mode"></span>    <span class="comment">// Mode controls the level of information returned for each package.</span>
+    Mode <a href="index.html#LoadMode">LoadMode</a>
+
+<span id="Config.Context"></span>    <span class="comment">// Context specifies the context for the load operation.</span>
+    <span class="comment">// Cancelling the context may cause [Load] to abort and</span>
+    <span class="comment">// return an error.</span>
+    Context <a href="http://localhost:6666/pkg/context/">context</a>.<a href="http://localhost:6666/pkg/context/#Context">Context</a>
+
+<span id="Config.Logf"></span>    <span class="comment">// Logf is the logger for the config.</span>
+    <span class="comment">// If the user provides a logger, debug logging is enabled.</span>
+    <span class="comment">// If the GOPACKAGESDEBUG environment variable is set to true,</span>
+    <span class="comment">// but the logger is nil, default to log.Printf.</span>
+    Logf func(format <a href="http://localhost:6666/pkg/builtin/#string">string</a>, args ...<a href="http://localhost:6666/pkg/builtin/#any">any</a>)
+
+<span id="Config.Dir"></span>    <span class="comment">// Dir is the directory in which to run the build system&#39;s query tool</span>
+    <span class="comment">// that provides information about the packages.</span>
+    <span class="comment">// If Dir is empty, the tool is run in the current directory.</span>
+    Dir <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Config.Env"></span>    <span class="comment">// Env is the environment to use when invoking the build system&#39;s query tool.</span>
+    <span class="comment">// If Env is nil, the current environment is used.</span>
+    <span class="comment">// As in os/exec&#39;s Cmd, only the last value in the slice for</span>
+    <span class="comment">// each environment key is used. To specify the setting of only</span>
+    <span class="comment">// a few variables, append to the current environment, as in:</span>
+    <span class="comment">//</span>
+    <span class="comment">//	opt.Env = append(os.Environ(), &#34;GOOS=plan9&#34;, &#34;GOARCH=386&#34;)</span>
+    <span class="comment">//</span>
+    Env []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Config.BuildFlags"></span>    <span class="comment">// BuildFlags is a list of command-line flags to be passed through to</span>
+    <span class="comment">// the build system&#39;s query tool.</span>
+    BuildFlags []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Config.Fset"></span>    <span class="comment">// Fset provides source position information for syntax trees and types.</span>
+    <span class="comment">// If Fset is nil, Load will use a new fileset, but preserve Fset&#39;s value.</span>
+    Fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>
+
+<span id="Config.ParseFile"></span>    <span class="comment">// ParseFile is called to read and parse each file</span>
+    <span class="comment">// when preparing a package&#39;s type-checked syntax tree.</span>
+    <span class="comment">// It must be safe to call ParseFile simultaneously from multiple goroutines.</span>
+    <span class="comment">// If ParseFile is nil, the loader will uses parser.ParseFile.</span>
+    <span class="comment">//</span>
+    <span class="comment">// ParseFile should parse the source from src and use filename only for</span>
+    <span class="comment">// recording position information.</span>
+    <span class="comment">//</span>
+    <span class="comment">// An application may supply a custom implementation of ParseFile</span>
+    <span class="comment">// to change the effective file contents or the behavior of the parser,</span>
+    <span class="comment">// or to modify the syntax tree. For example, selectively eliminating</span>
+    <span class="comment">// unwanted function bodies can significantly accelerate type checking.</span>
+    ParseFile func(fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a>, filename <a href="http://localhost:6666/pkg/builtin/#string">string</a>, src []<a href="http://localhost:6666/pkg/builtin/#byte">byte</a>) (*<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#File">File</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)
+
+    <span class="comment">// If Tests is set, the loader includes not just the packages</span>
+    <span class="comment">// matching a particular pattern but also any related test packages,</span>
+    <span class="comment">// including test-only variants of the package and the test executable.</span>
+    <span class="comment">//</span>
+    <span class="comment">// For example, when using the go command, loading &#34;fmt&#34; with Tests=true</span>
+    <span class="comment">// returns four packages, with IDs &#34;fmt&#34; (the standard package),</span>
+    <span class="comment">// &#34;fmt [fmt.test]&#34; (the package as compiled for the test),</span>
+    <span class="comment">// &#34;fmt_test&#34; (the test functions from source files in package fmt_test),</span>
+    <span class="comment">// and &#34;fmt.test&#34; (the test binary).</span>
+    <span class="comment">//</span>
+    <span class="comment">// In build systems with explicit names for tests,</span>
+    <span class="comment">// setting Tests may have no effect.</span>
+<span id="Config.Tests"></span>    Tests <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>
+
+<span id="Config.Overlay"></span>    <span class="comment">// Overlay is a mapping from absolute file paths to file contents.</span>
+    <span class="comment">//</span>
+    <span class="comment">// For each map entry, [Load] uses the alternative file</span>
+    <span class="comment">// contents provided by the overlay mapping instead of reading</span>
+    <span class="comment">// from the file system. This mechanism can be used to enable</span>
+    <span class="comment">// editor-integrated tools to correctly analyze the contents</span>
+    <span class="comment">// of modified but unsaved buffers, for example.</span>
+    <span class="comment">//</span>
+    <span class="comment">// The overlay mapping is passed to the build system&#39;s driver</span>
+    <span class="comment">// (see &#34;The driver protocol&#34;) so that it too can report</span>
+    <span class="comment">// consistent package metadata about unsaved files. However,</span>
+    <span class="comment">// drivers may vary in their level of support for overlays.</span>
+    Overlay map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>][]<a href="http://localhost:6666/pkg/builtin/#byte">byte</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="DriverRequest">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/external.go?s=703:1271#L16">DriverRequest</a>
+				<a class="permalink" href="index.html#DriverRequest">&#xb6;</a>
+				
+				
+			</h2>
+			<p>DriverRequest defines the schema of a request for package metadata
+from an external driver program. The JSON-encoded DriverRequest
+message is provided to the driver program&apos;s standard input. The
+query patterns are provided as command-line arguments.
+<p>See the package documentation for an overview.
+
+			<pre>type DriverRequest struct {
+<span id="DriverRequest.Mode"></span>    Mode <a href="index.html#LoadMode">LoadMode</a> `json:&#34;mode&#34;`
+
+<span id="DriverRequest.Env"></span>    <span class="comment">// Env specifies the environment the underlying build system should be run in.</span>
+    Env []<a href="http://localhost:6666/pkg/builtin/#string">string</a> `json:&#34;env&#34;`
+
+<span id="DriverRequest.BuildFlags"></span>    <span class="comment">// BuildFlags are flags that should be passed to the underlying build system.</span>
+    BuildFlags []<a href="http://localhost:6666/pkg/builtin/#string">string</a> `json:&#34;build_flags&#34;`
+
+<span id="DriverRequest.Tests"></span>    <span class="comment">// Tests specifies whether the patterns should also return test packages.</span>
+    Tests <a href="http://localhost:6666/pkg/builtin/#bool">bool</a> `json:&#34;tests&#34;`
+
+<span id="DriverRequest.Overlay"></span>    <span class="comment">// Overlay maps file paths (relative to the driver&#39;s working directory)</span>
+    <span class="comment">// to the contents of overlay files (see Config.Overlay).</span>
+    Overlay map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>][]<a href="http://localhost:6666/pkg/builtin/#byte">byte</a> `json:&#34;overlay&#34;`
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="DriverResponse">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/external.go?s=1566:2895#L39">DriverResponse</a>
+				<a class="permalink" href="index.html#DriverResponse">&#xb6;</a>
+				
+				
+			</h2>
+			<p>DriverResponse defines the schema of a response from an external
+driver program, providing the results of a query for package
+metadata. The driver program must write a JSON-encoded
+DriverResponse message to its standard output.
+<p>See the package documentation for an overview.
+
+			<pre>type DriverResponse struct {
+<span id="DriverResponse.NotHandled"></span>    <span class="comment">// NotHandled is returned if the request can&#39;t be handled by the current</span>
+    <span class="comment">// driver. If an external driver returns a response with NotHandled, the</span>
+    <span class="comment">// rest of the DriverResponse is ignored, and go/packages will fallback</span>
+    <span class="comment">// to the next driver. If go/packages is extended in the future to support</span>
+    <span class="comment">// lists of multiple drivers, go/packages will fall back to the next driver.</span>
+    NotHandled <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>
+
+<span id="DriverResponse.Compiler"></span>    <span class="comment">// Compiler and Arch are the arguments pass of types.SizesFor</span>
+    <span class="comment">// to get a types.Sizes to use when type checking.</span>
+    Compiler <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+<span id="DriverResponse.Arch"></span>    Arch     <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="DriverResponse.Roots"></span>    <span class="comment">// Roots is the set of package IDs that make up the root packages.</span>
+    <span class="comment">// We have to encode this separately because when we encode a single package</span>
+    <span class="comment">// we cannot know if it is one of the roots as that requires knowledge of the</span>
+    <span class="comment">// graph it is part of.</span>
+    Roots []<a href="http://localhost:6666/pkg/builtin/#string">string</a> `json:&#34;,omitempty&#34;`
+
+<span id="DriverResponse.Packages"></span>    <span class="comment">// Packages is the full set of packages in the graph.</span>
+    <span class="comment">// The packages are not connected into a graph.</span>
+    <span class="comment">// The Imports if populated will be stubs that only have their ID set.</span>
+    <span class="comment">// Imports will be connected and then type and syntax information added in a</span>
+    <span class="comment">// later pass (see refine).</span>
+    Packages []*<a href="index.html#Package">Package</a>
+
+<span id="DriverResponse.GoVersion"></span>    <span class="comment">// GoVersion is the minor version number used by the driver</span>
+    <span class="comment">// (e.g. the go command on the PATH) when selecting .go files.</span>
+    <span class="comment">// Zero means unknown.</span>
+    GoVersion <a href="http://localhost:6666/pkg/builtin/#int">int</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Error">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=20380:20490#L573">Error</a>
+				<a class="permalink" href="index.html#Error">&#xb6;</a>
+				
+				
+			</h2>
+			<p>An Error describes a problem with a package&apos;s metadata, syntax, or types.
+
+			<pre>type Error struct {
+<span id="Error.Pos"></span>    Pos  <a href="http://localhost:6666/pkg/builtin/#string">string</a> <span class="comment">// &#34;file:line:col&#34; or &#34;file:line&#34; or &#34;&#34; or &#34;-&#34;</span>
+<span id="Error.Msg"></span>    Msg  <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+<span id="Error.Kind"></span>    Kind <a href="index.html#ErrorKind">ErrorKind</a>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="Error.Error">func (Error) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=20750:20781#L591">Error</a>
+					<a class="permalink" href="index.html#Error.Error">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (err <a href="index.html#Error">Error</a>) Error() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="ErrorKind">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=20654:20672#L582">ErrorKind</a>
+				<a class="permalink" href="index.html#ErrorKind">&#xb6;</a>
+				
+				
+			</h2>
+			<p>ErrorKind describes the source of the error, allowing the user to
+differentiate between errors generated by the driver, the parser, or the
+type-checker.
+
+			<pre>type ErrorKind <a href="http://localhost:6666/pkg/builtin/#int">int</a></pre>
+
+			
+				
+				<pre>const (
+    <span id="UnknownError">UnknownError</span> <a href="index.html#ErrorKind">ErrorKind</a> = <a href="http://localhost:6666/pkg/builtin/#iota">iota</a>
+    <span id="ListError">ListError</span>
+    <span id="ParseError">ParseError</span>
+    <span id="TypeError">TypeError</span>
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="LoadMode">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=1813:1830#L56">LoadMode</a>
+				<a class="permalink" href="index.html#LoadMode">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A LoadMode controls the amount of detail to return when loading.
+The bits below can be combined to specify which fields should be
+filled in the result packages.
+<p>The zero value is a special case, equivalent to combining
+the NeedName, NeedFiles, and NeedCompiledGoFiles bits.
+<p>ID and Errors (if present) will always be filled.
+<a href="index.html#Load">Load</a> may return more information than requested.
+<p>The Mode flag is a union of several bits named NeedName,
+NeedFiles, and so on, each of which determines whether
+a given field of Package (Name, Files, etc) should be
+populated.
+<p>For convenience, we provide named constants for the most
+common combinations of Need flags:
+<pre>[LoadFiles]     lists of files in each package
+[LoadImports]   ... plus imports
+[LoadTypes]     ... plus type information
+[LoadSyntax]    ... plus type-annotated syntax
+[LoadAllSyntax] ... for all dependencies
+</pre>
+<p>Unfortunately there are a number of open bugs related to
+interactions among the LoadMode bits:
+<ul>
+<li><a href="https://go.dev/issue/56633">https://go.dev/issue/56633</a>
+<li><a href="https://go.dev/issue/56677">https://go.dev/issue/56677</a>
+<li><a href="https://go.dev/issue/58726">https://go.dev/issue/58726</a>
+<li><a href="https://go.dev/issue/63517">https://go.dev/issue/63517</a>
+</ul>
+
+			<pre>type LoadMode <a href="http://localhost:6666/pkg/builtin/#int">int</a></pre>
+
+			
+				
+				<pre>const (
+    <span class="comment">// NeedName adds Name and PkgPath.</span>
+    <span id="NeedName">NeedName</span> <a href="index.html#LoadMode">LoadMode</a> = 1 &lt;&lt; <a href="http://localhost:6666/pkg/builtin/#iota">iota</a>
+
+    <span class="comment">// NeedFiles adds Dir, GoFiles, OtherFiles, and IgnoredFiles</span>
+    <span id="NeedFiles">NeedFiles</span>
+
+    <span class="comment">// NeedCompiledGoFiles adds CompiledGoFiles.</span>
+    <span id="NeedCompiledGoFiles">NeedCompiledGoFiles</span>
+
+    <span class="comment">// NeedImports adds Imports. If NeedDeps is not set, the Imports field will contain</span>
+    <span class="comment">// &#34;placeholder&#34; Packages with only the ID set.</span>
+    <span id="NeedImports">NeedImports</span>
+
+    <span class="comment">// NeedDeps adds the fields requested by the LoadMode in the packages in Imports.</span>
+    <span id="NeedDeps">NeedDeps</span>
+
+    <span class="comment">// NeedExportFile adds ExportFile.</span>
+    <span id="NeedExportFile">NeedExportFile</span>
+
+    <span class="comment">// NeedTypes adds Types, Fset, and IllTyped.</span>
+    <span id="NeedTypes">NeedTypes</span>
+
+    <span class="comment">// NeedSyntax adds Syntax and Fset.</span>
+    <span id="NeedSyntax">NeedSyntax</span>
+
+    <span class="comment">// NeedTypesInfo adds TypesInfo and Fset.</span>
+    <span id="NeedTypesInfo">NeedTypesInfo</span>
+
+    <span class="comment">// NeedTypesSizes adds TypesSizes.</span>
+    <span id="NeedTypesSizes">NeedTypesSizes</span>
+
+    <span class="comment">// NeedForTest adds ForTest.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Tests must also be set on the context for this field to be populated.</span>
+    <span id="NeedForTest">NeedForTest</span>
+
+    <span class="comment">// NeedModule adds Module.</span>
+    <span id="NeedModule">NeedModule</span>
+
+    <span class="comment">// NeedEmbedFiles adds EmbedFiles.</span>
+    <span id="NeedEmbedFiles">NeedEmbedFiles</span>
+
+    <span class="comment">// NeedEmbedPatterns adds EmbedPatterns.</span>
+    <span id="NeedEmbedPatterns">NeedEmbedPatterns</span>
+
+    <span class="comment">// NeedTarget adds Target.</span>
+    <span id="NeedTarget">NeedTarget</span>
+)</pre>
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+				
+				<h3 id="LoadMode.String">func (LoadMode) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/loadmode_string.go?s=757:793#L23">String</a>
+					<a class="permalink" href="index.html#LoadMode.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (mode <a href="index.html#LoadMode">LoadMode</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+		
+			
+			
+			<h2 id="Module">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=19141:19746#L540">Module</a>
+				<a class="permalink" href="index.html#Module">&#xb6;</a>
+				
+				
+			</h2>
+			<p>Module provides module information for a package.
+<p>It also defines part of the JSON schema of <a href="index.html#DriverResponse">DriverResponse</a>.
+See the package documentation for an overview.
+
+			<pre>type Module struct {
+<span id="Module.Path"></span>    Path      <a href="http://localhost:6666/pkg/builtin/#string">string</a>       <span class="comment">// module path</span>
+<span id="Module.Version"></span>    Version   <a href="http://localhost:6666/pkg/builtin/#string">string</a>       <span class="comment">// module version</span>
+<span id="Module.Replace"></span>    Replace   *<a href="index.html#Module">Module</a>      <span class="comment">// replaced by this module</span>
+<span id="Module.Time"></span>    Time      *<a href="http://localhost:6666/pkg/time/">time</a>.<a href="http://localhost:6666/pkg/time/#Time">Time</a>   <span class="comment">// time version was created</span>
+<span id="Module.Main"></span>    Main      <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>         <span class="comment">// is this the main module?</span>
+<span id="Module.Indirect"></span>    Indirect  <a href="http://localhost:6666/pkg/builtin/#bool">bool</a>         <span class="comment">// is this module only an indirect dependency of main module?</span>
+<span id="Module.Dir"></span>    Dir       <a href="http://localhost:6666/pkg/builtin/#string">string</a>       <span class="comment">// directory holding files for this module, if any</span>
+<span id="Module.GoMod"></span>    GoMod     <a href="http://localhost:6666/pkg/builtin/#string">string</a>       <span class="comment">// path to go.mod file used when loading this module, if any</span>
+<span id="Module.GoVersion"></span>    GoVersion <a href="http://localhost:6666/pkg/builtin/#string">string</a>       <span class="comment">// go version used in module</span>
+<span id="Module.Error"></span>    Error     *<a href="index.html#ModuleError">ModuleError</a> <span class="comment">// error loading module</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="ModuleError">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=19794:19853#L554">ModuleError</a>
+				<a class="permalink" href="index.html#ModuleError">&#xb6;</a>
+				
+				
+			</h2>
+			<p>ModuleError holds errors loading a module.
+
+			<pre>type ModuleError struct {
+<span id="ModuleError.Err"></span>    Err <a href="http://localhost:6666/pkg/builtin/#string">string</a> <span class="comment">// the error itself</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+
+			
+		
+			
+			
+			<h2 id="Package">type <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=14548:18969#L417">Package</a>
+				<a class="permalink" href="index.html#Package">&#xb6;</a>
+				
+				
+			</h2>
+			<p>A Package describes a loaded Go package.
+<p>It also defines part of the JSON schema of <a href="index.html#DriverResponse">DriverResponse</a>.
+See the package documentation for an overview.
+
+			<pre>type Package struct {
+<span id="Package.ID"></span>    <span class="comment">// ID is a unique identifier for a package,</span>
+    <span class="comment">// in a syntax provided by the underlying build system.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Because the syntax varies based on the build system,</span>
+    <span class="comment">// clients should treat IDs as opaque and not attempt to</span>
+    <span class="comment">// interpret them.</span>
+    ID <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.Name"></span>    <span class="comment">// Name is the package name as it appears in the package source code.</span>
+    Name <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.PkgPath"></span>    <span class="comment">// PkgPath is the package path as used by the go/types package.</span>
+    PkgPath <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.Dir"></span>    <span class="comment">// Dir is the directory associated with the package, if it exists.</span>
+    <span class="comment">//</span>
+    <span class="comment">// For packages listed by the go command, this is the directory containing</span>
+    <span class="comment">// the package files.</span>
+    Dir <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.Errors"></span>    <span class="comment">// Errors contains any errors encountered querying the metadata</span>
+    <span class="comment">// of the package, or while parsing or type-checking its files.</span>
+    Errors []<a href="index.html#Error">Error</a>
+
+<span id="Package.TypeErrors"></span>    <span class="comment">// TypeErrors contains the subset of errors produced during type checking.</span>
+    TypeErrors []<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Error">Error</a>
+
+<span id="Package.GoFiles"></span>    <span class="comment">// GoFiles lists the absolute file paths of the package&#39;s Go source files.</span>
+    <span class="comment">// It may include files that should not be compiled, for example because</span>
+    <span class="comment">// they contain non-matching build tags, are documentary pseudo-files such as</span>
+    <span class="comment">// unsafe/unsafe.go or builtin/builtin.go, or are subject to cgo preprocessing.</span>
+    GoFiles []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.CompiledGoFiles"></span>    <span class="comment">// CompiledGoFiles lists the absolute file paths of the package&#39;s source</span>
+    <span class="comment">// files that are suitable for type checking.</span>
+    <span class="comment">// This may differ from GoFiles if files are processed before compilation.</span>
+    CompiledGoFiles []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.OtherFiles"></span>    <span class="comment">// OtherFiles lists the absolute file paths of the package&#39;s non-Go source files,</span>
+    <span class="comment">// including assembly, C, C++, Fortran, Objective-C, SWIG, and so on.</span>
+    OtherFiles []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.EmbedFiles"></span>    <span class="comment">// EmbedFiles lists the absolute file paths of the package&#39;s files</span>
+    <span class="comment">// embedded with go:embed.</span>
+    EmbedFiles []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.EmbedPatterns"></span>    <span class="comment">// EmbedPatterns lists the absolute file patterns of the package&#39;s</span>
+    <span class="comment">// files embedded with go:embed.</span>
+    EmbedPatterns []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.IgnoredFiles"></span>    <span class="comment">// IgnoredFiles lists source files that are not part of the package</span>
+    <span class="comment">// using the current build configuration but that might be part of</span>
+    <span class="comment">// the package using other build configurations.</span>
+    IgnoredFiles []<a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.ExportFile"></span>    <span class="comment">// ExportFile is the absolute path to a file containing type</span>
+    <span class="comment">// information for the package as provided by the build system.</span>
+    ExportFile <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.Target"></span>    <span class="comment">// Target is the absolute install path of the .a file, for libraries,</span>
+    <span class="comment">// and of the executable file, for binaries.</span>
+    Target <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+
+<span id="Package.Imports"></span>    <span class="comment">// Imports maps import paths appearing in the package&#39;s Go source files</span>
+    <span class="comment">// to corresponding loaded Packages.</span>
+    Imports map[<a href="http://localhost:6666/pkg/builtin/#string">string</a>]*<a href="index.html#Package">Package</a>
+
+<span id="Package.Module"></span>    <span class="comment">// Module is the module information for the package if it exists.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Note: it may be missing for std and cmd; see Go issue #65816.</span>
+    Module *<a href="index.html#Module">Module</a>
+
+<span id="Package.Types"></span>    <span class="comment">// Types provides type information for the package.</span>
+    <span class="comment">// The NeedTypes LoadMode bit sets this field for packages matching the</span>
+    <span class="comment">// patterns; type information for dependencies may be missing or incomplete,</span>
+    <span class="comment">// unless NeedDeps and NeedImports are also set.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Each call to [Load] returns a consistent set of type</span>
+    <span class="comment">// symbols, as defined by the comment at [types.Identical].</span>
+    <span class="comment">// Avoid mixing type information from two or more calls to [Load].</span>
+    Types *<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Package">Package</a> `json:&#34;-&#34;`
+
+<span id="Package.Fset"></span>    <span class="comment">// Fset provides position information for Types, TypesInfo, and Syntax.</span>
+    <span class="comment">// It is set only when Types is set.</span>
+    Fset *<a href="http://localhost:6666/pkg/go/token/">token</a>.<a href="http://localhost:6666/pkg/go/token/#FileSet">FileSet</a> `json:&#34;-&#34;`
+
+<span id="Package.IllTyped"></span>    <span class="comment">// IllTyped indicates whether the package or any dependency contains errors.</span>
+    <span class="comment">// It is set only when Types is set.</span>
+    IllTyped <a href="http://localhost:6666/pkg/builtin/#bool">bool</a> `json:&#34;-&#34;`
+
+<span id="Package.Syntax"></span>    <span class="comment">// Syntax is the package&#39;s syntax trees, for the files listed in CompiledGoFiles.</span>
+    <span class="comment">//</span>
+    <span class="comment">// The NeedSyntax LoadMode bit populates this field for packages matching the patterns.</span>
+    <span class="comment">// If NeedDeps and NeedImports are also set, this field will also be populated</span>
+    <span class="comment">// for dependencies.</span>
+    <span class="comment">//</span>
+    <span class="comment">// Syntax is kept in the same order as CompiledGoFiles, with the caveat that nils are</span>
+    <span class="comment">// removed.  If parsing returned nil, Syntax may be shorter than CompiledGoFiles.</span>
+    Syntax []*<a href="http://localhost:6666/pkg/go/ast/">ast</a>.<a href="http://localhost:6666/pkg/go/ast/#File">File</a> `json:&#34;-&#34;`
+
+<span id="Package.TypesInfo"></span>    <span class="comment">// TypesInfo provides type information about the package&#39;s syntax trees.</span>
+    <span class="comment">// It is set only when Syntax is set.</span>
+    TypesInfo *<a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Info">Info</a> `json:&#34;-&#34;`
+
+<span id="Package.TypesSizes"></span>    <span class="comment">// TypesSizes provides the effective size function for types in TypesInfo.</span>
+    TypesSizes <a href="http://localhost:6666/pkg/go/types/">types</a>.<a href="http://localhost:6666/pkg/go/types/#Sizes">Sizes</a> `json:&#34;-&#34;`
+
+<span id="Package.ForTest"></span>    <span class="comment">// ForTest is the package under test, if any.</span>
+    ForTest <a href="http://localhost:6666/pkg/builtin/#string">string</a>
+    <span class="comment">// contains filtered or unexported fields</span>
+}
+</pre>
+
+			
+
+			
+
+			
+			
+			
+
+			
+				
+				<h3 id="Load">func <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=9226:9288#L259">Load</a>
+					<a class="permalink" href="index.html#Load">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func Load(cfg *<a href="index.html#Config">Config</a>, patterns ...<a href="http://localhost:6666/pkg/builtin/#string">string</a>) ([]*<a href="index.html#Package">Package</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				<p>Load loads and returns the Go packages named by the given patterns.
+<p>The cfg parameter specifies loading options; nil behaves the same as an empty <a href="index.html#Config">Config</a>.
+<p>The [Config.Mode] field is a set of bits that determine what kinds
+of information should be computed and returned. Modes that require
+more information tend to be slower. See <a href="index.html#LoadMode">LoadMode</a> for details
+and important caveats. Its zero value is equivalent to
+<a href="index.html#NeedName">NeedName</a> | <a href="index.html#NeedFiles">NeedFiles</a> | <a href="index.html#NeedCompiledGoFiles">NeedCompiledGoFiles</a>.
+<p>Each call to Load returns a new set of <a href="index.html#Package">Package</a> instances.
+The Packages and their Imports form a directed acyclic graph.
+<p>If the <a href="index.html#NeedTypes">NeedTypes</a> mode flag was set, each call to Load uses a new
+<a href="http://localhost:6666/go/types#Importer">types.Importer</a>, so <a href="http://localhost:6666/go/types#Object">types.Object</a> and <a href="http://localhost:6666/go/types#Type">types.Type</a> values from
+different calls to Load must not be mixed as they will have
+inconsistent notions of type identity.
+<p>If any of the patterns was invalid as defined by the
+underlying build system, Load returns an error.
+It may return an empty list of packages without an error,
+for instance for an empty expansion of a valid wildcard.
+Errors associated with a particular package are recorded in the
+corresponding Package&apos;s Errors list, and do not cause Load to
+return an error. Clients may need to handle such errors before
+proceeding with further analysis. The <a href="index.html#PrintErrors">PrintErrors</a> function is
+provided for convenient display of all errors.
+
+				
+				
+			
+
+			
+				
+				<h3 id="Package.MarshalJSON">func (*Package) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=22282:22329#L628">MarshalJSON</a>
+					<a class="permalink" href="index.html#Package.MarshalJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (p *<a href="index.html#Package">Package</a>) MarshalJSON() ([]<a href="http://localhost:6666/pkg/builtin/#byte">byte</a>, <a href="http://localhost:6666/pkg/builtin/#error">error</a>)</pre>
+				<p>MarshalJSON returns the Package in its JSON form.
+For the most part, the structure fields are written out unmodified, and
+the type and syntax fields are skipped.
+The imports are written out as just a map of path to package id.
+The errors are written using a custom type that tries to preserve the
+structure of error types we know about.
+<p>This method exists to enable support for additional build systems.  It is
+not intended for use by clients of the API and we may change the format.
+
+				
+				
+				
+			
+				
+				<h3 id="Package.String">func (*Package) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=23738:23771#L680">String</a>
+					<a class="permalink" href="index.html#Package.String">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (p *<a href="index.html#Package">Package</a>) String() <a href="http://localhost:6666/pkg/builtin/#string">string</a></pre>
+				
+				
+				
+				
+			
+				
+				<h3 id="Package.UnmarshalJSON">func (*Package) <a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/go/packages/packages.go?s=23012:23059#L653">UnmarshalJSON</a>
+					<a class="permalink" href="index.html#Package.UnmarshalJSON">&#xb6;</a>
+					
+					
+				</h3>
+				<pre>func (p *<a href="index.html#Package">Package</a>) UnmarshalJSON(b []<a href="http://localhost:6666/pkg/builtin/#byte">byte</a>) <a href="http://localhost:6666/pkg/builtin/#error">error</a></pre>
+				<p>UnmarshalJSON reads in a Package from its JSON format.
+See MarshalJSON for details about the format accepted.
+
+				
+				
+				
+			
+		
+	
+
+	
+
+
+
+
+
+	
+	
+		<h2 id="pkg-subdirectories">Subdirectories</h2>
+	
+	<div class="pkg-dir">
+		<table>
+			<tr>
+				<th class="pkg-name">Name</th>
+				<th class="pkg-synopsis">Synopsis</th>
+			</tr>
+
+			
+			<tr>
+				<td colspan="2"><a href="../index.html">..</a></td>
+			</tr>
+			
+
+			
+				<tr>
+				
+					<td class="pkg-name" style="padding-left: 0px;">
+						<a href="gopackages/index.html">gopackages</a>
+					</td>
+				
+					<td class="pkg-synopsis">
+						The gopackages command is a diagnostic tool that demonstrates how to use golang.org/x/tools/go/packages to load, parse, type-check, and print one or more Go packages.
+					</td>
+				</tr>
+			
+				<tr>
+				
+					<td class="pkg-name" style="padding-left: 0px;">
+						<a href="packagestest/index.html">packagestest</a>
+					</td>
+				
+					<td class="pkg-synopsis">
+						Package packagestest creates temporary projects on disk for testing go tools on.
+					</td>
+				</tr>
+			
+		</table>
+	</div>
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>

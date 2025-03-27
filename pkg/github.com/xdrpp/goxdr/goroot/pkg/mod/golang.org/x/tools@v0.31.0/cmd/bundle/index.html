@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>bundle - Go Documentation Server</title>
+
+<link type="text/css" rel="stylesheet" href="../../../../../../../../../../../../lib/godoc/style.css">
+
+<script>window.initFuncs = [];</script>
+<script src="../../../../../../../../../../../../lib/godoc/jquery.js" defer></script>
+
+
+
+<script>var goVersion = "go1.24.1";</script>
+<script src="../../../../../../../../../../../../lib/godoc/godocs.js" defer></script>
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="../../../../../../../../../../../index.html">Go Documentation Server</a></div>
+<div class="top-heading" id="heading-narrow"><a href="../../../../../../../../../../../index.html">GoDoc</a></div>
+<a href="index.html#" id="menu-button"><span id="menu-button-arrow">&#9661;</span></a>
+<form method="GET" action="http://localhost:6666/search">
+<div id="menu">
+
+<span class="search-box"><input type="search" id="search" name="q" placeholder="Search" aria-label="Search" required><button type="submit"><span><!-- magnifying glass: --><svg width="24" height="24" viewBox="0 0 24 24"><title>submit search</title><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M0 0h24v24H0z" fill="none"/></svg></span></button></span>
+</div>
+</form>
+
+</div></div>
+
+
+
+<div id="page" class="wide">
+<div class="container">
+
+
+  <h1>
+    Command bundle
+    <span class="text-muted"></span>
+  </h1>
+
+
+
+
+
+
+
+<div id="nav"></div>
+
+
+<!--
+	Copyright 2009 The Go Authors. All rights reserved.
+	Use of this source code is governed by a BSD-style
+	license that can be found in the LICENSE file.
+-->
+<!--
+	Note: Static (i.e., not template-generated) href and id
+	attributes start with "pkg-" to make it impossible for
+	them to conflict with generated attributes (some of which
+	correspond to Go identifiers).
+-->
+
+	<script>
+	document.ANALYSIS_DATA = null;
+	document.CALLGRAPH = null;
+	</script>
+
+	
+		
+		<p>Bundle creates a single-source-file version of a source package
+suitable for inclusion in a particular target package.
+<p>Usage:
+<pre>bundle [-o file] [-dst path] [-pkg name] [-prefix p] [-import old=new] [-tags build_constraints] &lt;src&gt;
+</pre>
+<p>The src argument specifies the import path of the package to bundle.
+The bundling of a directory of source files into a single source file
+necessarily imposes a number of constraints.
+The package being bundled must not use cgo; must not use conditional
+file compilation, whether with build tags or system-specific file names
+like code_amd64.go; must not depend on any special comments, which
+may not be preserved; must not use any assembly sources;
+must not use renaming imports; and must not use reflection-based APIs
+that depend on the specific names of types or struct fields.
+<p>By default, bundle writes the bundled code to standard output.
+If the -o argument is given, bundle writes to the named file
+and also includes a “//go:generate” comment giving the exact
+command line used, for regenerating the file with “go generate.”
+<p>Bundle customizes its output for inclusion in a particular package, the destination package.
+By default bundle assumes the destination is the package in the current directory,
+but the destination package can be specified explicitly using the -dst option,
+which takes an import path as its argument.
+If the source package imports the destination package, bundle will remove
+those imports and rewrite any references to use direct references to the
+corresponding symbols.
+Bundle also must write a package declaration in the output and must
+choose a name to use in that declaration.
+If the -pkg option is given, bundle uses that name.
+Otherwise, the name of the destination package is used.
+Build constraints for the generated file can be specified using the -tags option.
+<p>To avoid collisions, bundle inserts a prefix at the beginning of
+every package-level const, func, type, and var identifier in src&apos;s code,
+updating references accordingly. The default prefix is the package name
+of the source package followed by an underscore. The -prefix option
+specifies an alternate prefix.
+<p>Occasionally it is necessary to rewrite imports during the bundling
+process. The -import option, which may be repeated, specifies that
+an import of &quot;old&quot; should be rewritten to import &quot;new&quot; instead.
+<h3 id="hdr-Example">Example</h3>
+<p>Bundle archive/zip for inclusion in cmd/dist:
+<pre>cd $GOROOT/src/cmd/dist
+bundle -o zip.go archive/zip
+</pre>
+<p>Bundle golang.org/x/net/http2 for inclusion in net/http,
+prefixing all identifiers by &quot;http2&quot; instead of &quot;http2_&quot;, and
+including a &quot;!nethttpomithttp2&quot; build constraint:
+<pre>cd $GOROOT/src/net/http
+bundle -o h2_bundle.go -prefix http2 -tags &apos;!nethttpomithttp2&apos; golang.org/x/net/http2
+</pre>
+<p>Update the http2 bundle in net/http:
+<pre>go generate net/http
+</pre>
+<p>Update all bundles in the standard library:
+<pre>go generate -run bundle std
+</pre>
+
+	
+
+	
+		
+			<h2 id="pkg-note-BUG">Bugs</h2>
+			<ul style="list-style: none; padding: 0;">
+			
+			<li><a href="http://localhost:6666/src/github.com/xdrpp/goxdr/goroot/pkg/mod/golang.org/x/tools@v0.31.0/cmd/bundle/main.go?s=7904:8368#L244" style="float: left;">&#x261e;</a> <p>bundle may generate incorrect code
+due to shadowing between identifiers and imported package names.
+<p>The generated code will either fail to compile or
+(unlikely) compile successfully but have different behavior
+than the original package. The risk of this happening is higher
+when the original package has renamed imports (they&apos;re typically
+renamed in order to resolve a shadow inside that particular .go file).
+</li>
+			
+			</ul>
+		
+	
+
+
+
+
+
+
+
+<div id="footer">
+Build version go1.24.1.<br>
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="http://localhost:6666/LICENSE">BSD license</a>.<br>
+<a href="https://golang.org/doc/tos.html">Terms of Service</a> |
+<a href="https://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+</body>
+</html>
