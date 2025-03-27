@@ -14,7 +14,7 @@ trap "kill $pid" 0
 mkdir gh-pages
 cd gh-pages
 
-sleep 1
+sleep 2
 
 wget -r -m -k -E -p -erobots=off -nH \
      --include-directories="/pkg/$PKG/,/lib" \
