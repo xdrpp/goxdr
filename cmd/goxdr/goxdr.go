@@ -19,13 +19,13 @@ import (
 var progname string
 
 type emitter struct {
-	syms *rpc_syms
-	output *strings.Builder
-	footer strings.Builder
-	emitted map[string]struct{}
-	enum_comments bool
+	syms              *rpc_syms
+	output            *strings.Builder
+	footer            strings.Builder
+	emitted           map[string]struct{}
+	enum_comments     bool
 	lax_discriminants bool
-	ptr_args bool
+	ptr_args          bool
 }
 
 type Emittable interface {
@@ -34,14 +34,14 @@ type Emittable interface {
 
 func capitalize(s string) string {
 	if len(s) > 0 && s[0] >= 'a' && s[0] <= 'z' {
-		return string(s[0] &^ 0x20) + s[1:]
+		return string(s[0]&^0x20) + s[1:]
 	}
 	return s
 }
 
 func uncapitalize(s string) string {
 	if len(s) > 0 && s[0] >= 'A' && s[0] <= 'Z' {
-		return string(s[0] | 0x20) + s[1:]
+		return string(s[0]|0x20) + s[1:]
 	}
 	return s
 }
@@ -175,7 +175,7 @@ func (e *emitter) gen_ptr(typ idval) string {
 		return ptrtyp
 	}
 	frag :=
-`type $PTR struct {
+		`type $PTR struct {
 	p **$TYPE
 }
 type _ptrflag_$TYPE $PTR
@@ -294,7 +294,7 @@ func (e *emitter) gen_vec(typ, bound0 idval) string {
 		return vectyp
 	}
 	frag :=
-`type $VEC []$TYPE
+		`type $VEC []$TYPE
 func ($VEC) XdrBound() uint32 {
 	const bound uint32 = $BOUND // Force error if not const or doesn't fit
 	return bound
@@ -368,7 +368,7 @@ func (e *emitter) gen_array(typ, bound0 idval) string {
 		return vectyp
 	}
 	frag :=
-`type $VEC [$BOUND]$TYPE
+		`type $VEC [$BOUND]$TYPE
 func ($VEC) XdrArraySize() uint32 {
 	const bound uint32 = $BOUND // Force error if not const or doesn't fit
 	return bound
@@ -397,7 +397,7 @@ func (e *emitter) gen_array_opaque(bound0 idval) string {
 		return vectyp
 	}
 	frag :=
-`type $VEC [$BOUND]byte
+		`type $VEC [$BOUND]byte
 func (v *$VEC) GetByteSlice() []byte { return v[:] }
 func (v *$VEC) XdrTypeName() string { return "opaque[]" }
 func (v *$VEC) XdrValue() interface{} { return v[:] }
@@ -475,13 +475,13 @@ func (e *emitter) xdrval(target string, context idval, d *rpc_decl) string {
 
 func (e *emitter) xdrgen(target, name string, context idval,
 	d *rpc_decl) string {
-/*
-	if d.qual == SCALAR && d.typ.getgo() != "string" {
-		// XXX - for typedefs
-		return fmt.Sprintf("\t%s.XdrMarshal(x, %s)\n",
-			e.xdrval(target, context, d), name)
-	}
-*/
+	/*
+		if d.qual == SCALAR && d.typ.getgo() != "string" {
+			// XXX - for typedefs
+			return fmt.Sprintf("\t%s.XdrMarshal(x, %s)\n",
+				e.xdrval(target, context, d), name)
+		}
+	*/
 	return fmt.Sprintf("\tx.Marshal(%s, %s)\n",
 		name, e.xdrval(target, context, d))
 }
@@ -509,7 +509,7 @@ func (r0 *rpc_typedef) emit(e *emitter) {
 		unwrap = unwrap[1:]
 	}
 	e.xprintf(
-`type XdrType_%[1]s struct {
+		`type XdrType_%[1]s struct {
 	%[2]s
 }
 func XDR_%[1]s(v *%[1]s) XdrType_%[1]s {
@@ -594,7 +594,7 @@ func (r *rpc_enum) emit(e *emitter) {
 	}
 	fmt.Fprintf(out, "}\n")
 	fmt.Fprintf(out,
-`func (%[1]s) XdrEnumNames() map[int32]string {
+		`func (%[1]s) XdrEnumNames() map[int32]string {
 	return _XdrNames_%[1]s
 }
 func (v %[1]s) String() string {
@@ -645,7 +645,7 @@ func XDR_%[1]s(v *%[1]s) *%[1]s { return v }
 		alltags.WriteString(tag.id.String())
 	}
 	fmt.Fprintf(out,
-`func (v *%[1]s) XdrInitialize() {
+		`func (v *%[1]s) XdrInitialize() {
 	switch %[1]s(0) {
 	case %[2]s:
 	default:
@@ -674,7 +674,7 @@ func (r *rpc_struct) emit(e *emitter) {
 	out = &strings.Builder{}
 
 	fmt.Fprintf(out,
-`type XdrType_%[1]s = *%[1]s
+		`type XdrType_%[1]s = *%[1]s
 func (v *%[1]s) XdrPointer() interface{} { return v }
 func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
@@ -685,8 +685,8 @@ func (v *%[1]s) XdrRecurse(x XDR, name string) {
 	}
 `, r.id)
 	for i := range r.decls {
-		out.WriteString(e.xdrgen("&v." + r.decls[i].id.getgo(),
-			`x.Sprintf("%s` + r.decls[i].id.getx() + `", name)`,
+		out.WriteString(e.xdrgen("&v."+r.decls[i].id.getgo(),
+			`x.Sprintf("%s`+r.decls[i].id.getx()+`", name)`,
 			r.id, &r.decls[i]))
 	}
 	fmt.Fprintf(out, "}\n")
@@ -751,7 +751,7 @@ func (r *rpc_union) emit(e *emitter) {
 		r.tagid)
 	for i := range r.fields {
 		u := &r.fields[i]
-		if (u.hasdefault) {
+		if u.hasdefault {
 			fmt.Fprintf(out, "\t//   default:\n")
 		} else {
 			fmt.Fprintf(out, "\t//   %s:\n",
@@ -765,13 +765,13 @@ func (r *rpc_union) emit(e *emitter) {
 		}
 	}
 	fmt.Fprintf(out, "\t%s %s\n", r.tagid, r.tagtype)
-	fmt.Fprintf(out, "\t_u interface{}\n" +
+	fmt.Fprintf(out, "\t_u interface{}\n"+
 		"}\n")
 	pop()
 	out = &strings.Builder{}
 
 	isBoolTag := e.is_bool(r.tagtype)
-	uh := unionHelper {
+	uh := unionHelper{
 		castCases: e.lax_discriminants && !isBoolTag,
 	}
 
@@ -812,7 +812,7 @@ func (r *rpc_union) emit(e *emitter) {
 		}
 		fmt.Fprintf(out, "func (u *%s) %s() *%s {\n", r.id, u.decl.id, ret)
 		goodcase := fmt.Sprintf(
-`		if v, ok := u._u.(*%[1]s); ok {
+			`		if v, ok := u._u.(*%[1]s); ok {
 			return v
 		} else {
 			var zero %[1]s
@@ -821,7 +821,7 @@ func (r *rpc_union) emit(e *emitter) {
 		}
 `, ret)
 		badcase := fmt.Sprintf(
-`		XdrPanic("%s.%s accessed when %s == %%v", u.%[3]s)
+			`		XdrPanic("%s.%s accessed when %s == %%v", u.%[3]s)
 		return nil
 `, r.id, u.decl.id, r.tagid)
 		fmt.Fprintf(out, "\tswitch %s {\n", discriminant)
@@ -860,7 +860,7 @@ func (r *rpc_union) emit(e *emitter) {
 	if r.hasdefault {
 		fmt.Fprintf(out, "\treturn true\n")
 	} else {
-		fmt.Fprintf(out, "\tswitch %s {\n" + "\tcase ", discriminant)
+		fmt.Fprintf(out, "\tswitch %s {\n"+"\tcase ", discriminant)
 		needcomma := false
 		for j := range r.fields {
 			u1 := &r.fields[j]
@@ -875,12 +875,12 @@ func (r *rpc_union) emit(e *emitter) {
 	}
 	fmt.Fprintf(out, "}\n")
 
-	fmt.Fprintf(out, "func (u *%s) XdrUnionTag() XdrNum32 {\n" +
+	fmt.Fprintf(out, "func (u *%s) XdrUnionTag() XdrNum32 {\n"+
 		"\treturn XDR_%s(&u.%s)\n}\n", r.id, r.tagtype, r.tagid)
-	fmt.Fprintf(out, "func (u *%s) XdrUnionTagName() string {\n" +
+	fmt.Fprintf(out, "func (u *%s) XdrUnionTagName() string {\n"+
 		"\treturn \"%s\"\n}\n", r.id, r.tagid)
 
-	fmt.Fprintf(out, "func (u *%s) XdrUnionBody() XdrType {\n" +
+	fmt.Fprintf(out, "func (u *%s) XdrUnionBody() XdrType {\n"+
 		"\tswitch %s {\n", r.id, discriminant)
 	for i := range r.fields {
 		u := &r.fields[i]
@@ -903,7 +903,7 @@ func (r *rpc_union) emit(e *emitter) {
 	}
 	fmt.Fprintf(out, "}\n")
 
-	fmt.Fprintf(out, "func (u *%s) XdrUnionBodyName() string {\n" +
+	fmt.Fprintf(out, "func (u *%s) XdrUnionBodyName() string {\n"+
 		"\tswitch %s {\n", r.id, discriminant)
 	for i := range r.fields {
 		u := &r.fields[i]
@@ -925,7 +925,7 @@ func (r *rpc_union) emit(e *emitter) {
 	fmt.Fprintf(out, "}\n")
 
 	fmt.Fprintf(out,
-`type XdrType_%[1]s = *%[1]s
+		`type XdrType_%[1]s = *%[1]s
 func (v *%[1]s) XdrPointer() interface{} { return v }
 func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
@@ -945,8 +945,8 @@ func (u *%[1]s) XdrRecurse(x XDR, name string) {
 			fmt.Fprintf(out, "\tcase %s:\n", uh.join(u))
 		}
 		if !u.isVoid() {
-			out.WriteString("\t" + e.xdrgen("u." + u.decl.id.getgo() + "()",
-				`x.Sprintf("%s` + u.decl.id.getx() + `", name)`,
+			out.WriteString("\t" + e.xdrgen("u."+u.decl.id.getgo()+"()",
+				`x.Sprintf("%s`+u.decl.id.getx()+`", name)`,
 				r.id, &u.decl))
 		}
 		out.WriteString("\t\treturn\n")
@@ -954,7 +954,7 @@ func (u *%[1]s) XdrRecurse(x XDR, name string) {
 	fmt.Fprintf(out, "\t}\n")
 	if !r.hasdefault {
 		fmt.Fprintf(out,
-`	XdrPanic("invalid %[1]s (%%v) in %[2]s", u.%[1]s)
+			`	XdrPanic("invalid %[1]s (%%v) in %[2]s", u.%[1]s)
 `, r.tagid, r.id)
 	}
 	fmt.Fprintf(out, "}\n")
@@ -977,7 +977,7 @@ func (u *%[1]s) XdrRecurse(x XDR, name string) {
 		// built-in types, especially bool, because go won't allow
 		// bool(0) as an expression.
 		fmt.Fprintf(out,
-`func (v *%[1]s) XdrInitialize() {
+			`func (v *%[1]s) XdrInitialize() {
 	var zero %[2]s
 	switch zero {
 	case %[3]s:
@@ -1008,7 +1008,7 @@ func (e *emitter) getArgType(p *rpc_proc) string {
 	}
 	e.xprintf("}\n")
 	e.xprintf(
-`func (v *%[1]s) XdrPointer() interface{} { return v }
+		`func (v *%[1]s) XdrPointer() interface{} { return v }
 func (%[1]s) XdrTypeName() string { return "%[1]s" }
 func (v %[1]s) XdrValue() interface{} { return v }
 func (v *%[1]s) XdrMarshal(x XDR, name string) { x.Marshal(name, v) }
@@ -1019,7 +1019,7 @@ func (v *%[1]s) XdrRecurse(x XDR, name string) {
 `, args)
 	for i := range p.arg {
 		e.xprintf(
-`	if v.a%[1]d == nil { v.a%[1]d = new(%[2]s) }
+			`	if v.a%[1]d == nil { v.a%[1]d = new(%[2]s) }
 	XDR_%[2]s(v.a%[1]d).XdrMarshal(x, x.Sprintf("%%sa%[1]d", name))
 `, i+1, p.arg[i])
 	}
@@ -1053,21 +1053,22 @@ func (e *emitter) doClientProc(cli string, p *rpc_proc) {
 	}
 	if p.res.getx() == "void" {
 		e.xprintf(
-`func (c %[1]s) %[2]s(%[3]s) {
+			`func (c %[1]s) %[2]s(ctx context.Context, %[3]s) error {
 	var proc xdrProc_%[2]s
-%[4]s	if err := c.Send.SendCall(c.Ctx, &proc); err != nil {
-		panic(err)
+%[4]s	if err := c.Send.SendCall(ctx, &proc); err != nil {
+		return err
 	}
+	return nil
 }
 `, cli, p.id, args, setargs)
 	} else {
 		e.xprintf(
-`func (c %[1]s) %[2]s(%[3]s) %[6]s%[5]s {
+			`func (c %[1]s) %[2]s(ctx context.Context, %[3]s) (r %[6]s%[5]s, _ error) {
 	var proc xdrProc_%[2]s
-%[4]s	if err := c.Send.SendCall(c.Ctx, &proc); err != nil {
-		panic(err)
+%[4]s	if err := c.Send.SendCall(ctx, &proc); err != nil {
+		return r, err
 	}
-	return %[7]sproc.Res
+	return %[7]sproc.Res, nil
 }
 `, cli, p.id, args, setargs, p.res, argtype, toarg)
 	}
@@ -1085,7 +1086,7 @@ func (r *rpc_program) emit(e *emitter) {
 		name := r.vers[i].id
 		e.printf("type %s interface {\n", name)
 		for _, p := range r.vers[i].procs {
-			e.printf("\t%s(", p.id)
+			e.printf("\t%s(context.Context, ", p.id)
 			for j := range p.arg {
 				if j != 0 {
 					e.printf(", ")
@@ -1094,7 +1095,9 @@ func (r *rpc_program) emit(e *emitter) {
 			}
 			e.printf(")")
 			if p.res.getx() != "void" {
-				e.printf(" %s%s", argtype, p.res)
+				e.printf(" (%s%s, error)", argtype, p.res)
+			} else {
+				e.printf(" error")
 			}
 			e.printf("\n")
 		}
@@ -1118,7 +1121,7 @@ func (%[1]s) ProcName() string { return %[9]q }
 `, pm, args, p.res, r.val, r.vers[i].val, p.val,
 				r.id.getx(), name.getx(), p.id.getx())
 			fmt.Fprintf(out,
-`func (p *%[1]s) GetArg() XdrType {
+				`func (p *%[1]s) GetArg() XdrType {
 	if p.Arg == nil {
 		p.Arg = new(%[2]s)
 	}
@@ -1126,7 +1129,7 @@ func (%[1]s) ProcName() string { return %[9]q }
 }
 `, pm, args)
 			fmt.Fprintf(out,
-`func (p *%[1]s) GetRes() XdrType {
+				`func (p *%[1]s) GetRes() XdrType {
 	if p.Res == nil {
 		p.Res = new(%[2]s)
 	}
@@ -1138,6 +1141,7 @@ var _ XdrProc = &%[1]s{} // XXX
 type %[1]s struct {
 	%[2]s
 	Srv %[3]s
+	Ctx context.Context
 }
 func (p *%[1]s) SetContext(ctx context.Context) {
 	if wc, ok := p.Srv.(interface {
@@ -1145,8 +1149,9 @@ func (p *%[1]s) SetContext(ctx context.Context) {
 	}); ok {
 		p.Srv = wc.WithContext(ctx)
 	}
+	p.Ctx = ctx
 }
-`, "xdrSrvProc_" + p.id.String(), pm, name)
+`, "xdrSrvProc_"+p.id.String(), pm, name)
 
 			var av string
 			if len(p.arg) == 1 {
@@ -1163,19 +1168,22 @@ func (p *%[1]s) SetContext(ctx context.Context) {
 			var reseq1, reseq2 string
 			if p.res.getx() != "void" {
 				if e.ptr_args {
-					reseq1 = "p.Res = "
+					reseq1 = "p.Res = " //XXX: err
 				} else {
-					reseq1 = "r := "
+					reseq1 = "r, err := "
 					reseq2 = "\n\tp.Res = " + fromarg + "r\n"
 				}
+			} else {
+				reseq1 = "err := "
 			}
 
 			fmt.Fprintf(out,
-`func (p *%[1]s) Do() {
-	%[4]sp.Srv.%[2]s(%[3]s)%[5]s
+				`func (p *%[1]s) Do() error {
+	%[4]sp.Srv.%[2]s(p.Ctx, %[3]s)%[5]s
+	return err
 }
 var _ XdrSrvProc = &%[1]s{} // XXX
-`, "xdrSrvProc_" + p.id.String(), p.id, av, reseq1, reseq2)
+`, "xdrSrvProc_"+p.id.String(), p.id, av, reseq1, reseq2)
 			e.xappend(out)
 		}
 
@@ -1189,7 +1197,7 @@ func init() {
 			e.xprintf("\t\t\treturn &xdrProc_%s{}\n", p.id.String())
 		}
 		e.xprintf(
-`		}
+			`		}
 		return nil
 	}
 }
@@ -1210,12 +1218,12 @@ func (s %[1]s) GetProc(p uint32) XdrSrvProc {
 
 		for _, p := range r.vers[i].procs {
 			e.xprintf(
-`	case %[1]d:  // %[2]s
+				`	case %[1]d:  // %[2]s
 		return &%[3]s{ Srv: s.Srv }
-`, p.val, p.id.getx(), "xdrSrvProc_" + p.id.String())
+`, p.val, p.id.getx(), "xdrSrvProc_"+p.id.String())
 		}
 		e.xprintf(
-`	default:
+			`	default:
 		return nil
 	}
 }
@@ -1242,10 +1250,10 @@ func (c %[1]s) WithContext(ctx context.Context) %[2]s {
 
 func emitAll(syms *rpc_syms, comments bool, lax bool) string {
 	e := emitter{
-		syms: syms,
-		output: &strings.Builder{},
-		emitted: map[string]struct{}{},
-		enum_comments: comments,
+		syms:              syms,
+		output:            &strings.Builder{},
+		emitted:           map[string]struct{}{},
+		enum_comments:     comments,
 		lax_discriminants: lax,
 	}
 
@@ -1271,6 +1279,7 @@ func emitAll(syms *rpc_syms, comments bool, lax bool) string {
 }
 
 type stringlist []string
+
 func (sl *stringlist) String() string {
 	return fmt.Sprint(*sl)
 }
@@ -1309,7 +1318,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 	flag.Parse()
-	if (*opt_help) {
+	if *opt_help {
 		flag.CommandLine.SetOutput(os.Stdout)
 		flag.Usage()
 		return
@@ -1326,7 +1335,7 @@ func main() {
 
 	var out io.WriteCloser
 	out = os.Stdout
-	if (*opt_output != "") {
+	if *opt_output != "" {
 		var err error
 		out, err = os.Create(*opt_output)
 		if err != nil {
@@ -1335,7 +1344,7 @@ func main() {
 		}
 	}
 
-	if (*opt_fmt) {
+	if *opt_fmt {
 		cmd := exec.Command("gofmt", "-s")
 		cmd.Stdout = out
 		cmd.Stderr = os.Stderr
@@ -1358,13 +1367,13 @@ func main() {
 	}
 
 	// https://github.com/golang/go/issues/13560#issuecomment-288457920
-	fmt.Fprintf(out, "// Code generated by %s", progname);
+	fmt.Fprintf(out, "// Code generated by %s", progname)
 	if len(os.Args) >= 1 {
 		for _, arg := range os.Args[1:] {
 			fmt.Fprintf(out, " %s", arg)
 		}
 	}
-	fmt.Fprint(out, "; DO NOT EDIT.\n\n");
+	fmt.Fprint(out, "; DO NOT EDIT.\n\n")
 
 	if *opt_pkg != "" {
 		fmt.Fprintf(out, "package %s\n%s", *opt_pkg, imports.ToImports())
@@ -1384,7 +1393,7 @@ func main() {
 	} else {
 		fmt.Fprint(out, "import \"fmt\"\nimport \"context\"\n")
 		if !*opt_nobp {
-			fmt.Fprintf(out, "import . \"github.com/xdrpp/goxdr/xdr\"\n" +
+			fmt.Fprintf(out, "import . \"github.com/xdrpp/goxdr/xdr\"\n"+
 				"\nvar _ XDR")
 		}
 	}

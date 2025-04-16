@@ -381,7 +381,9 @@ func (r *Driver) Go() {
 				}
 				r.safeSend(r.ctx, &reply)
 			}()
-			proc.Do()
+			if err = proc.Do(); err != nil {
+				panic(err)
+			}
 		}()
 	}
 	r.Close()
