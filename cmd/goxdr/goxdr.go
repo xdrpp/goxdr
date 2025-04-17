@@ -1168,7 +1168,7 @@ func (p *%[1]s) SetContext(ctx context.Context) {
 			var reseq1, reseq2 string
 			if p.res.getx() != "void" {
 				if e.ptr_args {
-					reseq1 = "p.Res = " //XXX: err
+					reseq1 = "var err error; p.Res, err = "
 				} else {
 					reseq1 = "r, err := "
 					reseq2 = "\n\tp.Res = " + fromarg + "r\n"
@@ -1178,9 +1178,11 @@ func (p *%[1]s) SetContext(ctx context.Context) {
 			}
 
 			fmt.Fprintf(out,
-				`func (p *%[1]s) Do() error {
+				`func (p *%[1]s) Do() {
 	%[4]sp.Srv.%[2]s(p.Ctx, %[3]s)%[5]s
-	return err
+	if err != nil {
+		panic(err)
+	}
 }
 var _ XdrSrvProc = &%[1]s{} // XXX
 `, "xdrSrvProc_"+p.id.String(), p.id, av, reseq1, reseq2)
