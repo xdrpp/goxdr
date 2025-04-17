@@ -324,7 +324,15 @@ func (r *Driver) Go() {
 	if atomic.SwapInt32(&r.started, 1) == 1 {
 		panic("rpc.Driver.Go called multiple times")
 	}
+loop:
 	for {
+		// check whether the context was cancelled or timed out
+		select {
+		case <-r.ctx.Done():
+			break loop
+		default:
+		}
+
 		m := <-r.in
 		if m == nil {
 			break

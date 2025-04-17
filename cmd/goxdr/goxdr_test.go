@@ -1,12 +1,14 @@
 package main
 
-import "os"
-import "os/exec"
-import "path/filepath"
-import "testing"
+import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"testing"
+)
 
 func TestCompile(t *testing.T) {
-	goxdr := "./goxdr"			// Can't join "."
+	goxdr := "./goxdr" // Can't join "."
 	source := filepath.Join("testdata", "testxdr.x")
 	source_strict := filepath.Join("testdata", "testxdr_strict.x")
 	target := filepath.Join("testdata", "testxdr.go")
@@ -14,7 +16,7 @@ func TestCompile(t *testing.T) {
 	cmd := exec.Command(goxdr, "-enum-comments", "-p", "testxdr",
 		"-o", target, source)
 	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Errorf("goxdr failed:\n%s", out)
+		t.Errorf("goxdr failed:\n%s: %s", out, err)
 		return
 	}
 	cmd = exec.Command("go", "build", target)
@@ -31,7 +33,7 @@ func TestCompile(t *testing.T) {
 	}
 	cmd = exec.Command("go", "build", target)
 	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Errorf("goxdr's output without -lax-discriminants " +
+		t.Errorf("goxdr's output without -lax-discriminants "+
 			"failed to compile:\n%s", out)
 		return
 	}
