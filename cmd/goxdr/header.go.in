@@ -667,7 +667,7 @@ func (xo XdrOut) Marshal(name string, i XdrType) {
 func xdrReadN(in io.Reader, n uint32) []byte {
 	var b bytes.Buffer
 	if _, err := io.CopyN(&b, in, int64(n)); err != nil {
-		XdrPanic(err.Error())
+		XdrPanic("%s", err.Error())
 	}
 	return b.Bytes()
 }
