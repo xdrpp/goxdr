@@ -1,25 +1,27 @@
-
 package rpc_test
 
 import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/xdrpp/goxdr/rpc"
 	"io/ioutil"
 	"net"
 	"os"
 	"syscall"
 	"testing"
+
+	"github.com/xdrpp/goxdr/rpc"
 )
 
-type Server struct {}
-func (*Server) Test_null() {}
-func (*Server) Test_inc(i int32) int32 { return i + 1 }
-func (*Server) Test_add(i, j int32) int32 { return i + j }
-func (*Server) Test_string(s string) string {
-	return "Hello " + s
+type Server struct{}
+
+func (*Server) Test_null(ctx context.Context) error                     { return nil }
+func (*Server) Test_inc(ctx context.Context, i int32) (int32, error)    { return i + 1, nil }
+func (*Server) Test_add(ctx context.Context, i, j int32) (int32, error) { return i + j, nil }
+func (*Server) Test_string(ctx context.Context, s string) (string, error) {
+	return "Hello " + s, nil
 }
+
 var _ TEST_V1 = &Server{}
 
 func streampair() (ret [2]net.Conn) {
@@ -55,7 +57,7 @@ func TestChannels(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	contents := []string{ "one\n", "two\n", "three\n" }
+	contents := []string{"one\n", "two\n", "three\n"}
 	var ms []*rpc.Message
 	for _, msg := range contents {
 		m := &rpc.Message{}
@@ -76,8 +78,8 @@ func TestChannels(t *testing.T) {
 		}
 	}()
 
-	for i := 0;; i++ {
-		m := <- r
+	for i := 0; ; i++ {
+		m := <-r
 		if m == nil {
 			break
 		}
@@ -106,16 +108,16 @@ func TestRPC(t *testing.T) {
 		fmt.Println("loop2 returned")
 	}()
 
-	c := TEST_V1_Client { Send: r2, Ctx: ctx }
+	c := TEST_V1_Client{Send: r2, Ctx: ctx}
 
-	c.Test_null()
-	if c.Test_inc(1) != 2 {
+	c.Test_null(ctx)
+	if r, _ := c.Test_inc(ctx, 1); r != 2 {
 		t.Error("Test_inc failed")
 	}
-	if c.Test_add(2, 3) != 5 {
+	if r, _ := c.Test_add(ctx, 2, 3); r != 5 {
 		t.Error("Test_add failed")
 	}
-	if c.Test_string("test") != "Hello test" {
+	if r, _ := c.Test_string(ctx, "test"); r != "Hello test" {
 		t.Error("Test_string failed")
 	}
 }
