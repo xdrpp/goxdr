@@ -35,7 +35,7 @@ default:
 typedef U2 A1[5];
 
 const C1 = 1'000'000;
-const C2 = 0xABCD'EF_01;
+const C2 = 0xABCD'EF'01;
 
 struct A2 {
      A1 a[4];
