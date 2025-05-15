@@ -319,7 +319,7 @@ func (l *Lexer) skipLine() {
 }
 
 func isDigit(c rune) bool {
-	return c >= '0' && c <= '9'
+	return (c >= '0' && c <= '9') || c == '\''
 }
 
 func isHexDigit(c rune) bool {
@@ -327,7 +327,7 @@ func isHexDigit(c rune) bool {
 		return true
 	}
 	c &^= 0x20
-	return c >= 'A' && c <= 'F'
+	return (c >= 'A' && c <= 'F') || c == '\''
 }
 
 func isIdStart(c rune) bool {
