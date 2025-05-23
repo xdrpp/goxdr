@@ -241,7 +241,6 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	go func() {
 		<-ctx.Done()
 		t.Close()
-		close(ret.out)
 	}()
 
 	return &ret
