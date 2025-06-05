@@ -373,7 +373,7 @@ loop:
 			unlock:  unlock,
 		}))
 
-		go func() {
+		q := func() {
 			defer func() {
 				unlock()
 				if i := recover(); i != nil {
@@ -396,7 +396,12 @@ loop:
 				r.safeSend(r.ctx, &reply)
 			}()
 			proc.Do()
-		}()
+		}
+		if r.Lock == nil {
+			go q()
+		} else {
+			q()
+		}
 	}
 	r.Close()
 	r.cs.CancelAll()
