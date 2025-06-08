@@ -15,16 +15,17 @@ import (
 type Message struct {
 	*bytes.Buffer
 	Peer    string
-	reclaim func()
+	recycle func()
 }
 
-func NewMessage(peer string, buf *bytes.Buffer, reclaim func()) *Message {
-	return &Message{Buffer: buf, Peer: peer, reclaim: reclaim}
+func NewMessage(peer string, buf *bytes.Buffer, recycle func()) *Message {
+	return &Message{Buffer: buf, Peer: peer, recycle: recycle}
 }
 
-func (m *Message) Reclaim() {
-	m.reclaim()
-	m.reclaim = nil
+func (m *Message) Recycle() {
+	m.recycle()
+	m.Buffer = nil
+	m.recycle = nil
 }
 
 func (m *Message) In() xdr.XDR {
@@ -147,7 +148,7 @@ func (tx *StreamTransport) Close() {
 const maxSegment = 0x7fffffff
 
 func (tx *StreamTransport) Send(m *Message) error {
-	defer m.Reclaim()
+	defer m.Recycle()
 	if tx.failed() {
 		return tx.err
 	}
@@ -182,7 +183,7 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
-			ret.Reclaim()
+			ret.Recycle()
 			tx.fail(err)
 			return nil, err
 		}
@@ -190,12 +191,12 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 		if int(n) > tx.MaxMsgSize-ret.Len() {
 			err := fmt.Errorf("Message length %d exceeds maximum %d",
 				int(n)+ret.Len(), tx.MaxMsgSize)
-			ret.Reclaim()
+			ret.Recycle()
 			tx.fail(err)
 			return nil, err
 		}
 		if _, err := io.CopyN(ret, tx.Conn, int64(n)); err != nil {
-			ret.Reclaim()
+			ret.Recycle()
 			tx.fail(err)
 			return nil, err
 		}
