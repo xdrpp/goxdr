@@ -110,7 +110,7 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 			select {
 			case c <- m:
 			case <-ctx.Done():
-				m.Reclaim()
+				m.Recycle()
 				close(c)
 				return
 			}
@@ -279,7 +279,7 @@ func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
 	case r.out <- m:
 		return true
 	case <-ctx.Done():
-		m.Reclaim()
+		m.Recycle()
 		return false
 	}
 }
@@ -354,7 +354,7 @@ loop:
 		}
 		msg, err := GetMsg(m.In())
 		if err != nil {
-			m.Reclaim()
+			m.Recycle()
 			fmt.Fprintf(os.Stderr, "GetMsg failed: %s\n", err)
 			break
 		}
@@ -362,19 +362,19 @@ loop:
 		if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
 			r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s",
 				m.Peer, msg.Xid, pc.Proc.ProcName())
-			m.Reclaim()
+			m.Recycle()
 			pc.Cb(msg)
 			continue
 		}
 
 		rmsg, proc := r.srv.GetProc(msg, m.In())
-		m.Reclaim()
+		m.Recycle()
 		if rmsg == nil {
 			continue
 		} else if proc == nil {
 			reply := r.newMessage(m.Peer)
 			reply.Serialize(rmsg)
-			reply.Reclaim() //XXX
+			reply.Recycle() //XXX
 			continue
 		}
 
