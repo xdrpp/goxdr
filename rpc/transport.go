@@ -113,7 +113,10 @@ func NewStreamTransport(c net.Conn) *StreamTransport {
 
 func (tx *StreamTransport) NewMessage(peer string) *Message {
 	buf := tx.mpool.Get().(*bytes.Buffer)
-	return NewMessage(peer, buf, func() { tx.mpool.Put(buf) })
+	return NewMessage(peer, buf, func() {
+		buf.Reset()
+		tx.mpool.Put(buf)
+	})
 }
 
 func (tx *StreamTransport) fail(err error) {
