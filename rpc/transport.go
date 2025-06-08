@@ -1,27 +1,38 @@
-
 package rpc
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"github.com/xdrpp/goxdr/xdr"
 	"io"
 	"net"
+	"sync"
 	"sync/atomic"
+
+	"github.com/xdrpp/goxdr/xdr"
 )
 
 type Message struct {
-	bytes.Buffer
-	Peer string
+	*bytes.Buffer
+	Peer    string
+	reclaim func()
+}
+
+func NewMessage(peer string, buf *bytes.Buffer, reclaim func()) *Message {
+	return &Message{Buffer: buf, Peer: peer, reclaim: reclaim}
+}
+
+func (m *Message) Reclaim() {
+	m.reclaim()
+	m.reclaim = nil
 }
 
 func (m *Message) In() xdr.XDR {
-	return xdr.XdrIn{m}
+	return xdr.XdrIn{In: m}
 }
 
 func (m *Message) Out() xdr.XDR {
-	return xdr.XdrOut{m}
+	return xdr.XdrOut{Out: m}
 }
 
 func (m *Message) Xid() uint32 {
@@ -32,7 +43,7 @@ func (m *Message) Xid() uint32 {
 	return 0
 }
 
-func (m *Message) Serialize(vs...xdr.XdrType) {
+func (m *Message) Serialize(vs ...xdr.XdrType) {
 	out := m.Out()
 	for i := range vs {
 		vs[i].XdrMarshal(out, "")
@@ -61,6 +72,8 @@ type Transport interface {
 	// because each instance of the transport is connected to a single
 	// endpoint (like TCP and unlike an unconnected UDP socket).
 	IsConnected() bool
+
+	NewMessage(peer string) *Message
 }
 
 var ErrTransportClosed = fmt.Errorf("Transport is closed")
@@ -68,7 +81,7 @@ var ErrTransportClosed = fmt.Errorf("Transport is closed")
 // Implements RFC5531 record-marking protocol for stream sockets
 type StreamTransport struct {
 	MaxMsgSize int
-	Conn net.Conn
+	Conn       net.Conn
 
 	// Since a StreamTransport is connected, we ignore Peer in sent
 	// messages, but can hardcode a value for incoming messages.
@@ -79,19 +92,28 @@ type StreamTransport struct {
 	// err are synchronized through okay.  Shared read-only access to
 	// err is allowed only when okay == 0.  Value -1 is used as an
 	// exclusive lock to ensure only one thread updates err.
-	okay int32					// 1 = okay, 0 = failed, -1 = failing
-	err error
+	okay int32 // 1 = okay, 0 = failed, -1 = failing
+	err  error
+
+	mpool sync.Pool
 }
 
 // Create a stream transport from a connected stream socket.  This is
 // the only valid way to initialize a StreamTransport.  You can
 // manually adjust MaxMsgSize after calling this function.
 func NewStreamTransport(c net.Conn) *StreamTransport {
-	return &StreamTransport{
+	r := &StreamTransport{
 		MaxMsgSize: 0x100000,
-		Conn: c,
-		okay: 1,
+		Conn:       c,
+		okay:       1,
 	}
+	r.mpool.New = func() any { return &bytes.Buffer{} }
+	return r
+}
+
+func (tx *StreamTransport) NewMessage(peer string) *Message {
+	buf := tx.mpool.Get().(*bytes.Buffer)
+	return NewMessage(peer, buf, func() { tx.mpool.Put(buf) })
 }
 
 func (tx *StreamTransport) fail(err error) {
@@ -122,6 +144,7 @@ func (tx *StreamTransport) Close() {
 const maxSegment = 0x7fffffff
 
 func (tx *StreamTransport) Send(m *Message) error {
+	defer m.Reclaim()
 	if tx.failed() {
 		return tx.err
 	}
@@ -152,26 +175,29 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 	if tx.failed() {
 		return nil, tx.err
 	}
-	ret := Message{ Peer: tx.Peer }
+	ret := tx.NewMessage(tx.Peer)
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
+			ret.Reclaim()
 			tx.fail(err)
 			return nil, err
 		}
 		n := binary.BigEndian.Uint32(b) & 0x7fffffff
-		if int(n) > tx.MaxMsgSize - ret.Len() {
+		if int(n) > tx.MaxMsgSize-ret.Len() {
 			err := fmt.Errorf("Message length %d exceeds maximum %d",
-				int(n) + ret.Len(), tx.MaxMsgSize)
+				int(n)+ret.Len(), tx.MaxMsgSize)
+			ret.Reclaim()
 			tx.fail(err)
 			return nil, err
 		}
-		if _, err := io.CopyN(&ret, tx.Conn, int64(n)); err != nil {
+		if _, err := io.CopyN(ret, tx.Conn, int64(n)); err != nil {
+			ret.Reclaim()
 			tx.fail(err)
 			return nil, err
 		}
 	}
-	return &ret, nil
+	return ret, nil
 }
 
 func (tx *StreamTransport) IsConnected() bool {

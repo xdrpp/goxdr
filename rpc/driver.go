@@ -110,6 +110,7 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 			select {
 			case c <- m:
 			case <-ctx.Done():
+				m.Reclaim()
 				close(c)
 				return
 			}
@@ -134,7 +135,8 @@ func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- s
 					return
 				} else {
 					xid := m.Xid()
-					if err := t.Send(m); err != nil && onErr != nil {
+					err := t.Send(m)
+					if err != nil && onErr != nil {
 						onErr(xid, err)
 					}
 				}
@@ -190,6 +192,7 @@ type Driver struct {
 	// If non-nil, all panics arising from service method implementations are passed to PanicHandle.
 	PanicHandler PanicHandler
 
+	t        Transport
 	srv      RpcSrv
 	ctx      context.Context
 	cancel   context.CancelFunc
@@ -238,6 +241,7 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	ret := Driver{
 		Log:    DefaultLog,
 		Lock:   &sync.Mutex{},
+		t:      t,
 		ctx:    ctx,
 		cancel: cancel,
 		in:     ReceiveChan(ctx, t),
@@ -252,6 +256,10 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	}()
 
 	return &ret
+}
+
+func (r *Driver) newMessage(peer string) *Message {
+	return r.t.NewMessage(peer)
 }
 
 // Register an RPC server.
@@ -271,6 +279,7 @@ func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
 	case r.out <- m:
 		return true
 	case <-ctx.Done():
+		m.Reclaim()
 		return false
 	}
 }
@@ -287,11 +296,11 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		c <- rmsg
 		close(c)
 	})
-	m := Message{Peer: peer}
+	m := r.newMessage(peer)
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
-	if !r.safeSend(ctx, &m) {
+	if !r.safeSend(ctx, m) {
 		r.cs.Delete(cmsg.Xid)
 		return ErrTransportClosed
 	}
@@ -345,6 +354,7 @@ loop:
 		}
 		msg, err := GetMsg(m.In())
 		if err != nil {
+			m.Reclaim()
 			fmt.Fprintf(os.Stderr, "GetMsg failed: %s\n", err)
 			break
 		}
@@ -352,16 +362,19 @@ loop:
 		if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
 			r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s",
 				m.Peer, msg.Xid, pc.Proc.ProcName())
+			m.Reclaim()
 			pc.Cb(msg)
 			continue
 		}
 
 		rmsg, proc := r.srv.GetProc(msg, m.In())
+		m.Reclaim()
 		if rmsg == nil {
 			continue
 		} else if proc == nil {
-			reply := Message{Peer: m.Peer}
+			reply := r.newMessage(m.Peer)
 			reply.Serialize(rmsg)
+			reply.Reclaim() //XXX
 			continue
 		}
 
@@ -386,14 +399,14 @@ loop:
 						SetStat(rmsg, SYSTEM_ERR)
 					}
 				}
-				reply := Message{Peer: m.Peer}
+				reply := r.newMessage(m.Peer)
 				reply.Serialize(rmsg)
 				if IsSuccess(rmsg) {
 					reply.Serialize(proc.GetRes())
 					r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
 						m.Peer, msg.Xid, proc.ProcName())
 				}
-				r.safeSend(r.ctx, &reply)
+				r.safeSend(r.ctx, reply)
 			}()
 			proc.Do()
 		}
