@@ -192,7 +192,6 @@ type Driver struct {
 	// If non-nil, all panics arising from service method implementations are passed to PanicHandle.
 	PanicHandler PanicHandler
 
-	t        Transport
 	srv      RpcSrv
 	ctx      context.Context
 	cancel   context.CancelFunc
@@ -241,7 +240,6 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	ret := Driver{
 		Log:    DefaultLog,
 		Lock:   &sync.Mutex{},
-		t:      t,
 		ctx:    ctx,
 		cancel: cancel,
 		in:     ReceiveChan(ctx, t),
@@ -256,10 +254,6 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	}()
 
 	return &ret
-}
-
-func (r *Driver) newMessage(peer string) *Message {
-	return r.t.NewMessage(peer)
 }
 
 // Register an RPC server.
@@ -296,7 +290,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		c <- rmsg
 		close(c)
 	})
-	m := r.newMessage(peer)
+	m := NewMessage(peer)
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -372,7 +366,7 @@ loop:
 		if rmsg == nil {
 			continue
 		} else if proc == nil {
-			reply := r.newMessage(m.Peer)
+			reply := NewMessage(m.Peer)
 			reply.Serialize(rmsg)
 			reply.Recycle() //XXX
 			continue
@@ -399,7 +393,7 @@ loop:
 						SetStat(rmsg, SYSTEM_ERR)
 					}
 				}
-				reply := r.newMessage(m.Peer)
+				reply := NewMessage(m.Peer)
 				reply.Serialize(rmsg)
 				if IsSuccess(rmsg) {
 					reply.Serialize(proc.GetRes())

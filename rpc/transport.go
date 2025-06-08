@@ -14,18 +14,24 @@ import (
 
 type Message struct {
 	*bytes.Buffer
-	Peer    string
-	recycle func()
+	Peer string
 }
 
-func NewMessage(peer string, buf *bytes.Buffer, recycle func()) *Message {
-	return &Message{Buffer: buf, Peer: peer, recycle: recycle}
+var mpool sync.Pool
+
+func init() {
+	mpool.New = func() any { return &bytes.Buffer{} }
+}
+
+func NewMessage(peer string) *Message {
+	buf := mpool.Get().(*bytes.Buffer)
+	buf.Reset()
+	return &Message{Buffer: buf, Peer: peer}
 }
 
 func (m *Message) Recycle() {
-	m.recycle()
+	mpool.Put(m.Buffer)
 	m.Buffer = nil
-	m.recycle = nil
 }
 
 func (m *Message) In() xdr.XDR {
@@ -73,8 +79,6 @@ type Transport interface {
 	// because each instance of the transport is connected to a single
 	// endpoint (like TCP and unlike an unconnected UDP socket).
 	IsConnected() bool
-
-	NewMessage(peer string) *Message
 }
 
 var ErrTransportClosed = fmt.Errorf("Transport is closed")
@@ -95,29 +99,17 @@ type StreamTransport struct {
 	// exclusive lock to ensure only one thread updates err.
 	okay int32 // 1 = okay, 0 = failed, -1 = failing
 	err  error
-
-	mpool sync.Pool
 }
 
 // Create a stream transport from a connected stream socket.  This is
 // the only valid way to initialize a StreamTransport.  You can
 // manually adjust MaxMsgSize after calling this function.
 func NewStreamTransport(c net.Conn) *StreamTransport {
-	r := &StreamTransport{
+	return &StreamTransport{
 		MaxMsgSize: 0x100000,
 		Conn:       c,
 		okay:       1,
 	}
-	r.mpool.New = func() any { return &bytes.Buffer{} }
-	return r
-}
-
-func (tx *StreamTransport) NewMessage(peer string) *Message {
-	buf := tx.mpool.Get().(*bytes.Buffer)
-	buf.Reset()
-	return NewMessage(peer, buf, func() {
-		tx.mpool.Put(buf)
-	})
 }
 
 func (tx *StreamTransport) fail(err error) {
@@ -179,7 +171,7 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 	if tx.failed() {
 		return nil, tx.err
 	}
-	ret := tx.NewMessage(tx.Peer)
+	ret := NewMessage(tx.Peer)
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
