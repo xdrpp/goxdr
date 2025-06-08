@@ -60,7 +60,7 @@ func TestChannels(t *testing.T) {
 	contents := []string{"one\n", "two\n", "three\n"}
 	var ms []*rpc.Message
 	for _, msg := range contents {
-		m := &rpc.Message{}
+		m := rpc.NewMessage("", &bytes.Buffer{}, func() {})
 		m.WriteString(msg)
 		ms = append(ms, m)
 	}
