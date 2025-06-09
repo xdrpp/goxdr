@@ -368,7 +368,7 @@ loop:
 		} else if proc == nil {
 			reply := NewMessage(m.Peer)
 			reply.Serialize(rmsg)
-			reply.Recycle() //XXX
+			r.safeSend(r.ctx, reply)
 			continue
 		}
 
