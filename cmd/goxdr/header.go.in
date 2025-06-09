@@ -665,11 +665,11 @@ func (xo XdrOut) Marshal(name string, i XdrType) {
 }
 
 func xdrReadN(in io.Reader, n uint32) []byte {
-	var b bytes.Buffer
-	if _, err := io.CopyN(&b, in, int64(n)); err != nil {
+	p := make([]byte, n)
+	if k, err := in.Read(p); err != nil || k != int(n){
 		XdrPanic("%s", err.Error())
 	}
-	return b.Bytes()
+	return p
 }
 
 func xdrReadPad(in io.Reader, n uint32) {
