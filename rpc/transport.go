@@ -17,15 +17,43 @@ type Message struct {
 	Peer string
 }
 
-var mpool sync.Pool
+var (
+	mpool        sync.Pool
+	mpoolLk      sync.Mutex
+	mpoolNumGet  int
+	mpoolNumMiss int
+	mpoolCap     [256]int
+	mpoolCapPtr  int
+)
+
+func MpoolStats() string {
+	mpoolLk.Lock()
+	defer mpoolLk.Unlock()
+	return fmt.Sprintf("rpc.mpool: num_get=%d num_miss=%d miss_ratio=%v%% caps=%v",
+		mpoolNumGet, mpoolNumMiss, float64(mpoolNumMiss)/float64(mpoolNumGet), mpoolCap)
+}
 
 func init() {
-	mpool.New = func() any { return &bytes.Buffer{} }
+	mpool.New = func() any {
+		mpoolLk.Lock()
+		mpoolNumMiss += 1
+		mpoolLk.Unlock()
+		return &bytes.Buffer{}
+	}
 }
 
 func NewMessage(peer string) *Message {
 	buf := mpool.Get().(*bytes.Buffer)
 	buf.Reset()
+
+	mpoolLk.Lock()
+	mpoolNumGet += 1
+	if buf.Cap() > 0 {
+		mpoolCap[mpoolCapPtr%len(mpoolCap)] = buf.Cap()
+		mpoolCapPtr += 1
+	}
+	mpoolLk.Unlock()
+
 	return &Message{Buffer: buf, Peer: peer}
 }
 
