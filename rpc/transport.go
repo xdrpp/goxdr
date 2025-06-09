@@ -30,7 +30,7 @@ func MpoolStats() string {
 	mpoolLk.Lock()
 	defer mpoolLk.Unlock()
 	return fmt.Sprintf("rpc.mpool: num_get=%d num_miss=%d miss_ratio=%v%% caps=%v",
-		mpoolNumGet, mpoolNumMiss, float64(mpoolNumMiss)/float64(mpoolNumGet), mpoolCap)
+		mpoolNumGet, mpoolNumMiss, 100*float64(mpoolNumMiss)/float64(mpoolNumGet), mpoolCap)
 }
 
 func init() {
