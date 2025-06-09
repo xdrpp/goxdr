@@ -494,7 +494,7 @@ func (r *rpc_const) emit(e *emitter) {
 	if r.comment != "" {
 		e.printf("%s\n", r.comment)
 	}
-	// Replace the character '\'' with '_' in r.val before printing constants; 
+	// Replace the character '\'' with '_' in r.val before printing constants;
 	// golang supports _ but not '
 	valStr := strings.ReplaceAll(r.val.String(), "'", "_")
 	e.printf("const %s = %s\n", r.id, valStr)
@@ -1386,7 +1386,6 @@ func main() {
 
 	if *opt_emitbp {
 		fmt.Fprintf(out, `import(
-	"bytes"
 	"context"
 	"encoding/binary"
 	"fmt"
