@@ -67,7 +67,7 @@ func TestChannels(t *testing.T) {
 	}
 
 	cs := streampair()
-	tx1, tx2 := rpc.NewStreamTransport(cs[0]), rpc.NewStreamTransport(cs[1])
+	tx1, tx2 := rpc.NewStreamTransport(cs[0], msgPool), rpc.NewStreamTransport(cs[1], msgPool)
 	r := rpc.ReceiveChan(ctx, tx1)
 	defer tx1.Close()
 	s, _ := rpc.SendChan(tx2, nil)
@@ -95,14 +95,16 @@ func TestRPC(t *testing.T) {
 	defer cancel()
 	cs := streampair()
 
-	r1 := rpc.NewDriver(ctx, rpc.NewStreamTransport(cs[0]))
+	mp1 := rpc.NewMsgPool()
+	r1 := rpc.NewDriver(ctx, mp1, rpc.NewStreamTransport(cs[0], mp1))
 	r1.Register(TEST_V1_Server{&Server{}})
 	go func() {
 		r1.Go()
 		fmt.Println("loop1 returned")
 	}()
 
-	r2 := rpc.NewDriver(ctx, rpc.NewStreamTransport(cs[1]))
+	mp2 := rpc.NewMsgPool()
+	r2 := rpc.NewDriver(ctx, mp2, rpc.NewStreamTransport(cs[1], mp2))
 	r2.Log = os.Stderr
 	go func() {
 		r2.Go()

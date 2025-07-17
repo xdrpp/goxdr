@@ -122,12 +122,12 @@ type StreamTransport struct {
 // Create a stream transport from a connected stream socket.  This is
 // the only valid way to initialize a StreamTransport.  You can
 // manually adjust MaxMsgSize after calling this function.
-func NewStreamTransport(c net.Conn) *StreamTransport {
+func NewStreamTransport(c net.Conn, mp *MsgPool) *StreamTransport {
 	return &StreamTransport{
 		MaxMsgSize: 0x100000,
 		Conn:       c,
 		okay:       1,
-		msgPool:    NewMsgPool(),
+		msgPool:    mp,
 	}
 }
 
