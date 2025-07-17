@@ -200,6 +200,8 @@ type Driver struct {
 	in       <-chan *Message
 	cs       CallSet
 	started  int32
+
+	msgPool *MsgPool
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -238,11 +240,12 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	ret := Driver{
-		Log:    DefaultLog,
-		Lock:   &sync.Mutex{},
-		ctx:    ctx,
-		cancel: cancel,
-		in:     ReceiveChan(ctx, t),
+		Log:     DefaultLog,
+		Lock:    &sync.Mutex{},
+		ctx:     ctx,
+		cancel:  cancel,
+		in:      ReceiveChan(ctx, t),
+		msgPool: NewMsgPool(),
 	}
 	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
@@ -290,7 +293,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		c <- rmsg
 		close(c)
 	})
-	m := NewMessage(peer)
+	m := r.msgPool.NewMessage(peer)
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -362,11 +365,12 @@ loop:
 		}
 
 		rmsg, proc := r.srv.GetProc(msg, m.In())
-		m.Recycle()
 		if rmsg == nil {
+			m.Recycle()
 			continue
 		} else if proc == nil {
-			reply := NewMessage(m.Peer)
+			reply := r.msgPool.NewMessage(m.Peer)
+			m.Recycle()
 			reply.Serialize(rmsg)
 			r.safeSend(r.ctx, reply)
 			continue
@@ -393,13 +397,14 @@ loop:
 						SetStat(rmsg, SYSTEM_ERR)
 					}
 				}
-				reply := NewMessage(m.Peer)
+				reply := r.msgPool.NewMessage(m.Peer)
 				reply.Serialize(rmsg)
 				if IsSuccess(rmsg) {
 					reply.Serialize(proc.GetRes())
 					r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
 						m.Peer, msg.Xid, proc.ProcName())
 				}
+				m.Recycle()
 				r.safeSend(r.ctx, reply)
 			}()
 			proc.Do()
