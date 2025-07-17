@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"sync"
 	"sync/atomic"
 
 	"github.com/xdrpp/goxdr/xdr"
@@ -15,51 +14,40 @@ import (
 type Message struct {
 	*bytes.Buffer
 	Peer string
+	pool *MsgPool
 }
 
-var (
-	mpool        sync.Pool
-	mpoolLk      sync.Mutex
-	mpoolNumGet  int
-	mpoolNumMiss int
-	mpoolCap     [256]int
-	mpoolCapPtr  int
-)
+type MsgPool xdr.Pool[*Message]
 
-func MpoolStats() string {
-	mpoolLk.Lock()
-	defer mpoolLk.Unlock()
-	return fmt.Sprintf("rpc.mpool: num_get=%d num_miss=%d miss_ratio=%v%% caps=%v",
-		mpoolNumGet, mpoolNumMiss, 100*float64(mpoolNumMiss)/float64(mpoolNumGet), mpoolCap)
+func NewMsgPool() *MsgPool {
+	pool := &xdr.Pool[*Message]{}
+	pool.SetMkReset(
+		func() *Message {
+			return &Message{Buffer: &bytes.Buffer{}, pool: (*MsgPool)(pool)}
+		},
+		func(m *Message) {
+			m.Peer = ""
+			m.Buffer.Reset()
+		},
+	)
+	return (*MsgPool)(pool)
 }
 
-func init() {
-	mpool.New = func() any {
-		mpoolLk.Lock()
-		mpoolNumMiss += 1
-		mpoolLk.Unlock()
-		return &bytes.Buffer{}
-	}
+func (msgPool *MsgPool) NewMessage(peer string) *Message {
+	msg := (*xdr.Pool[*Message])(msgPool).Get()
+	msg.Peer = peer
+	return msg
 }
 
-func NewMessage(peer string) *Message {
-	buf := mpool.Get().(*bytes.Buffer)
-	buf.Reset()
-
-	mpoolLk.Lock()
-	mpoolNumGet += 1
-	if buf.Cap() > 0 {
-		mpoolCap[mpoolCapPtr%len(mpoolCap)] = buf.Cap()
-		mpoolCapPtr += 1
-	}
-	mpoolLk.Unlock()
-
-	return &Message{Buffer: buf, Peer: peer}
+func (msgPool *MsgPool) Reycle(msg *Message) {
+	(*xdr.Pool[*Message])(msgPool).Recycle(msg)
 }
 
 func (m *Message) Recycle() {
-	mpool.Put(m.Buffer)
-	m.Buffer = nil
+	if m == nil {
+		panic("XXX m=nil")
+	}
+	m.pool.Reycle(m)
 }
 
 func (m *Message) In() xdr.XDR {
@@ -127,6 +115,8 @@ type StreamTransport struct {
 	// exclusive lock to ensure only one thread updates err.
 	okay int32 // 1 = okay, 0 = failed, -1 = failing
 	err  error
+
+	msgPool *MsgPool
 }
 
 // Create a stream transport from a connected stream socket.  This is
@@ -137,6 +127,7 @@ func NewStreamTransport(c net.Conn) *StreamTransport {
 		MaxMsgSize: 0x100000,
 		Conn:       c,
 		okay:       1,
+		msgPool:    NewMsgPool(),
 	}
 }
 
@@ -199,11 +190,14 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 	if tx.failed() {
 		return nil, tx.err
 	}
-	ret := NewMessage(tx.Peer)
+	ret := tx.msgPool.NewMessage(tx.Peer)
 	b := make([]byte, 4)
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
 			ret.Recycle()
+			if err == nil {
+				err = fmt.Errorf("short read")
+			}
 			tx.fail(err)
 			return nil, err
 		}
