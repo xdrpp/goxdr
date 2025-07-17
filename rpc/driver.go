@@ -234,7 +234,7 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 //
 // If you will never need to cancel the driver, or plan to do so by
 // calling Close(), then you may supply a nil ctx.
-func NewDriver(ctx context.Context, t Transport) *Driver {
+func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -245,7 +245,7 @@ func NewDriver(ctx context.Context, t Transport) *Driver {
 		ctx:     ctx,
 		cancel:  cancel,
 		in:      ReceiveChan(ctx, t),
-		msgPool: NewMsgPool(),
+		msgPool: mp,
 	}
 	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
