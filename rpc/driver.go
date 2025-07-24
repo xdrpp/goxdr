@@ -257,7 +257,7 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		t.Close()
 		close(ret.outClose)
 	}()
-	for i := 0; i < 5; i++ { //XXX
+	for i := 0; i < 10; i++ { //XXX
 		go ret.doMsgs()
 	}
 
