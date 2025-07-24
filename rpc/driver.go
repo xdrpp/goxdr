@@ -202,7 +202,6 @@ type Driver struct {
 	started  int32
 
 	msgPool *MsgPool
-	msgCh   chan *Message
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -247,7 +246,6 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		cancel:  cancel,
 		in:      ReceiveChan(ctx, t),
 		msgPool: mp,
-		msgCh:   make(chan *Message, 100), //XXX
 	}
 	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
@@ -257,9 +255,6 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		t.Close()
 		close(ret.outClose)
 	}()
-	for i := 0; i < 10; i++ { //XXX
-		go ret.doMsgs()
-	}
 
 	return &ret
 }
@@ -341,29 +336,37 @@ func (r *Driver) Go() {
 	if atomic.SwapInt32(&r.started, 1) == 1 {
 		panic("rpc.Driver.Go called multiple times")
 	}
-loop:
-	for {
-		select {
-		case <-r.ctx.Done():
-			break loop
-		case m := <-r.in:
-			select {
-			case <-r.ctx.Done():
-				break loop
-			case r.msgCh <- m:
-			}
-		}
+	for i := 0; i < 10; i++ { //XXX
+		go r.doMsgs()
 	}
-	r.Close()
-	r.cs.CancelAll()
+	// loop:
+	//
+	//	for {
+	//		select {
+	//		case <-r.ctx.Done():
+	//			break loop
+	//		case m := <-r.in:
+	//			select {
+	//			case <-r.ctx.Done():
+	//				break loop
+	//			case r.msgCh <- m:
+	//			}
+	//		}
+	//	}
+	//	r.Close()
+	//	r.cs.CancelAll()
 }
 
 func (r *Driver) doMsgs() {
+	defer func() {
+		r.Close()
+		r.cs.CancelAll()
+	}()
 	for {
 		select {
 		case <-r.ctx.Done():
 			return
-		case m := <-r.msgCh:
+		case m := <-r.in:
 			r.doMsg(m)
 		}
 	}
