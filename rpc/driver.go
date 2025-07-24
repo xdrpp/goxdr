@@ -202,6 +202,7 @@ type Driver struct {
 	started  int32
 
 	msgPool *MsgPool
+	msgCh   chan *Message
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -246,6 +247,7 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		cancel:  cancel,
 		in:      ReceiveChan(ctx, t),
 		msgPool: mp,
+		msgCh:   make(chan *Message),
 	}
 	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
@@ -255,6 +257,9 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		t.Close()
 		close(ret.outClose)
 	}()
+	for i := 0; i < 5; i++ { //XXX
+		go ret.doMsgs()
+	}
 
 	return &ret
 }
@@ -338,83 +343,103 @@ func (r *Driver) Go() {
 	}
 loop:
 	for {
-		// check whether the context was cancelled or timed out
 		select {
 		case <-r.ctx.Done():
 			break loop
-		default:
-		}
-
-		m := <-r.in
-		if m == nil {
-			break
-		}
-		msg, err := GetMsg(m.In())
-		if err != nil {
-			m.Recycle()
-			fmt.Fprintf(os.Stderr, "GetMsg failed: %s\n", err)
-			break
-		}
-
-		if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
-			r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s",
-				m.Peer, msg.Xid, pc.Proc.ProcName())
-			m.Recycle()
-			pc.Cb(msg)
-			continue
-		}
-
-		rmsg, proc := r.srv.GetProc(msg, m.In())
-		if rmsg == nil {
-			m.Recycle()
-			continue
-		} else if proc == nil {
-			reply := r.msgPool.NewMessage(m.Peer)
-			m.Recycle()
-			reply.Serialize(rmsg)
-			r.safeSend(r.ctx, reply)
-			continue
-		}
-
-		unlock := mkUnlocker(r.Lock)
-		r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s",
-			m.Peer, msg.Xid, proc.ProcName())
-		proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
-			peerCtx: peerCtx{Peer: m.Peer},
-			unlock:  unlock,
-		}))
-
-		q := func() {
-			defer func() {
-				unlock()
-				if i := recover(); i != nil {
-					if r.PanicHandler != nil {
-						r.PanicHandler.PanicHandle(i)
-					} else {
-						fmt.Fprintf(os.Stderr, "%s\n", i)
-					}
-					if IsSuccess(rmsg) {
-						SetStat(rmsg, SYSTEM_ERR)
-					}
-				}
-				reply := r.msgPool.NewMessage(m.Peer)
-				reply.Serialize(rmsg)
-				if IsSuccess(rmsg) {
-					reply.Serialize(proc.GetRes())
-					r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
-						m.Peer, msg.Xid, proc.ProcName())
-				}
-				m.Recycle()
-				r.safeSend(r.ctx, reply)
-			}()
-			proc.Do()
-		}
-		if r.Lock == nil {
-			go q()
-		} else {
-			q()
+		case m := <-r.in:
+			select {
+			case <-r.ctx.Done():
+				break loop
+			case r.msgCh <- m:
+			}
 		}
 	}
 	r.Close()
 	r.cs.CancelAll()
+}
+
+func (r *Driver) doMsgs() {
+	for {
+		select {
+		case <-r.ctx.Done():
+			return
+		case m := <-r.msgCh:
+			r.doMsg(m)
+		}
+	}
+}
+
+func (r *Driver) doMsg(m *Message) {
+
+	if m == nil {
+		r.cancel()
+		return
+	}
+
+	msg, err := GetMsg(m.In())
+	if err != nil {
+		m.Recycle()
+		fmt.Fprintf(os.Stderr, "GetMsg failed: %s\n", err)
+		r.cancel()
+		return
+	}
+
+	if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
+		r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, pc.Proc.ProcName())
+		m.Recycle()
+		pc.Cb(msg)
+		return
+	}
+
+	rmsg, proc := r.srv.GetProc(msg, m.In())
+	if rmsg == nil {
+		m.Recycle()
+		return
+	} else if proc == nil {
+		reply := r.msgPool.NewMessage(m.Peer)
+		m.Recycle()
+		reply.Serialize(rmsg)
+		r.safeSend(r.ctx, reply)
+		return
+	}
+
+	unlock := mkUnlocker(r.Lock)
+	r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
+	proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
+		peerCtx: peerCtx{Peer: m.Peer},
+		unlock:  unlock,
+	}))
+
+	q := func() {
+		defer func() {
+			unlock()
+			if i := recover(); i != nil {
+				if r.PanicHandler != nil {
+					r.PanicHandler.PanicHandle(i)
+				} else {
+					fmt.Fprintf(os.Stderr, "%s\n", i)
+				}
+				if IsSuccess(rmsg) {
+					SetStat(rmsg, SYSTEM_ERR)
+				}
+			}
+			reply := r.msgPool.NewMessage(m.Peer)
+			reply.Serialize(rmsg)
+			if IsSuccess(rmsg) {
+				reply.Serialize(proc.GetRes())
+				r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
+					m.Peer, msg.Xid, proc.ProcName())
+			}
+			m.Recycle()
+			r.safeSend(r.ctx, reply)
+		}()
+		proc.Do()
+	}
+
+	if r.Lock == nil {
+		go q()
+	} else {
+		q()
+	}
+
 }
