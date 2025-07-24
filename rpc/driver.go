@@ -96,7 +96,7 @@ func Detach(ctx context.Context) {
 // is Done or when the transport returns an error.  Does not close the
 // Transport.
 func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
-	ret := make(chan *Message)
+	ret := make(chan *Message, 100) //XXX: used to be 0
 	go func(c chan<- *Message) {
 		for {
 			m, err := t.Receive()
@@ -123,7 +123,7 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 // a thread that won't exit until the returned channel is closed.
 // Does not close the underlying Transport.
 func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- struct{}) {
-	ch := make(chan *Message, 1)
+	ch := make(chan *Message, 100) //XXX: used to be 1
 	chClose := make(chan struct{})
 	go func(ch <-chan *Message, cancel <-chan struct{}) {
 		for {
