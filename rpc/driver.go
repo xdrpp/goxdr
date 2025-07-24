@@ -9,6 +9,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/xdrpp/goxdr/stat"
 	"github.com/xdrpp/goxdr/xdr"
 )
 
@@ -98,8 +99,20 @@ func Detach(ctx context.Context) {
 func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 	ret := make(chan *Message, 100) //XXX: used to be 0
 	go func(c chan<- *Message) {
+
+		var receiveLat stat.LatencyMeter
+		var betweenLat stat.LatencyMeter
+		defer func() {
+			fmt.Printf("ReceiveChan: receive-latency=%v between-latency=%v\n", &receiveLat, &betweenLat)
+		}()
+
+		bspan := betweenLat.Start()
 		for {
+			bspan.Stop()
+			rspan := receiveLat.Start()
 			m, err := t.Receive()
+			rspan.Stop()
+			bspan = betweenLat.Start()
 			if err != nil {
 				if err != io.EOF {
 					fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
@@ -126,6 +139,14 @@ func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- s
 	ch := make(chan *Message, 100) //XXX: used to be 1
 	chClose := make(chan struct{})
 	go func(ch <-chan *Message, cancel <-chan struct{}) {
+
+		var sendLat stat.LatencyMeter
+		var betweenLat stat.LatencyMeter
+		defer func() {
+			fmt.Printf("SendChan: send-latency=%v between-latency=%v\n", &sendLat, &betweenLat)
+		}()
+
+		bspan := betweenLat.Start()
 		for {
 			select {
 			case <-cancel:
@@ -135,7 +156,11 @@ func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- s
 					return
 				} else {
 					xid := m.Xid()
+					bspan.Stop()
+					sspan := sendLat.Start()
 					err := t.Send(m)
+					sspan.Stop()
+					bspan = betweenLat.Start()
 					if err != nil && onErr != nil {
 						onErr(xid, err)
 					}
