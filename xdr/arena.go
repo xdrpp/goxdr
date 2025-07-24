@@ -2,12 +2,16 @@ package xdr
 
 import (
 	"fmt"
+	"os"
 	"sync"
 	"unsafe"
 )
 
 type Arena[T any] struct {
+	init    func(*T)
+	reset   func(*T)
 	objects []T
+	//
 	lk      sync.Mutex
 	free    []*T
 	used    []*T
@@ -15,12 +19,15 @@ type Arena[T any] struct {
 	numMiss int
 }
 
-func NewArena[T any](n int) *Arena[T] {
+func NewArena[T any](n int, init func(*T), reset func(*T)) *Arena[T] {
 	a := &Arena[T]{
+		init:    init,
+		reset:   reset,
 		objects: make([]T, n),
 		free:    make([]*T, n),
 	}
 	for i := range a.objects {
+		init(&a.objects[i])
 		a.free[i] = &a.objects[i]
 	}
 	return a
@@ -31,9 +38,11 @@ func (a *Arena[T]) Get() *T {
 	defer a.lk.Unlock()
 
 	if len(a.free) == 0 {
+		fmt.Fprintf(os.Stderr, "xdr rpc arena miss\n")
 		a.numMiss += 1
-		var z T
-		return &z
+		var obj T
+		a.init(&obj)
+		return &obj
 	}
 
 	a.numGet += 1
@@ -41,8 +50,7 @@ func (a *Arena[T]) Get() *T {
 	ptr := a.free[len(a.free)-1]
 	a.free = a.free[:len(a.free)-1]
 
-	var z T // reset
-	*ptr = z
+	a.reset(ptr)
 	return ptr
 }
 

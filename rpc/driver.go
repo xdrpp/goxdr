@@ -339,22 +339,6 @@ func (r *Driver) Go() {
 	for i := 0; i < 10; i++ { //XXX
 		go r.doMsgs()
 	}
-	// loop:
-	//
-	//	for {
-	//		select {
-	//		case <-r.ctx.Done():
-	//			break loop
-	//		case m := <-r.in:
-	//			select {
-	//			case <-r.ctx.Done():
-	//				break loop
-	//			case r.msgCh <- m:
-	//			}
-	//		}
-	//	}
-	//	r.Close()
-	//	r.cs.CancelAll()
 }
 
 func (r *Driver) doMsgs() {
