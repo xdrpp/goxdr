@@ -247,7 +247,7 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		cancel:  cancel,
 		in:      ReceiveChan(ctx, t),
 		msgPool: mp,
-		msgCh:   make(chan *Message),
+		msgCh:   make(chan *Message, 100), //XXX
 	}
 	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
 		ret.cs.Cancel(xid, SEND_ERR)
