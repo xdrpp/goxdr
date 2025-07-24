@@ -102,12 +102,14 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 
 		var receiveLat stat.LatencyMeter
 		var betweenLat stat.LatencyMeter
-		defer func() {
-			fmt.Printf("ReceiveChan: receive-latency=%v between-latency=%v\n", &receiveLat, &betweenLat)
-		}()
 
 		bspan := betweenLat.Start()
+		i := 0
 		for {
+			i += 1
+			if i%100000 == 0 {
+				fmt.Printf("ReceiveChan: receive-latency=%v between-latency=%v\n", &receiveLat, &betweenLat)
+			}
 			bspan.Stop()
 			rspan := receiveLat.Start()
 			m, err := t.Receive()
@@ -142,12 +144,14 @@ func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- s
 
 		var sendLat stat.LatencyMeter
 		var betweenLat stat.LatencyMeter
-		defer func() {
-			fmt.Printf("SendChan: send-latency=%v between-latency=%v\n", &sendLat, &betweenLat)
-		}()
 
 		bspan := betweenLat.Start()
+		i := 0
 		for {
+			i += 1
+			if i%100000 == 0 {
+				fmt.Printf("SendChan: send-latency=%v between-latency=%v\n", &sendLat, &betweenLat)
+			}
 			select {
 			case <-cancel:
 				return
