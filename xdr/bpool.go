@@ -21,9 +21,10 @@ func NewSmallBytesPool() *SmallBytesPool {
 	}
 }
 
-func (x *SmallBytesPool) Get(size int) []byte {
-	// XXX: must zero out
-	return x.size[size-1].Get().([]byte)
+func (x *SmallBytesPool) Get(len int) []byte {
+	p := x.size[len-1].Get().([]byte)
+	clear(p)
+	return p
 }
 
 func (x *SmallBytesPool) Recycle(b []byte) {
