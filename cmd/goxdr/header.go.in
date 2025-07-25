@@ -683,16 +683,36 @@ func xdrReadPad(in io.Reader, n uint32) {
 	}
 }
 
+// func xdrGet32(in io.Reader) uint32 {
+// 	b := xdrReadN(in, 4)
+// 	return binary.BigEndian.Uint32(b)
+// }
+// 
+// func xdrGet64(in io.Reader) uint64 {
+// 	b := xdrReadN(in, 8)
+// 	return binary.BigEndian.Uint64(b)
+// }
+
+func xdrReadInto(in io.Reader, p []byte) []byte {
+	if k, err := in.Read(p); err != nil || k != len(p) {
+		XdrPanic("%s", err.Error())
+	}
+	return p
+}
+
+var smallPool = NewSmallBytesPool()
+
 func xdrGet32(in io.Reader) uint32 {
-	b := xdrReadN(in, 4)
+	b := xdrReadInto(in, smallPool.Get(4))
+	defer smallPool.Recycle(b)
 	return binary.BigEndian.Uint32(b)
 }
 
 func xdrGet64(in io.Reader) uint64 {
-	b := xdrReadN(in, 8)
+	b := xdrReadInto(in, smallPool.Get(8))
+	defer smallPool.Recycle(b)
 	return binary.BigEndian.Uint64(b)
 }
-
 
 // XDR that unmarshals from canonical binary format
 type XdrIn struct {
