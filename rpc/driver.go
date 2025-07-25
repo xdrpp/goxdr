@@ -96,8 +96,8 @@ func Detach(ctx context.Context) {
 // Creates a thread that closes the channel and exits when the Context
 // is Done or when the transport returns an error.  Does not close the
 // Transport.
-func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
-	ret := make(chan *Message, 100) //XXX: used to be 0
+func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Message {
+	ret := make(chan *Message, recvQueueLen)
 	go func(c chan<- *Message) {
 
 		var receiveLat stat.LatencyMeter
@@ -137,8 +137,8 @@ func ReceiveChan(ctx context.Context, t Transport) <-chan *Message {
 // Create a channel for sending messages through a Transport.  Creates
 // a thread that won't exit until the returned channel is closed.
 // Does not close the underlying Transport.
-func SendChan(t Transport, onErr func(uint32, error)) (chan<- *Message, chan<- struct{}) {
-	ch := make(chan *Message, 100) //XXX: used to be 1
+func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- *Message, chan<- struct{}) {
+	ch := make(chan *Message, sendQueueLen) // queue len must be at least 1
 	chClose := make(chan struct{})
 	go func(ch <-chan *Message, cancel <-chan struct{}) {
 
@@ -231,6 +231,7 @@ type Driver struct {
 	started  int32
 
 	msgPool *MsgPool
+	numProc int
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -263,7 +264,22 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 //
 // If you will never need to cancel the driver, or plan to do so by
 // calling Close(), then you may supply a nil ctx.
-func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
+func NewDriver(
+	ctx context.Context,
+	mp *MsgPool,
+	t Transport,
+) *Driver {
+	return NewDriverTuned(ctx, mp, t, 100, 100, 5)
+}
+
+func NewDriverTuned(
+	ctx context.Context,
+	mp *MsgPool,
+	t Transport,
+	recvQueueLen int,
+	sendQueueLen int,
+	numProc int,
+) *Driver {
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -273,12 +289,17 @@ func NewDriver(ctx context.Context, mp *MsgPool, t Transport) *Driver {
 		Lock:    &sync.Mutex{},
 		ctx:     ctx,
 		cancel:  cancel,
-		in:      ReceiveChan(ctx, t),
+		in:      ReceiveChan(ctx, t, recvQueueLen),
 		msgPool: mp,
+		numProc: numProc,
 	}
-	ret.out, ret.outClose = SendChan(t, func(xid uint32, _ error) {
-		ret.cs.Cancel(xid, SEND_ERR)
-	})
+	ret.out, ret.outClose = SendChan(
+		t,
+		func(xid uint32, _ error) {
+			ret.cs.Cancel(xid, SEND_ERR)
+		},
+		sendQueueLen,
+	)
 	go func() {
 		<-ctx.Done()
 		t.Close()
@@ -365,7 +386,7 @@ func (r *Driver) Go() {
 	if atomic.SwapInt32(&r.started, 1) == 1 {
 		panic("rpc.Driver.Go called multiple times")
 	}
-	for i := 0; i < 10; i++ { //XXX
+	for i := 0; i < r.numProc; i++ {
 		go r.doMsgs()
 	}
 }
