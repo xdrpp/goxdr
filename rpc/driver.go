@@ -269,7 +269,7 @@ func NewDriver(
 	mp *MsgPool,
 	t Transport,
 ) *Driver {
-	return NewDriverTuned(ctx, mp, t, 100, 100, 5)
+	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
 }
 
 func NewDriverTuned(
