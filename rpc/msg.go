@@ -7,7 +7,7 @@ import (
 )
 
 type Message struct {
-	*bytes.Buffer
+	bytes.Buffer
 	Peer string
 	pool *MsgPool
 }
@@ -25,7 +25,6 @@ func NewMsgPoolCap(cap int) *MsgPool {
 	msgPool.arena = xdr.NewArena(
 		cap,
 		func(m *Message) {
-			m.Buffer = &bytes.Buffer{}
 			m.pool = msgPool
 		},
 		func(m *Message) {
@@ -34,6 +33,10 @@ func NewMsgPoolCap(cap int) *MsgPool {
 		},
 	)
 	return msgPool
+}
+
+func (msgPool *MsgPool) StatString() string {
+	return msgPool.arena.StatString()
 }
 
 func (msgPool *MsgPool) NewMessage(peer string) *Message {

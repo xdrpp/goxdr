@@ -14,7 +14,6 @@ type Arena[T any] struct {
 	//
 	lk      sync.Mutex
 	free    []*T
-	used    []*T
 	numGet  int
 	numMiss int
 }
@@ -34,6 +33,7 @@ func NewArena[T any](n int, init func(*T), reset func(*T)) *Arena[T] {
 }
 
 func (a *Arena[T]) Get() *T {
+
 	a.lk.Lock()
 	defer a.lk.Unlock()
 
@@ -67,6 +67,10 @@ func (a *Arena[T]) Recycle(x *T) {
 func (a *Arena[T]) StatString() string {
 	a.lk.Lock()
 	defer a.lk.Unlock()
+	return a.statString()
+}
+
+func (a *Arena[T]) statString() string {
 	return fmt.Sprintf("num_get=%d num_miss=%d miss_ratio=%.3f%%",
 		a.numGet, a.numMiss, 100*float64(a.numMiss)/float64(a.numGet))
 }
