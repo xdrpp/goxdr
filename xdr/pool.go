@@ -38,6 +38,7 @@ func (x *Pool[T]) Get() *T {
 }
 
 func (x *Pool[T]) Recycle(o *T) {
+	x.reset(o)
 	x.pool.Put(o)
 }
 
