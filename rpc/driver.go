@@ -230,8 +230,9 @@ type Driver struct {
 	cs       CallSet
 	started  int32
 
-	msgPool MessagePool
-	numProc int
+	rmsgChanPool *RmsgChanPool
+	msgPool      MessagePool
+	numProc      int
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -285,13 +286,14 @@ func NewDriverTuned(
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	ret := Driver{
-		Log:     DefaultLog,
-		Lock:    &sync.Mutex{},
-		ctx:     ctx,
-		cancel:  cancel,
-		in:      ReceiveChan(ctx, t, recvQueueLen),
-		msgPool: mp,
-		numProc: numProc,
+		Log:          DefaultLog,
+		Lock:         &sync.Mutex{},
+		ctx:          ctx,
+		cancel:       cancel,
+		in:           ReceiveChan(ctx, t, recvQueueLen),
+		rmsgChanPool: NewRmsgChanPool(),
+		msgPool:      mp,
+		numProc:      numProc,
 	}
 	ret.out, ret.outClose = SendChan(
 		t,
@@ -334,14 +336,16 @@ func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
 // Driver implements the XdrSendCall interface, allowing it to be
 // used as the Send field of generated RPC client structures.
 func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
-	c := make(chan *Rpc_msg, 1)
+	// c := make(chan *Rpc_msg, 1)
+	c := r.rmsgChanPool.Get()
+	defer r.rmsgChanPool.Recycle(c)
 	if ctx == nil {
 		ctx = r.ctx
 	}
 	peer := GetPeer(ctx)
 	cmsg := r.cs.NewCall(peer, proc, func(rmsg *Rpc_msg) {
 		c <- rmsg
-		close(c)
+		// close(c)
 	})
 	m := r.msgPool.NewMessage(peer)
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
