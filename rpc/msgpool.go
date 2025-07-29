@@ -8,22 +8,20 @@ type MessagePool interface {
 	StatString() string
 }
 
-type MsgPool struct {
+type msgArena struct {
 	arena *xdr.Arena[Message]
 }
 
-func NewMsgPool() MessagePool {
-	return NewMsgPoolCap(5000)
+func NewMsgArena() MessagePool {
+	return NewMsgArenaCap(5000)
 }
 
-func NewMsgPoolCap(cap int) MessagePool {
-	msgPool := &MsgPool{}
+func NewMsgArenaCap(cap int) MessagePool {
+	msgPool := &msgArena{}
 	msgPool.arena = xdr.NewArena(
 		cap,
 		func(m *Message) {
 			m.pool = msgPool
-		},
-		func(m *Message) {
 			m.Peer = ""
 			m.Buffer.Reset()
 		},
@@ -31,17 +29,17 @@ func NewMsgPoolCap(cap int) MessagePool {
 	return msgPool
 }
 
-func (msgPool *MsgPool) StatString() string {
+func (msgPool *msgArena) StatString() string {
 	return msgPool.arena.StatString()
 }
 
-func (msgPool *MsgPool) NewMessage(peer string) *Message {
+func (msgPool *msgArena) NewMessage(peer string) *Message {
 	msg := msgPool.arena.Get()
 	msg.Peer = peer
 	return msg
 }
 
-func (msgPool *MsgPool) Reycle(msg *Message) {
+func (msgPool *msgArena) Reycle(msg *Message) {
 	msgPool.arena.Recycle(msg)
 }
 
