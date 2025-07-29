@@ -11,7 +11,7 @@ type MessagePool interface {
 }
 
 func NewMessagePool() MessagePool {
-	return NewMsgPool(200)
+	return NewMsgPool(0)
 	// return NewMsgArenaCap(5000)
 }
 
