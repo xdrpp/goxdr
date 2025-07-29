@@ -11,7 +11,7 @@ type MessagePool interface {
 }
 
 func NewMessagePool() MessagePool {
-	return NewMsgPool(200)
+	return NewMsgPool()
 	// return NewMsgArenaCap(5000)
 }
 
@@ -54,15 +54,12 @@ type msgPool struct {
 	pool *xdr.Pool[Message]
 }
 
-func NewMsgPool(preAlloc int) MessagePool {
+func NewMsgPool() MessagePool {
 	x := &msgPool{}
 	x.pool = xdr.NewPool(
 		func(m *Message) {
 			m.pool = x
 			m.Peer = ""
-			if m.Buffer.Cap() == 0 {
-				m.Buffer.Grow(preAlloc)
-			}
 			m.Buffer.Reset()
 		},
 	)
