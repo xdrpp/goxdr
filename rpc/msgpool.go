@@ -1,6 +1,8 @@
 package rpc
 
-import "github.com/xdrpp/goxdr/xdr"
+import (
+	"github.com/xdrpp/goxdr/xdr"
+)
 
 type MessagePool interface {
 	NewMessage(peer string) *Message
@@ -8,65 +10,72 @@ type MessagePool interface {
 	StatString() string
 }
 
+func NewMessagePool() MessagePool {
+	return NewMsgPool()
+	// return NewMsgArenaCap(5000)
+}
+
+// msg arena
+
 type msgArena struct {
 	arena *xdr.Arena[Message]
 }
 
-func NewMsgArena() MessagePool {
-	return NewMsgArenaCap(5000)
-}
-
 func NewMsgArenaCap(cap int) MessagePool {
-	msgPool := &msgArena{}
-	msgPool.arena = xdr.NewArena(
+	msgArena := &msgArena{}
+	msgArena.arena = xdr.NewArena(
 		cap,
 		func(m *Message) {
-			m.pool = msgPool
+			m.pool = msgArena
 			m.Peer = ""
 			m.Buffer.Reset()
 		},
 	)
-	return msgPool
+	return msgArena
 }
 
-func (msgPool *msgArena) StatString() string {
-	return msgPool.arena.StatString()
+func (msgArena *msgArena) StatString() string {
+	return msgArena.arena.StatString()
 }
 
-func (msgPool *msgArena) NewMessage(peer string) *Message {
-	msg := msgPool.arena.Get()
+func (msgArena *msgArena) NewMessage(peer string) *Message {
+	msg := msgArena.arena.Get()
 	msg.Peer = peer
 	return msg
 }
 
-func (msgPool *msgArena) Reycle(msg *Message) {
-	msgPool.arena.Recycle(msg)
+func (msgArena *msgArena) Reycle(msg *Message) {
+	msgArena.arena.Recycle(msg)
 }
 
-/*
-type MsgPool xdr.Pool[*Message]
+// msg pool
 
-func NewMsgPool() *MsgPool {
-	pool := &xdr.Pool[*Message]{}
-	pool.SetMkReset(
-		func() *Message {
-			return &Message{Buffer: &bytes.Buffer{}, pool: (*MsgPool)(pool)}
-		},
+type msgPool struct {
+	pool *xdr.Pool[Message]
+}
+
+func NewMsgPool() MessagePool {
+	x := &msgPool{}
+	x.pool = xdr.NewPool(
 		func(m *Message) {
+			m.pool = x
 			m.Peer = ""
 			m.Buffer.Reset()
 		},
 	)
-	return (*MsgPool)(pool)
+	return x
 }
 
-func (msgPool *MsgPool) NewMessage(peer string) *Message {
-	msg := (*xdr.Pool[*Message])(msgPool).Get()
+func (msgPool *msgPool) NewMessage(peer string) *Message {
+	msg := msgPool.pool.Get()
 	msg.Peer = peer
 	return msg
 }
 
-func (msgPool *MsgPool) Reycle(msg *Message) {
-	(*xdr.Pool[*Message])(msgPool).Recycle(msg)
+func (msgPool *msgPool) Reycle(msg *Message) {
+	msgPool.pool.Recycle(msg)
 }
-*/
+
+func (msgPool *msgPool) StatString() string {
+	return msgPool.pool.StatString()
+}

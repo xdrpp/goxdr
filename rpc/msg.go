@@ -9,7 +9,7 @@ import (
 type Message struct {
 	bytes.Buffer
 	Peer string
-	pool *msgArena
+	pool MessagePool
 }
 
 func (m *Message) Recycle() {
