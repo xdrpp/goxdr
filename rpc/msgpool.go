@@ -11,7 +11,7 @@ type MessagePool interface {
 }
 
 func NewMessagePool() MessagePool {
-	return NewMsgPool(0)
+	return NewMsgPool(200)
 	// return NewMsgArenaCap(5000)
 }
 
@@ -62,8 +62,8 @@ func NewMsgPool(preAlloc int) MessagePool {
 			m.Peer = ""
 			if m.Buffer.Cap() == 0 {
 				m.Buffer.Grow(preAlloc)
-				m.Buffer.Reset()
 			}
+			m.Buffer.Reset()
 		},
 	)
 	return x
