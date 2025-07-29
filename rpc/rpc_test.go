@@ -59,7 +59,7 @@ func TestChannels(t *testing.T) {
 
 	contents := []string{"one\n", "two\n", "three\n"}
 	var ms []*rpc.Message
-	msgPool := rpc.NewMsgPool()
+	msgPool := rpc.NewMsgArena()
 	for _, msg := range contents {
 		m := msgPool.NewMessage("")
 		m.WriteString(msg)
@@ -95,7 +95,7 @@ func TestRPC(t *testing.T) {
 	defer cancel()
 	cs := streampair()
 
-	mp1 := rpc.NewMsgPool()
+	mp1 := rpc.NewMsgArena()
 	r1 := rpc.NewDriver(ctx, mp1, rpc.NewStreamTransport(cs[0], mp1))
 	r1.Register(TEST_V1_Server{&Server{}})
 	go func() {
@@ -103,7 +103,7 @@ func TestRPC(t *testing.T) {
 		fmt.Println("loop1 returned")
 	}()
 
-	mp2 := rpc.NewMsgPool()
+	mp2 := rpc.NewMsgArena()
 	r2 := rpc.NewDriver(ctx, mp2, rpc.NewStreamTransport(cs[1], mp2))
 	r2.Log = os.Stderr
 	go func() {

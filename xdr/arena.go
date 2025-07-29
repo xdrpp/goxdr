@@ -8,7 +8,6 @@ import (
 )
 
 type Arena[T any] struct {
-	init    func(*T)
 	reset   func(*T)
 	objects []T
 	//
@@ -18,15 +17,13 @@ type Arena[T any] struct {
 	numMiss int
 }
 
-func NewArena[T any](n int, init func(*T), reset func(*T)) *Arena[T] {
+func NewArena[T any](n int, reset func(*T)) *Arena[T] {
 	a := &Arena[T]{
-		init:    init,
 		reset:   reset,
 		objects: make([]T, n),
 		free:    make([]*T, n),
 	}
 	for i := range a.objects {
-		init(&a.objects[i])
 		a.free[i] = &a.objects[i]
 	}
 	return a
@@ -41,7 +38,7 @@ func (a *Arena[T]) Get() *T {
 		fmt.Fprintf(os.Stderr, "xdr rpc arena miss\n")
 		a.numMiss += 1
 		var obj T
-		a.init(&obj)
+		a.reset(&obj)
 		return &obj
 	}
 
@@ -80,12 +77,9 @@ func contains[T any](slice []T, ptr *T) bool {
 		return false
 	}
 
-	// Get pointer to first element
 	first := unsafe.Pointer(&slice[0])
-	// Get pointer to one past the last element
 	last := unsafe.Pointer(uintptr(first) + uintptr(len(slice))*unsafe.Sizeof(slice[0]))
 
-	// Check if ptr is within the range [first, last)
 	ptrAddr := unsafe.Pointer(ptr)
 	return uintptr(ptrAddr) >= uintptr(first) && uintptr(ptrAddr) < uintptr(last)
 }
