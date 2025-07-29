@@ -55,6 +55,7 @@ func (a *Arena[T]) Recycle(x *T) {
 	if !contains(a.objects, x) {
 		return
 	}
+	a.reset(x)
 
 	a.lk.Lock()
 	defer a.lk.Unlock()
