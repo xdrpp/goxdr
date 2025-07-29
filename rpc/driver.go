@@ -240,7 +240,7 @@ func NewDriver(
 	mp MessagePool,
 	t Transport,
 ) *Driver {
-	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
+	return NewDriverTuned(ctx, mp, t, 10, 10, 1)
 }
 
 func NewDriverTuned(
@@ -357,8 +357,12 @@ func (r *Driver) Go() {
 	if atomic.SwapInt32(&r.started, 1) == 1 {
 		panic("rpc.Driver.Go called multiple times")
 	}
-	for i := 0; i < r.numProc; i++ {
-		go r.doMsgs()
+	if r.numProc == 1 {
+		r.doMsgs()
+	} else {
+		for i := 0; i < r.numProc; i++ {
+			go r.doMsgs()
+		}
 	}
 }
 

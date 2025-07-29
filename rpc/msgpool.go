@@ -12,7 +12,7 @@ type MessagePool interface {
 
 func NewMessagePool() MessagePool {
 	// return NewMsgPool()
-	return NewMsgArenaCap(5000)
+	return NewMsgArenaCap(5000) // dogwood benchmark performs better
 }
 
 // msg arena
