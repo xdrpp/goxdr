@@ -12,75 +12,7 @@ type Message struct {
 	pool *MsgPool
 }
 
-type MsgPool struct {
-	arena *xdr.Arena[Message]
-}
-
-func NewMsgPool() *MsgPool {
-	return NewMsgPoolCap(10000)
-}
-
-func NewMsgPoolCap(cap int) *MsgPool {
-	msgPool := &MsgPool{}
-	msgPool.arena = xdr.NewArena(
-		cap,
-		func(m *Message) {
-			m.pool = msgPool
-		},
-		func(m *Message) {
-			m.Peer = ""
-			m.Buffer.Reset()
-		},
-	)
-	return msgPool
-}
-
-func (msgPool *MsgPool) StatString() string {
-	return msgPool.arena.StatString()
-}
-
-func (msgPool *MsgPool) NewMessage(peer string) *Message {
-	msg := msgPool.arena.Get()
-	msg.Peer = peer
-	return msg
-}
-
-func (msgPool *MsgPool) Reycle(msg *Message) {
-	msgPool.arena.Recycle(msg)
-}
-
-/*
-type MsgPool xdr.Pool[*Message]
-
-func NewMsgPool() *MsgPool {
-	pool := &xdr.Pool[*Message]{}
-	pool.SetMkReset(
-		func() *Message {
-			return &Message{Buffer: &bytes.Buffer{}, pool: (*MsgPool)(pool)}
-		},
-		func(m *Message) {
-			m.Peer = ""
-			m.Buffer.Reset()
-		},
-	)
-	return (*MsgPool)(pool)
-}
-
-func (msgPool *MsgPool) NewMessage(peer string) *Message {
-	msg := (*xdr.Pool[*Message])(msgPool).Get()
-	msg.Peer = peer
-	return msg
-}
-
-func (msgPool *MsgPool) Reycle(msg *Message) {
-	(*xdr.Pool[*Message])(msgPool).Recycle(msg)
-}
-*/
-
 func (m *Message) Recycle() {
-	if m == nil {
-		panic("XXX m=nil")
-	}
 	m.pool.Reycle(m)
 }
 

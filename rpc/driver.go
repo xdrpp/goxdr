@@ -230,7 +230,7 @@ type Driver struct {
 	cs       CallSet
 	started  int32
 
-	msgPool *MsgPool
+	msgPool MessagePool
 	numProc int
 }
 
@@ -266,7 +266,7 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 // calling Close(), then you may supply a nil ctx.
 func NewDriver(
 	ctx context.Context,
-	mp *MsgPool,
+	mp MessagePool,
 	t Transport,
 ) *Driver {
 	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
@@ -274,7 +274,7 @@ func NewDriver(
 
 func NewDriverTuned(
 	ctx context.Context,
-	mp *MsgPool,
+	mp MessagePool,
 	t Transport,
 	recvQueueLen int,
 	sendQueueLen int,
