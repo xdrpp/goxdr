@@ -7,25 +7,28 @@ import (
 
 type Pool[T any] struct {
 	pool  sync.Pool
-	reset func(T)
+	reset func(*T)
 	// stats
 	lk      sync.Mutex
 	numGet  int
 	numMiss int
 }
 
-func (x *Pool[T]) SetMkReset(mk func() T, reset func(T)) {
+func NewPool[T any](reset func(*T)) *Pool[T] {
+	x := &Pool[T]{reset: reset}
 	x.pool.New = func() any {
 		x.lk.Lock()
 		x.numMiss += 1
 		x.lk.Unlock()
-		return mk()
+		var obj T
+		reset(&obj)
+		return &obj
 	}
-	x.reset = reset
+	return x
 }
 
-func (x *Pool[T]) Get() T {
-	o := x.pool.Get().(T)
+func (x *Pool[T]) Get() *T {
+	o := x.pool.Get().(*T)
 	x.reset(o)
 
 	x.lk.Lock()
@@ -34,7 +37,7 @@ func (x *Pool[T]) Get() T {
 	return o
 }
 
-func (x *Pool[T]) Recycle(o T) {
+func (x *Pool[T]) Recycle(o *T) {
 	x.pool.Put(o)
 }
 
