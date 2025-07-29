@@ -9,7 +9,6 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/xdrpp/goxdr/stat"
 	"github.com/xdrpp/goxdr/xdr"
 )
 
@@ -99,22 +98,8 @@ func Detach(ctx context.Context) {
 func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Message {
 	ret := make(chan *Message, recvQueueLen)
 	go func(c chan<- *Message) {
-
-		var receiveLat stat.LatencyMeter
-		var betweenLat stat.LatencyMeter
-
-		bspan := betweenLat.Start()
-		i := 0
 		for {
-			i += 1
-			if i%100000 == 0 {
-				fmt.Printf("ReceiveChan: receive-latency=%v between-latency=%v\n", &receiveLat, &betweenLat)
-			}
-			bspan.Stop()
-			rspan := receiveLat.Start()
 			m, err := t.Receive()
-			rspan.Stop()
-			bspan = betweenLat.Start()
 			if err != nil {
 				if err != io.EOF {
 					fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
@@ -141,17 +126,7 @@ func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- 
 	ch := make(chan *Message, sendQueueLen) // queue len must be at least 1
 	chClose := make(chan struct{})
 	go func(ch <-chan *Message, cancel <-chan struct{}) {
-
-		var sendLat stat.LatencyMeter
-		var betweenLat stat.LatencyMeter
-
-		bspan := betweenLat.Start()
-		i := 0
 		for {
-			i += 1
-			if i%100000 == 0 {
-				fmt.Printf("SendChan: send-latency=%v between-latency=%v\n", &sendLat, &betweenLat)
-			}
 			select {
 			case <-cancel:
 				return
@@ -160,11 +135,7 @@ func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- 
 					return
 				} else {
 					xid := m.Xid()
-					bspan.Stop()
-					sspan := sendLat.Start()
 					err := t.Send(m)
-					sspan.Stop()
-					bspan = betweenLat.Start()
 					if err != nil && onErr != nil {
 						onErr(xid, err)
 					}
@@ -269,7 +240,7 @@ func NewDriver(
 	mp MessagePool,
 	t Transport,
 ) *Driver {
-	return NewDriverTuned(ctx, mp, t, 10, 10, 1)
+	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
 }
 
 func NewDriverTuned(
