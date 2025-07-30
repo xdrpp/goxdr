@@ -13,7 +13,7 @@ type Message struct {
 }
 
 func (m *Message) Recycle() {
-	m.pool.Reycle(m)
+	m.pool.Recycle(m)
 }
 
 func (m *Message) In() xdr.XDR {

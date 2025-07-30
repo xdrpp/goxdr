@@ -1,21 +1,28 @@
-
 // Utilities for implementing RFC5531 RPC.
 package rpc
 
 import (
 	"fmt"
-	"github.com/xdrpp/goxdr/xdr"
 	"sync"
+
+	"github.com/xdrpp/goxdr/xdr"
 )
 
 // Fake accept stat for when we can't send a message
 const SEND_ERR Accept_stat = 97
+
 // Fake accept stat to represent a cancelled call
 const CANCELED Accept_stat = 98
+
 // Fake accept stat to represent a response we can't unmarshal
 const GARBAGE_RET Accept_stat = 99
+
 func init() {
-	pseudo_states := []struct{stat Accept_stat; name string; comment string}{
+	pseudo_states := []struct {
+		stat    Accept_stat
+		name    string
+		comment string
+	}{
 		{SEND_ERR, "SEND_ERR", "Transport-level error when sending call"},
 		{CANCELED, "CANCELED", "Call context canceled"},
 		{GARBAGE_RET, "GARBAGE_RET", "Unable to decode return value"},
@@ -68,17 +75,18 @@ func GetMsg(in xdr.XDR) (*Rpc_msg, error) {
 }
 
 type PendingCall struct {
-	Proc xdr.XdrProc
-	Cb func(*Rpc_msg)
+	Proc   xdr.XdrProc
+	Cb     func(*Rpc_msg)
 	Server string
 }
 
 // A CallSet represents a set of pending calls.  Its methods can be
 // called concurrently from multiple threads.
 type CallSet struct {
-	lock sync.Mutex
+	pool    CallPool
+	lock    sync.Mutex
 	lastXid uint32
-	calls map[uint32]*PendingCall
+	calls   map[uint32]*PendingCall
 }
 
 // Allocate a new XID and create a message header for an outgoing RPC
@@ -97,12 +105,14 @@ func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 		cs.lastXid++
 		_, ok = cs.calls[cs.lastXid]
 	}
-	cs.calls[cs.lastXid] = &PendingCall{
-		Proc: proc,
-		Cb: cb,
-		Server: server,
-	}
-	cmsg := Rpc_msg { Xid: cs.lastXid }
+
+	pc := cs.pool.NewCall()
+	pc.Proc = proc
+	pc.Cb = cb
+	pc.Server = server
+	cs.calls[cs.lastXid] = pc
+
+	cmsg := Rpc_msg{Xid: cs.lastXid}
 	cmsg.Body.Mtype = CALL
 	cmsg.Body.Cbody().Rpcvers = 2
 	cmsg.Body.Cbody().Prog = proc.Prog()
@@ -115,6 +125,14 @@ func (cs *CallSet) NewCall(server string, proc xdr.XdrProc,
 func (cs *CallSet) Delete(xid uint32) {
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
+	cs.delete(xid)
+}
+
+func (cs *CallSet) delete(xid uint32) {
+	pc, ok := cs.calls[xid]
+	if ok {
+		cs.pool.Recycle(pc)
+	}
 	delete(cs.calls, xid)
 }
 
@@ -122,18 +140,19 @@ func (cs *CallSet) Delete(xid uint32) {
 // CANCELED pseudo-error (by default) or another pseudo-error if
 // reason is supplied.  The only lengths that make sense for reason
 // are 0 (use default) and 1 (supply Accept_stat).
-func (cs *CallSet) Cancel(xid uint32, reason...Accept_stat) {
+func (cs *CallSet) Cancel(xid uint32, reason ...Accept_stat) {
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
 	if pc, ok := cs.calls[xid]; ok {
 		delete(cs.calls, xid)
-		rmsg := Rpc_msg{ Xid: xid }
+		rmsg := Rpc_msg{Xid: xid}
 		if len(reason) == 0 || reason[0] == SUCCESS {
 			SetStat(&rmsg, CANCELED)
 		} else {
 			SetStat(&rmsg, reason[0])
 		}
 		pc.Cb(&rmsg)
+		cs.pool.Recycle(pc)
 	}
 }
 
@@ -143,24 +162,24 @@ func (cs *CallSet) CancelAll() {
 	calls := cs.calls
 	cs.calls = nil
 	for xid, pc := range calls {
-		rmsg := Rpc_msg{ Xid: xid }
+		rmsg := Rpc_msg{Xid: xid}
 		SetStat(&rmsg, CANCELED)
 		pc.Cb(&rmsg)
+		cs.pool.Recycle(pc)
 	}
 }
 
 // Attempt to match a reply with a pending call.  If it returns
 // a non-nil pc, you should call pc.Cb(rmsg).
-func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg,
-	in xdr.XDR) *PendingCall {
+func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) (xdr.XdrProc, func(*Rpc_msg), bool) {
 	if rmsg.Body.Mtype != REPLY {
-		return nil
+		return nil, nil, false
 	}
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
 	pc, ok := cs.calls[rmsg.Xid]
 	if !ok || pc.Server != server {
-		return nil
+		return nil, nil, false
 	}
 	delete(cs.calls, rmsg.Xid)
 	if IsSuccess(rmsg) {
@@ -168,7 +187,8 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg,
 			rmsg.Body.Rbody().Areply().Reply_data.Stat = GARBAGE_RET
 		}
 	}
-	return pc
+	defer cs.pool.Recycle(pc)
+	return pc.Proc, pc.Cb, true
 }
 
 // Container for a server implementing a set of program/version
@@ -201,7 +221,7 @@ func (s RpcSrv) GetProc(cmsg *Rpc_msg, in xdr.XDR) (
 	if cmsg.Body.Mtype != CALL {
 		return nil, nil
 	}
-	rmsg = &Rpc_msg { Xid: cmsg.Xid }
+	rmsg = &Rpc_msg{Xid: cmsg.Xid}
 
 	if cmsg.Body.Cbody().Rpcvers != 2 {
 		rmsg.Body.Mtype = REPLY
