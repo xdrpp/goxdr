@@ -237,7 +237,7 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 // calling Close(), then you may supply a nil ctx.
 func NewDriver(
 	ctx context.Context,
-	mp MessagePool,
+	mp MessagePool, //XXX: remove
 	t Transport,
 ) *Driver {
 	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
@@ -422,36 +422,28 @@ func (r *Driver) doMsg(m *Message) {
 		unlock:  unlock,
 	}))
 
-	q := func() {
-		defer func() {
-			unlock()
-			if i := recover(); i != nil {
-				if r.PanicHandler != nil {
-					r.PanicHandler.PanicHandle(i)
-				} else {
-					fmt.Fprintf(os.Stderr, "%s\n", i)
-				}
-				if IsSuccess(rmsg) {
-					SetStat(rmsg, SYSTEM_ERR)
-				}
+	// process call
+	defer func() {
+		unlock()
+		if i := recover(); i != nil {
+			if r.PanicHandler != nil {
+				r.PanicHandler.PanicHandle(i)
+			} else {
+				fmt.Fprintf(os.Stderr, "%s\n", i)
 			}
-			reply := r.msgPool.NewMessage(m.Peer)
-			reply.Serialize(rmsg)
 			if IsSuccess(rmsg) {
-				reply.Serialize(proc.GetRes())
-				r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
-					m.Peer, msg.Xid, proc.ProcName())
+				SetStat(rmsg, SYSTEM_ERR)
 			}
-			m.Recycle()
-			r.safeSend(r.ctx, reply)
-		}()
-		proc.Do()
-	}
-
-	if r.Lock == nil {
-		go q()
-	} else {
-		q()
-	}
-
+		}
+		reply := r.msgPool.NewMessage(m.Peer)
+		reply.Serialize(rmsg)
+		if IsSuccess(rmsg) {
+			reply.Serialize(proc.GetRes())
+			r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
+				m.Peer, msg.Xid, proc.ProcName())
+		}
+		m.Recycle()
+		r.safeSend(r.ctx, reply)
+	}()
+	proc.Do()
 }
