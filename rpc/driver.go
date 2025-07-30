@@ -235,12 +235,8 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 //
 // If you will never need to cancel the driver, or plan to do so by
 // calling Close(), then you may supply a nil ctx.
-func NewDriver(
-	ctx context.Context,
-	mp MessagePool, //XXX: remove
-	t Transport,
-) *Driver {
-	return NewDriverTuned(ctx, mp, t, 10, 10, 3)
+func NewDriver(ctx context.Context, t Transport) *Driver {
+	return NewDriverTuned(ctx, NewMsgPool(), t, 10, 10, 3)
 }
 
 func NewDriverTuned(
