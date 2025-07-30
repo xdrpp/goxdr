@@ -59,7 +59,7 @@ func TestChannels(t *testing.T) {
 
 	contents := []string{"one\n", "two\n", "three\n"}
 	var ms []*rpc.Message
-	msgPool := rpc.NewMsgArenaCap(5000)
+	msgPool := rpc.NewMsgArena(5000)
 	for _, msg := range contents {
 		m := msgPool.NewMessage("")
 		m.WriteString(msg)

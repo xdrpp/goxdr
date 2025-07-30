@@ -236,12 +236,13 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 // If you will never need to cancel the driver, or plan to do so by
 // calling Close(), then you may supply a nil ctx.
 func NewDriver(ctx context.Context, t Transport) *Driver {
-	return NewDriverTuned(ctx, NewMsgPool(), t, 10, 10, 3)
+	return NewDriverTuned(ctx, NewMsgPool(), NewCallPool(), t, 10, 10, 3)
 }
 
 func NewDriverTuned(
 	ctx context.Context,
 	mp MessagePool,
+	cp CallPool,
 	t Transport,
 	recvQueueLen int,
 	sendQueueLen int,
@@ -260,6 +261,7 @@ func NewDriverTuned(
 		msgPool: mp,
 		numProc: numProc,
 	}
+	ret.cs.pool = cp
 	ret.out, ret.outClose = SendChan(
 		t,
 		func(xid uint32, _ error) {
@@ -392,10 +394,10 @@ func (r *Driver) doMsg(m *Message) {
 		return
 	}
 
-	if pc := r.cs.GetReply(m.Peer, msg, m.In()); pc != nil {
-		r.logXdr(pc.Proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, pc.Proc.ProcName())
+	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
+		r.logXdr(proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 		m.Recycle()
-		pc.Cb(msg)
+		cb(msg)
 		return
 	}
 

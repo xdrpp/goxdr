@@ -6,7 +6,7 @@ import (
 
 type MessagePool interface {
 	NewMessage(peer string) *Message
-	Reycle(msg *Message)
+	Recycle(msg *Message)
 	StatString() string
 }
 
@@ -16,7 +16,7 @@ type msgArena struct {
 	arena *xdr.Arena[Message]
 }
 
-func NewMsgArenaCap(cap int) MessagePool {
+func NewMsgArena(cap int) MessagePool {
 	msgArena := &msgArena{}
 	msgArena.arena = xdr.NewArena(
 		cap,
@@ -39,7 +39,7 @@ func (msgArena *msgArena) NewMessage(peer string) *Message {
 	return msg
 }
 
-func (msgArena *msgArena) Reycle(msg *Message) {
+func (msgArena *msgArena) Recycle(msg *Message) {
 	msgArena.arena.Recycle(msg)
 }
 
@@ -67,7 +67,7 @@ func (msgPool *msgPool) NewMessage(peer string) *Message {
 	return msg
 }
 
-func (msgPool *msgPool) Reycle(msg *Message) {
+func (msgPool *msgPool) Recycle(msg *Message) {
 	msgPool.pool.Recycle(msg)
 }
 
