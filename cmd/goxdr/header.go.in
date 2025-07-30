@@ -674,7 +674,9 @@ func xdrReadN(in io.Reader, n uint32) []byte {
 
 func xdrReadPad(in io.Reader, n uint32) {
 	if n & 3 != 0 {
-		got := xdrReadN(in, 4-(n&3))
+		var buf [4]byte
+		got := buf[:4-(n&3)]
+		xdrReadInto(in, got)
 		for _, b := range got {
 			if b != 0 {
 				XdrPanic("padding contained non-zero bytes")
