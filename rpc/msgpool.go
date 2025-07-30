@@ -10,11 +10,6 @@ type MessagePool interface {
 	StatString() string
 }
 
-func NewMessagePool() MessagePool {
-	// return NewMsgPool()
-	return NewMsgArenaCap(5000) // dogwood benchmark performs better
-}
-
 // msg arena
 
 type msgArena struct {
