@@ -54,6 +54,9 @@ type StreamTransport struct {
 	msgPool MessagePool
 }
 
+// DefaultMaxMsgSize is the default maximum message size for StreamTransports.
+var DefaultMaxMsgSize int = 10e6
+
 // Create a stream transport from a connected stream socket.  This is
 // the only valid way to initialize a StreamTransport.  You can
 // manually adjust MaxMsgSize after calling this function.
@@ -63,7 +66,7 @@ func NewStreamTransport(c net.Conn) *StreamTransport {
 
 func NewStreamTransportWithPool(c net.Conn, mp MessagePool) *StreamTransport {
 	return &StreamTransport{
-		MaxMsgSize: 0x100000,
+		MaxMsgSize: DefaultMaxMsgSize,
 		Conn:       c,
 		okay:       1,
 		msgPool:    mp,
