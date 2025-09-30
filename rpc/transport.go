@@ -1,6 +1,7 @@
 package rpc
 
 import (
+	"crypto/rand"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -30,6 +31,8 @@ type Transport interface {
 	// because each instance of the transport is connected to a single
 	// endpoint (like TCP and unlike an unconnected UDP socket).
 	IsConnected() bool
+
+	ID() string
 }
 
 var ErrTransportClosed = fmt.Errorf("Transport is closed")
@@ -52,6 +55,8 @@ type StreamTransport struct {
 	err  error
 
 	msgPool MessagePool
+
+	uid [4]byte
 }
 
 // DefaultMaxMsgSize is the default maximum message size for StreamTransports.
@@ -65,12 +70,20 @@ func NewStreamTransport(c net.Conn) *StreamTransport {
 }
 
 func NewStreamTransportWithPool(c net.Conn, mp MessagePool) *StreamTransport {
+	var uid [4]byte
+	rand.Read(uid[:])
+
 	return &StreamTransport{
 		MaxMsgSize: DefaultMaxMsgSize,
 		Conn:       c,
 		okay:       1,
 		msgPool:    mp,
+		uid:        uid,
 	}
+}
+
+func (tx *StreamTransport) ID() string {
+	return fmt.Sprintf("%v--[%x]--%v", tx.Conn.LocalAddr().String(), tx.uid, tx.Conn.RemoteAddr().String())
 }
 
 func (tx *StreamTransport) fail(err error) {
