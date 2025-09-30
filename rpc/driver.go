@@ -313,6 +313,8 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		close(c)
 	})
 	m := r.msgPool.NewMessage(peer)
+	fmt.Printf("->%s CALL(xid=%d) %s\n", peer, cmsg.Xid,
+		proc.ProcName())
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -395,6 +397,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
+		fmt.Printf("<-%s REPLY(xid=%d) %s\n", m.Peer, msg.Xid, proc.ProcName())
 		r.logXdr(proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 		m.Recycle()
 		cb(msg)
@@ -414,6 +417,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	unlock := mkUnlocker(r.Lock)
+	fmt.Printf("<-%s CALL(xid=%d) %s\n", m.Peer, msg.Xid, proc.ProcName())
 	r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 	proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
 		peerCtx: peerCtx{Peer: m.Peer},
@@ -437,6 +441,8 @@ func (r *Driver) doMsg(m *Message) {
 		reply.Serialize(rmsg)
 		if IsSuccess(rmsg) {
 			reply.Serialize(proc.GetRes())
+			fmt.Printf("->%s REPLY(xid=%d) %s\n",
+				m.Peer, msg.Xid, proc.ProcName())
 			r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
 				m.Peer, msg.Xid, proc.ProcName())
 		}
