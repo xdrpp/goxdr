@@ -8,6 +8,7 @@ import (
 	"os"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/xdrpp/goxdr/xdr"
 )
@@ -204,7 +205,9 @@ type Driver struct {
 	msgPool MessagePool
 	numProc int
 
-	streamID string
+	local  string
+	remote string
+	id     string
 }
 
 // PanicHandler defines a handler for panics arising from service method implementations.
@@ -255,14 +258,17 @@ func NewDriverTuned(
 	}
 	ctx, cancel := context.WithCancel(ctx)
 	ret := Driver{
-		Log:      DefaultLog,
-		Lock:     &sync.Mutex{},
-		ctx:      ctx,
-		cancel:   cancel,
-		in:       ReceiveChan(ctx, t, recvQueueLen),
-		msgPool:  mp,
-		numProc:  numProc,
-		streamID: t.ID(),
+		Log:     DefaultLog,
+		Lock:    &sync.Mutex{},
+		ctx:     ctx,
+		cancel:  cancel,
+		in:      ReceiveChan(ctx, t, recvQueueLen),
+		msgPool: mp,
+		numProc: numProc,
+		//
+		local:  t.Local(),
+		remote: t.Remote(),
+		id:     t.ID(),
 	}
 	ret.cs.pool = cp
 	ret.out, ret.outClose = SendChan(
@@ -303,6 +309,13 @@ func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
 	}
 }
 
+func ntime() string {
+	now := time.Now()
+	seconds := now.Unix()
+	nanos := now.Nanosecond()
+	return fmt.Sprintf("%d.%09d\n", seconds, nanos)
+}
+
 // Driver implements the XdrSendCall interface, allowing it to be
 // used as the Send field of generated RPC client structures.
 func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
@@ -316,8 +329,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		close(c)
 	})
 	m := r.msgPool.NewMessage(peer)
-	fmt.Printf("%s ->%s CALL(xid=%d) %s\n", r.streamID, peer, cmsg.Xid,
-		proc.ProcName())
+	Logf("%s,CLIENT,CALL,%d,%s,%s,%v\n", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -400,7 +412,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
-		fmt.Printf("%s <-%s REPLY(xid=%d) %s\n", r.streamID, m.Peer, msg.Xid, proc.ProcName())
+		Logf("%s,CLIENT,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 		r.logXdr(proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 		m.Recycle()
 		cb(msg)
@@ -420,7 +432,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	unlock := mkUnlocker(r.Lock)
-	fmt.Printf("%s <-%s CALL(xid=%d) %s\n", r.streamID, m.Peer, msg.Xid, proc.ProcName())
+	Logf("%s,SERVER,CALL,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 	r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 	proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
 		peerCtx: peerCtx{Peer: m.Peer},
@@ -444,8 +456,7 @@ func (r *Driver) doMsg(m *Message) {
 		reply.Serialize(rmsg)
 		if IsSuccess(rmsg) {
 			reply.Serialize(proc.GetRes())
-			fmt.Printf("%s ->%s REPLY(xid=%d) %s\n", r.streamID,
-				m.Peer, msg.Xid, proc.ProcName())
+			Logf("%s,SERVER,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 			r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
 				m.Peer, msg.Xid, proc.ProcName())
 		}
@@ -453,4 +464,12 @@ func (r *Driver) doMsg(m *Message) {
 		r.safeSend(r.ctx, reply)
 	}()
 	proc.Do()
+}
+
+var logCalls bool = os.Getenv("GOXDR_LOG_CALLS") == "1"
+
+func Logf(f string, args ...any) {
+	if logCalls {
+		fmt.Printf(f, args...)
+	}
 }

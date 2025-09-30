@@ -32,6 +32,8 @@ type Transport interface {
 	// endpoint (like TCP and unlike an unconnected UDP socket).
 	IsConnected() bool
 
+	Local() string
+	Remote() string
 	ID() string
 }
 
@@ -82,8 +84,16 @@ func NewStreamTransportWithPool(c net.Conn, mp MessagePool) *StreamTransport {
 	}
 }
 
+func (tx *StreamTransport) Local() string {
+	return tx.Conn.LocalAddr().String()
+}
+
+func (tx *StreamTransport) Remote() string {
+	return tx.Conn.LocalAddr().String()
+}
+
 func (tx *StreamTransport) ID() string {
-	return fmt.Sprintf("%v--[%x]--%v", tx.Conn.LocalAddr().String(), tx.uid, tx.Conn.RemoteAddr().String())
+	return fmt.Sprintf("%x", tx.uid)
 }
 
 func (tx *StreamTransport) fail(err error) {
