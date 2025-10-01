@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
 	"sync"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/xdrpp/goxdr/xdr"
@@ -330,6 +332,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 	})
 	m := r.msgPool.NewMessage(peer)
 	Logf("%s,CLIENT,CALL,%d,%s,%s,%v\n", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
+	logCall(proc.ProcName())
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
@@ -413,6 +416,7 @@ func (r *Driver) doMsg(m *Message) {
 
 	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
 		Logf("%s,CLIENT,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
+		logReply(proc.ProcName())
 		r.logXdr(proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
 		m.Recycle()
 		cb(msg)
@@ -472,4 +476,43 @@ func Logf(f string, args ...any) {
 	if logCalls {
 		fmt.Printf(f, args...)
 	}
+}
+
+var (
+	callLogLk  sync.Mutex
+	callLog    = map[string]int{}
+	replyLogLk sync.Mutex
+	replyLog   = map[string]int{}
+)
+
+func logCall(proc string) {
+	callLogLk.Lock()
+	defer callLogLk.Unlock()
+	callLog[proc] += 1
+}
+
+func logReply(proc string) {
+	replyLogLk.Lock()
+	defer replyLogLk.Unlock()
+	replyLog[proc] += 1
+}
+
+func displayCallReplyLog() {
+	callLogLk.Lock()
+	defer callLogLk.Unlock()
+
+	replyLogLk.Lock()
+	defer replyLogLk.Unlock()
+
+	fmt.Printf("call_log: %v\nreply_log: %v\n", callLog, replyLog)
+}
+
+func init() {
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigchan
+		displayCallReplyLog()
+	}()
 }
