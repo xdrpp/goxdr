@@ -313,7 +313,7 @@ func ntime() string {
 	now := time.Now()
 	seconds := now.Unix()
 	nanos := now.Nanosecond()
-	return fmt.Sprintf("%d.%09d\n", seconds, nanos)
+	return fmt.Sprintf("%d.%09d", seconds, nanos)
 }
 
 // Driver implements the XdrSendCall interface, allowing it to be
