@@ -302,6 +302,9 @@ func (r *Driver) Close() {
 }
 
 func (r *Driver) safeSend(driverCtx context.Context, callReplyCtx context.Context, m *Message) error {
+	if callReplyCtx == nil {
+		callReplyCtx = context.Background()
+	}
 	select {
 	case r.out <- m:
 		return nil
