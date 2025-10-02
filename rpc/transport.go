@@ -148,6 +148,7 @@ func (tx *StreamTransport) Send(m *Message) error {
 		tx.fail(err)
 		return err
 	}
+	nsent.Add(1)
 	return nil
 }
 
@@ -180,6 +181,7 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 			return nil, err
 		}
 	}
+	nreceived.Add(1)
 	return ret, nil
 }
 
@@ -188,3 +190,8 @@ func (tx *StreamTransport) IsConnected() bool {
 }
 
 var _ Transport = &StreamTransport{}
+
+var (
+	nsent     atomic.Int64
+	nreceived atomic.Int64
+)

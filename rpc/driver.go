@@ -523,5 +523,6 @@ func init() {
 	go func() {
 		<-sigchan
 		displayCallReplyLog()
+		fmt.Printf("transport-level msgs, sent %d, received %d\n", nsent.Load(), nreceived.Load())
 	}()
 }
