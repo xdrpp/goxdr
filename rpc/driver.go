@@ -301,13 +301,16 @@ func (r *Driver) Close() {
 	r.cancel()
 }
 
-func (r *Driver) safeSend(ctx context.Context, m *Message) (ok bool) {
+func (r *Driver) safeSend(driverCtx context.Context, callReplyCtx context.Context, m *Message) error {
 	select {
 	case r.out <- m:
-		return true
-	case <-ctx.Done():
+		return nil
+	case <-driverCtx.Done():
 		m.Recycle()
-		return false
+		return ErrTransportClosed
+	case <-callReplyCtx.Done():
+		m.Recycle()
+		return callReplyCtx.Err()
 	}
 }
 
@@ -322,9 +325,6 @@ func ntime() string {
 // used as the Send field of generated RPC client structures.
 func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 	c := make(chan *Rpc_msg, 1)
-	if ctx == nil {
-		ctx = r.ctx
-	}
 	peer := GetPeer(ctx)
 	cmsg := r.cs.NewCall(peer, proc, func(rmsg *Rpc_msg) {
 		c <- rmsg
@@ -336,9 +336,9 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
 		proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
-	if !r.safeSend(ctx, m) {
+	if err := r.safeSend(r.ctx, ctx, m); err != nil {
 		r.cs.Delete(cmsg.Xid)
-		return ErrTransportClosed
+		return err
 	}
 	select {
 	case rmsg := <-c:
@@ -346,7 +346,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 			return nil
 		}
 		return rmsg
-	case <-ctx.Done():
+	case <-r.ctx.Done():
 		// The fact that we don't read from c here is why it needs a
 		// buffer size of 1.
 		//
@@ -354,6 +354,9 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		// XID around to avoid recycling it before the server replies.
 		r.cs.Delete(cmsg.Xid)
 		return ErrTransportClosed
+	case <-ctx.Done():
+		r.cs.Delete(cmsg.Xid)
+		return ctx.Err()
 	}
 }
 
@@ -431,17 +434,20 @@ func (r *Driver) doMsg(m *Message) {
 		reply := r.msgPool.NewMessage(m.Peer)
 		m.Recycle()
 		reply.Serialize(rmsg)
-		r.safeSend(r.ctx, reply)
+		r.safeSend(r.ctx, nil, reply)
 		return
 	}
 
 	unlock := mkUnlocker(r.Lock)
 	Logf("%s,SERVER,CALL,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 	r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
-	proc.SetContext(context.WithValue(r.ctx, ctxKey, &srvCtx{
-		peerCtx: peerCtx{Peer: m.Peer},
-		unlock:  unlock,
-	}))
+
+	proc.SetContext(
+		context.WithValue(r.ctx, ctxKey, &srvCtx{
+			peerCtx: peerCtx{Peer: m.Peer},
+			unlock:  unlock,
+		}),
+	)
 
 	// process call
 	defer func() {
@@ -465,7 +471,7 @@ func (r *Driver) doMsg(m *Message) {
 				m.Peer, msg.Xid, proc.ProcName())
 		}
 		m.Recycle()
-		r.safeSend(r.ctx, reply)
+		r.safeSend(r.ctx, nil, reply)
 	}()
 	proc.Do()
 }
