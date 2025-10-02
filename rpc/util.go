@@ -3,6 +3,7 @@ package rpc
 
 import (
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/xdrpp/goxdr/xdr"
@@ -178,7 +179,13 @@ func (cs *CallSet) GetReply(server string, rmsg *Rpc_msg, in xdr.XDR) (xdr.XdrPr
 	cs.lock.Lock()
 	defer cs.lock.Unlock()
 	pc, ok := cs.calls[rmsg.Xid]
-	if !ok || pc.Server != server {
+	if !ok {
+		fmt.Fprintf(os.Stderr, "WARNING: Reply XID %d not found in pending calls\n", rmsg.Xid)
+		return nil, nil, false
+	}
+	if pc.Server != server {
+		fmt.Fprintf(os.Stderr, "WARNING: Reply XID %d from %s dropped, expected from %s\n",
+			rmsg.Xid, server, pc.Server)
 		return nil, nil, false
 	}
 	delete(cs.calls, rmsg.Xid)
