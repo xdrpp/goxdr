@@ -20,7 +20,7 @@ git add -f go.mod
 test ! -r go.sum || git add -f go.sum
 git add -f $(cat built_sources)
 rm -f built_sources
-git rm --cache cmd/*/tools.go
+# git rm --cache cmd/*/tools.go
 
 tree=$(git write-tree)
 rm -f "$GIT_INDEX_FILE"
