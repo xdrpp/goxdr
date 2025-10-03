@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/signal"
 	"sync"
 	"sync/atomic"
-	"syscall"
 	"time"
 
 	"github.com/xdrpp/goxdr/xdr"
@@ -226,14 +224,18 @@ func (h PanicHandlerFunc) PanicHandle(r any) {
 }
 
 func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
-	if r.Log == nil {
+	log := r.Log
+	if log == nil && logCalls {
+		log = os.Stderr
+	}
+	if log == nil {
 		return
 	}
 	var out bytes.Buffer
 	fmt.Fprintf(&out, f, args...)
 	out.WriteByte('\n')
 	t.XdrMarshal(xdr.XdrPrint{Out: &out}, "")
-	r.Log.Write(out.Bytes())
+	log.Write(out.Bytes())
 }
 
 // Allocate a Driver for a transport.  NewDriver takes ownership of
@@ -334,10 +336,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		close(c)
 	})
 	m := r.msgPool.NewMessage(peer)
-	Logf("%s,CLIENT,CALL,%d,%s,%s,%v\n", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
-	logCall(proc.ProcName())
-	r.logXdr(proc.GetArg(), "->%s CALL(xid=%d) %s", peer, cmsg.Xid,
-		proc.ProcName())
+	r.logXdr(proc.GetArg(), "%s,CLIENT,CALL,%d,%s,%s,%v\n", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
 	if err := r.safeSend(r.ctx, ctx, m); err != nil {
 		r.cs.Delete(cmsg.Xid)
@@ -421,9 +420,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
-		Logf("%s,CLIENT,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
-		logReply(proc.ProcName())
-		r.logXdr(proc.GetRes(), "<-%s REPLY(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
+		r.logXdr(proc.GetRes(), "%s,CLIENT,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 		m.Recycle()
 		cb(msg)
 		return
@@ -442,8 +439,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	unlock := mkUnlocker(r.Lock)
-	Logf("%s,SERVER,CALL,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
-	r.logXdr(proc.GetArg(), "<-%s CALL(xid=%d) %s", m.Peer, msg.Xid, proc.ProcName())
+	r.logXdr(proc.GetArg(), "%s,SERVER,CALL,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 
 	proc.SetContext(
 		context.WithValue(r.ctx, ctxKey, &srvCtx{
@@ -469,9 +465,7 @@ func (r *Driver) doMsg(m *Message) {
 		reply.Serialize(rmsg)
 		if IsSuccess(rmsg) {
 			reply.Serialize(proc.GetRes())
-			Logf("%s,SERVER,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
-			r.logXdr(proc.GetRes(), "->%s REPLY(xid=%d) %s",
-				m.Peer, msg.Xid, proc.ProcName())
+			r.logXdr(proc.GetRes(), "%s,SERVER,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 		}
 		m.Recycle()
 		r.safeSend(r.ctx, nil, reply)
@@ -480,49 +474,3 @@ func (r *Driver) doMsg(m *Message) {
 }
 
 var logCalls bool = os.Getenv("GOXDR_LOG_CALLS") == "1"
-
-func Logf(f string, args ...any) {
-	if logCalls {
-		fmt.Printf(f, args...)
-	}
-}
-
-var (
-	callLogLk  sync.Mutex
-	callLog    = map[string]int{}
-	replyLogLk sync.Mutex
-	replyLog   = map[string]int{}
-)
-
-func logCall(proc string) {
-	callLogLk.Lock()
-	defer callLogLk.Unlock()
-	callLog[proc] += 1
-}
-
-func logReply(proc string) {
-	replyLogLk.Lock()
-	defer replyLogLk.Unlock()
-	replyLog[proc] += 1
-}
-
-func displayCallReplyLog() {
-	callLogLk.Lock()
-	defer callLogLk.Unlock()
-
-	replyLogLk.Lock()
-	defer replyLogLk.Unlock()
-
-	fmt.Printf("call_log: %v\nreply_log: %v\n", callLog, replyLog)
-}
-
-func init() {
-	sigchan := make(chan os.Signal, 1)
-	signal.Notify(sigchan, os.Interrupt, syscall.SIGTERM)
-
-	go func() {
-		<-sigchan
-		displayCallReplyLog()
-		fmt.Printf("transport-level msgs, sent %d, received %d\n", nsent.Load(), nreceived.Load())
-	}()
-}
