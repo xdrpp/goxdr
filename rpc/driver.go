@@ -102,9 +102,9 @@ func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Mes
 		for {
 			m, err := t.Receive()
 			if err != nil {
-				if err != io.EOF {
-					fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
-				}
+				// if err != io.EOF {
+				// 	fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
+				// }
 				close(c)
 				return
 			}
