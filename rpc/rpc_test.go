@@ -67,7 +67,7 @@ func TestChannels(t *testing.T) {
 	}
 
 	cs := streampair()
-	tx1, tx2 := rpc.NewStreamTransportWithPool(cs[0], msgPool), rpc.NewStreamTransportWithPool(cs[1], msgPool)
+	tx1, tx2 := rpc.NewStreamTransportWithPool(cs[0], msgPool, rpc.DefaultMaxMsgSize), rpc.NewStreamTransportWithPool(cs[1], msgPool, rpc.DefaultMaxMsgSize)
 	r := rpc.ReceiveChan(ctx, tx1, 10)
 	defer tx1.Close()
 	s, _ := rpc.SendChan(tx2, nil, 10)

@@ -68,15 +68,15 @@ var DefaultMaxMsgSize int = 10e6
 // the only valid way to initialize a StreamTransport.  You can
 // manually adjust MaxMsgSize after calling this function.
 func NewStreamTransport(c net.Conn) *StreamTransport {
-	return NewStreamTransportWithPool(c, NewMsgPool())
+	return NewStreamTransportWithPool(c, NewMsgPool(), DefaultMaxMsgSize)
 }
 
-func NewStreamTransportWithPool(c net.Conn, mp MessagePool) *StreamTransport {
+func NewStreamTransportWithPool(c net.Conn, mp MessagePool, maxMsgSize int) *StreamTransport {
 	var uid [4]byte
 	rand.Read(uid[:])
 
 	return &StreamTransport{
-		MaxMsgSize: DefaultMaxMsgSize,
+		MaxMsgSize: maxMsgSize,
 		Conn:       c,
 		okay:       1,
 		msgPool:    mp,
