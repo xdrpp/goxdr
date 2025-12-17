@@ -223,7 +223,7 @@ func (h PanicHandlerFunc) PanicHandle(r any) {
 	h(r)
 }
 
-func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
+func (r *Driver) logXdr(t xdr.XdrType, f string, args ...any) {
 	log := r.Log
 	if log == nil && logCalls {
 		log = os.Stderr
@@ -238,6 +238,18 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 	log.Write(out.Bytes())
 }
 
+type DriverRegime struct {
+	RecvQueueLen int
+	SendQueueLen int
+	NumProc      int
+}
+
+var DefaultDriverRegime = DriverRegime{
+	RecvQueueLen: 10,
+	SendQueueLen: 10,
+	NumProc:      3,
+}
+
 // Allocate a Driver for a transport.  NewDriver takes ownership of
 // the Transport it and will Close it when Done.  Do not use a
 // Transport after you have passed it to Driver.
@@ -245,7 +257,7 @@ func (r *Driver) logXdr(t xdr.XdrType, f string, args ...interface{}) {
 // If you will never need to cancel the driver, or plan to do so by
 // calling Close(), then you may supply a nil ctx.
 func NewDriver(ctx context.Context, t Transport) *Driver {
-	return NewDriverTuned(ctx, NewMsgPool(), NewCallPool(), t, 10, 10, 3)
+	return NewDriverTuned(ctx, NewMsgPool(), NewCallPool(), t, DefaultDriverRegime)
 }
 
 func NewDriverTuned(
@@ -253,9 +265,7 @@ func NewDriverTuned(
 	mp MessagePool,
 	cp CallPool,
 	t Transport,
-	recvQueueLen int,
-	sendQueueLen int,
-	numProc int,
+	regime DriverRegime,
 ) *Driver {
 	if ctx == nil {
 		ctx = context.Background()
@@ -266,9 +276,9 @@ func NewDriverTuned(
 		Lock:    &sync.Mutex{},
 		ctx:     ctx,
 		cancel:  cancel,
-		in:      ReceiveChan(ctx, t, recvQueueLen),
+		in:      ReceiveChan(ctx, t, regime.RecvQueueLen),
 		msgPool: mp,
-		numProc: numProc,
+		numProc: regime.NumProc,
 		//
 		local:  t.Local(),
 		remote: t.Remote(),
@@ -280,7 +290,7 @@ func NewDriverTuned(
 		func(xid uint32, _ error) {
 			ret.cs.Cancel(xid, SEND_ERR)
 		},
-		sendQueueLen,
+		regime.SendQueueLen,
 	)
 	go func() {
 		<-ctx.Done()
