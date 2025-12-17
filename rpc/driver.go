@@ -243,6 +243,7 @@ func (r *Driver) logMsg(m *Message, t xdr.XdrType, f string, args ...any) {
 			if r.LogCalls {
 				t.XdrMarshal(xdr.XdrPrint{Out: &out}, "")
 			}
+			io.Copy(r.Log, &out)
 		},
 	)
 }
