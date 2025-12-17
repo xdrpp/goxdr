@@ -108,6 +108,7 @@ func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Mes
 				close(c)
 				return
 			}
+			m.EnteringQueue()
 			select {
 			case c <- m:
 			case <-ctx.Done():
@@ -135,6 +136,7 @@ func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- 
 				if !ok {
 					return
 				} else {
+					m.LeavingQueue()
 					xid := m.Xid()
 					err := t.Send(m)
 					if err != nil && onErr != nil {
@@ -223,19 +225,26 @@ func (h PanicHandlerFunc) PanicHandle(r any) {
 	h(r)
 }
 
-func (r *Driver) logXdr(t xdr.XdrType, f string, args ...any) {
-	log := r.Log
-	if log == nil && logCalls {
-		log = os.Stderr
-	}
-	if log == nil {
+var logCalls bool = os.Getenv("GOXDR_LOG_CALLS") == "1"
+var logStats bool = os.Getenv("GOXDR_LOG_STATS") == "1"
+
+func (r *Driver) logMsg(m *Message, t xdr.XdrType, f string, args ...any) {
+	if r.Log == nil {
 		return
 	}
-	var out bytes.Buffer
-	fmt.Fprintf(&out, f, args...)
-	out.WriteByte('\n')
-	t.XdrMarshal(xdr.XdrPrint{Out: &out}, "")
-	log.Write(out.Bytes())
+	if !logCalls && !logStats {
+		return
+	}
+	m.SetReport(
+		func(ioLatency time.Duration, queueLatency time.Duration, serdeLatency time.Duration) {
+			var out bytes.Buffer
+			fmt.Fprintf(&out, f, args...)
+			fmt.Fprintf(&out, "io=%v, queue=%v, serde=%v\n", ioLatency, queueLatency, serdeLatency)
+			if logCalls {
+				t.XdrMarshal(xdr.XdrPrint{Out: &out}, "")
+			}
+		},
+	)
 }
 
 type DriverRegime struct {
@@ -317,6 +326,7 @@ func (r *Driver) safeSend(driverCtx context.Context, callReplyCtx context.Contex
 	if callReplyCtx == nil {
 		callReplyCtx = context.Background()
 	}
+	m.EnteringQueue()
 	select {
 	case r.out <- m:
 		return nil
@@ -346,7 +356,7 @@ func (r *Driver) SendCall(ctx context.Context, proc xdr.XdrProc) (err error) {
 		close(c)
 	})
 	m := r.msgPool.NewMessage(peer)
-	r.logXdr(proc.GetArg(), "%s,CLIENT,CALL,%d,%s,%s,%v\n", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
+	r.logMsg(m, proc.GetArg(), "%s, CLIENT, CALL, %d, %s, %s, %v; ", ntime(), cmsg.Xid, r.remote, r.local, proc.ProcName())
 	m.Serialize(cmsg, proc.GetArg())
 	if err := r.safeSend(r.ctx, ctx, m); err != nil {
 		r.cs.Delete(cmsg.Xid)
@@ -409,17 +419,19 @@ func (r *Driver) doMsgs() {
 		case <-r.ctx.Done():
 			return
 		case m := <-r.in:
-			r.doMsg(m)
+			if m == nil {
+				r.cancel()
+			} else {
+				m.LeavingQueue()
+				r.doMsg(m)
+			}
 		}
 	}
 }
 
 func (r *Driver) doMsg(m *Message) {
 
-	if m == nil {
-		r.cancel()
-		return
-	}
+	t0 := time.Now() // measure message deserialization latency
 
 	msg, err := GetMsg(m.In())
 	if err != nil {
@@ -430,13 +442,15 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	if proc, cb, ok := r.cs.GetReply(m.Peer, msg, m.In()); ok {
-		r.logXdr(proc.GetRes(), "%s,CLIENT,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
+		m.SetSerdeLatency(time.Since(t0))
+		r.logMsg(m, proc.GetRes(), "%s, CLIENT, REPLY, %d, %s, %s, %v; ", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 		m.Recycle()
 		cb(msg)
 		return
 	}
 
 	rmsg, proc := r.srv.GetProc(msg, m.In())
+	m.SetSerdeLatency(time.Since(t0))
 	if rmsg == nil {
 		m.Recycle()
 		return
@@ -449,7 +463,7 @@ func (r *Driver) doMsg(m *Message) {
 	}
 
 	unlock := mkUnlocker(r.Lock)
-	r.logXdr(proc.GetArg(), "%s,SERVER,CALL,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
+	r.logMsg(m, proc.GetArg(), "%s, SERVER, CALL, %d, %s, %s, %v; ", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 
 	proc.SetContext(
 		context.WithValue(r.ctx, ctxKey, &srvCtx{
@@ -475,12 +489,10 @@ func (r *Driver) doMsg(m *Message) {
 		reply.Serialize(rmsg)
 		if IsSuccess(rmsg) {
 			reply.Serialize(proc.GetRes())
-			r.logXdr(proc.GetRes(), "%s,SERVER,REPLY,%d,%s,%s,%v\n", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
+			r.logMsg(reply, proc.GetRes(), "%s, SERVER, REPLY, %d, %s, %s, %v; ", ntime(), msg.Xid, r.remote, r.local, proc.ProcName())
 		}
 		m.Recycle()
 		r.safeSend(r.ctx, nil, reply)
 	}()
 	proc.Do()
 }
-
-var logCalls bool = os.Getenv("GOXDR_LOG_CALLS") == "1"

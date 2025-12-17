@@ -1,6 +1,8 @@
 package rpc
 
 import (
+	"time"
+
 	"github.com/xdrpp/goxdr/xdr"
 )
 
@@ -16,6 +18,8 @@ type msgArena struct {
 	arena *xdr.Arena[Message]
 }
 
+var zeroTime time.Time
+
 func NewMsgArena(cap int) MessagePool {
 	msgArena := &msgArena{}
 	msgArena.arena = xdr.NewArena(
@@ -24,6 +28,9 @@ func NewMsgArena(cap int) MessagePool {
 			m.pool = msgArena
 			m.Peer = ""
 			m.Buffer.Reset()
+			m.enteredQueue = zeroTime
+			m.ioLatency, m.queueLatency, m.serdeLatency = 0, 0, 0
+			m.report = nil
 		},
 	)
 	return msgArena
@@ -56,6 +63,9 @@ func NewMsgPool() MessagePool {
 			m.pool = x
 			m.Peer = ""
 			m.Buffer.Reset()
+			m.enteredQueue = zeroTime
+			m.ioLatency, m.queueLatency, m.serdeLatency = 0, 0, 0
+			m.report = nil
 		},
 	)
 	return x

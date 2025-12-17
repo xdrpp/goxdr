@@ -7,6 +7,7 @@ import (
 	"io"
 	"net"
 	"sync/atomic"
+	"time"
 )
 
 // Abstraction for an RPC transport.  Note that Send() should not be
@@ -124,8 +125,10 @@ func (tx *StreamTransport) Close() {
 const maxSegment = 0x7fffffff
 
 func (tx *StreamTransport) Send(m *Message) error {
+	t0 := time.Now()
 	defer m.Recycle()
 	if tx.failed() {
+		m.CancelReport()
 		return tx.err
 	}
 	iov := make(net.Buffers, 0, 2)
@@ -145,13 +148,16 @@ func (tx *StreamTransport) Send(m *Message) error {
 		}
 	}
 	if _, err := iov.WriteTo(tx.Conn); err != nil {
+		m.CancelReport()
 		tx.fail(err)
 		return err
 	}
+	m.SetIOLatency(time.Since(t0))
 	return nil
 }
 
 func (tx *StreamTransport) Receive() (*Message, error) {
+	t0 := time.Now()
 	if tx.failed() {
 		return nil, tx.err
 	}
@@ -180,6 +186,7 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 			return nil, err
 		}
 	}
+	ret.SetIOLatency(time.Since(t0))
 	return ret, nil
 }
 
