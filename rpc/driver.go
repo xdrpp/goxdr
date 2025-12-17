@@ -192,6 +192,9 @@ type Driver struct {
 	// if you want to trace all Drivers by default.
 	Log io.Writer
 
+	LogCalls bool
+	LogStats bool
+
 	// If non-nil, all panics arising from service method implementations are passed to PanicHandle.
 	PanicHandler PanicHandler
 
@@ -225,14 +228,11 @@ func (h PanicHandlerFunc) PanicHandle(r any) {
 	h(r)
 }
 
-var logCalls bool = os.Getenv("GOXDR_LOG_CALLS") == "1"
-var logStats bool = os.Getenv("GOXDR_LOG_STATS") == "1"
-
 func (r *Driver) logMsg(m *Message, t xdr.XdrType, f string, args ...any) {
 	if r.Log == nil {
 		return
 	}
-	if !logCalls && !logStats {
+	if !r.LogCalls && !r.LogStats {
 		return
 	}
 	m.SetReport(
@@ -240,7 +240,7 @@ func (r *Driver) logMsg(m *Message, t xdr.XdrType, f string, args ...any) {
 			var out bytes.Buffer
 			fmt.Fprintf(&out, f, args...)
 			fmt.Fprintf(&out, "io=%v, queue=%v, serde=%v\n", ioLatency, queueLatency, serdeLatency)
-			if logCalls {
+			if r.LogCalls {
 				t.XdrMarshal(xdr.XdrPrint{Out: &out}, "")
 			}
 		},
