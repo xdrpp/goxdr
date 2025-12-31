@@ -90,7 +90,7 @@ func (tx *StreamTransport) Local() string {
 }
 
 func (tx *StreamTransport) Remote() string {
-	return tx.Conn.LocalAddr().String()
+	return tx.Conn.RemoteAddr().String()
 }
 
 func (tx *StreamTransport) ID() string {
