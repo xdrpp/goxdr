@@ -157,12 +157,12 @@ func (tx *StreamTransport) Send(m *Message) error {
 }
 
 func (tx *StreamTransport) Receive() (*Message, error) {
-	t0 := time.Now()
 	if tx.failed() {
 		return nil, tx.err
 	}
 	ret := tx.msgPool.NewMessage(tx.Peer)
 	b := make([]byte, 4)
+	var t0 time.Time
 	for b[0]&0x80 == 0 {
 		if n, err := tx.Conn.Read(b); n != 4 || err != nil {
 			ret.Recycle()
@@ -171,6 +171,9 @@ func (tx *StreamTransport) Receive() (*Message, error) {
 			}
 			tx.fail(err)
 			return nil, err
+		}
+		if t0.IsZero() {
+			t0 = time.Now()
 		}
 		n := binary.BigEndian.Uint32(b) & 0x7fffffff
 		if int(n) > tx.MaxMsgSize-ret.Len() {
