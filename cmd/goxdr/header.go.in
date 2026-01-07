@@ -665,6 +665,9 @@ func (xo XdrOut) Marshal(name string, i XdrType) {
 }
 
 func xdrReadN(in io.Reader, n uint32) []byte {
+	if n == 0 {
+		return nil
+	}
 	p := make([]byte, n)
 	if k, err := io.ReadFull(in, p); err != nil {
 		XdrPanic("short read; %d/%d bytes (%s)", k, n, err.Error())
