@@ -50,4 +50,20 @@ func TestCompile(t *testing.T) {
 		return
 	}
 	os.Remove(target)
+
+	source_scoped := filepath.Join("testdata", "testxdr_scoped.x")
+	target_scoped := filepath.Join("testdata", "testxdr_scoped.go")
+
+	cmd = exec.Command(goxdr, "-scoped-enums", "-enum-comments",
+		"-p", "testxdr", "-o", target_scoped, source_scoped)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Errorf("goxdr -scoped-enums failed:\n%s: %s", out, err)
+		return
+	}
+	cmd = exec.Command("go", "build", target_scoped)
+	if out, err := cmd.CombinedOutput(); err != nil {
+		t.Errorf("goxdr -scoped-enums output failed to compile:\n%s", out)
+		return
+	}
+	os.Remove(target_scoped)
 }
