@@ -1253,7 +1253,64 @@ func (c %[1]s) WithContext(ctx context.Context) %[2]s {
 	}
 }
 
-func emitAll(syms *rpc_syms, comments bool, lax bool) string {
+// scopeEnumTags prefixes each enum tag's Go name with its enum type
+// name using kEnumTag convention, so XDR sources can use short tag
+// names while generated Go gets properly-scoped constants
+// (e.g., enum Color { red=0 } -> kColorRed).
+func scopeEnumTags(syms *rpc_syms) {
+	// Build map of xdr tag name -> new Go name
+	renames := map[string]string{}
+	for _, sym := range syms.Symbols {
+		e, ok := sym.(*rpc_enum)
+		if !ok {
+			continue
+		}
+		prefix := e.id.getgo()
+		for i := range e.tags {
+			tag := &e.tags[i]
+			xname := tag.id.getx()
+			newGoName := "k" + prefix + capitalize(xname)
+			renames[xname] = newGoName
+			tag.id.goid = newGoName
+		}
+	}
+
+	applyRename := func(iv *idval) {
+		if newName, ok := renames[iv.getx()]; ok {
+			iv.goid = newName
+		}
+	}
+
+	for _, sym := range syms.Symbols {
+		switch s := sym.(type) {
+		case *rpc_enum:
+			for i := range s.tags {
+				applyRename(&s.tags[i].val)
+			}
+		case *rpc_union:
+			for i := range s.fields {
+				for j := range s.fields[i].cases {
+					applyRename(&s.fields[i].cases[j])
+				}
+			}
+		case *rpc_const:
+			applyRename(&s.val)
+		}
+	}
+
+	// Also update SymbolMap entries (separate objects from enum tags)
+	for _, sym := range syms.SymbolMap {
+		if c, ok := sym.(*rpc_const); ok {
+			applyRename(&c.id)
+			applyRename(&c.val)
+		}
+	}
+}
+
+func emitAll(syms *rpc_syms, comments bool, lax bool, scoped bool) string {
+	if scoped {
+		scopeEnumTags(syms)
+	}
 	e := emitter{
 		syms:              syms,
 		output:            &strings.Builder{},
@@ -1311,6 +1368,8 @@ func main() {
 		"for each enum, output a map containing source comments")
 	opt_lax_discriminants := flag.Bool("lax-discriminants", false,
 		"allow union discriminants and cases to be different enum types")
+	opt_scoped_enums := flag.Bool("scoped-enums", false,
+		"prefix enum tags with enum type using kEnumTag convention")
 	var imports stringlist
 	flag.Var(&imports, "i", "add import directive for `path`")
 	progname = os.Args[0]
@@ -1336,7 +1395,8 @@ func main() {
 	if syms.Failed {
 		os.Exit(1)
 	}
-	code := emitAll(&syms, *opt_enum_comments, *opt_lax_discriminants)
+	code := emitAll(&syms, *opt_enum_comments, *opt_lax_discriminants,
+		*opt_scoped_enums)
 
 	var out io.WriteCloser
 	out = os.Stdout
