@@ -27,6 +27,7 @@ type Transport interface {
 	// allow multiple calls to Close (unlike most io.Closer types,
 	// which don't guaratnee this).
 	Close()
+	CloseBecause(error)
 
 	// Returns true if the Peer field of Message does not matter
 	// because each instance of the transport is connected to a single
@@ -38,7 +39,8 @@ type Transport interface {
 	ID() string
 }
 
-var ErrTransportClosed = fmt.Errorf("Transport is closed")
+var ErrTransportClosed = fmt.Errorf("transport is closed")
+var ErrTransportAbandoned = fmt.Errorf("transport abandoned")
 
 // Implements RFC5531 record-marking protocol for stream sockets
 type StreamTransport struct {
@@ -120,6 +122,10 @@ func (tx *StreamTransport) failed() bool {
 // yet.  Subsequent calls to Close() have no effect.
 func (tx *StreamTransport) Close() {
 	tx.fail(ErrTransportClosed)
+}
+
+func (tx *StreamTransport) CloseBecause(err error) {
+	tx.fail(err)
 }
 
 const maxSegment = 0x7fffffff

@@ -112,13 +112,13 @@ func TestRPC(t *testing.T) {
 	c := TEST_V1_Client{Send: r2, Ctx: ctx}
 
 	c.Test_null(ctx)
-	if r, _ := c.Test_inc(ctx, 1); r != 2 {
-		t.Error("Test_inc failed")
+	if r, err := c.Test_inc(ctx, 1); r != 2 {
+		t.Errorf("Test_inc failed, (%v)", err)
 	}
-	if r, _ := c.Test_add(ctx, 2, 3); r != 5 {
-		t.Error("Test_add failed")
+	if r, err := c.Test_add(ctx, 2, 3); r != 5 {
+		t.Errorf("Test_add failed, (%v)", err)
 	}
-	if r, _ := c.Test_string(ctx, "test"); r != "Hello test" {
-		t.Error("Test_string failed")
+	if r, err := c.Test_string(ctx, "test"); r != "Hello test" {
+		t.Errorf("Test_string failed, (%v)", err)
 	}
 }

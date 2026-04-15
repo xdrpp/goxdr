@@ -106,6 +106,7 @@ func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Mes
 				// 	fmt.Fprintf(os.Stderr, "ReceiveChan: %s\n", err)
 				// }
 				close(c)
+				t.Close() // ensure connection is closed
 				return
 			}
 			m.EnteringQueue()
@@ -114,6 +115,7 @@ func ReceiveChan(ctx context.Context, t Transport, recvQueueLen int) <-chan *Mes
 			case <-ctx.Done():
 				m.Recycle()
 				close(c)
+				t.CloseBecause(ErrTransportAbandoned) // ensure connection is closed
 				return
 			}
 		}
@@ -131,9 +133,11 @@ func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- 
 		for {
 			select {
 			case <-cancel:
+				t.CloseBecause(ErrTransportAbandoned) // ensure connection is closed
 				return
 			case m, ok := <-ch:
 				if !ok {
+					t.CloseBecause(ErrTransportAbandoned) // ensure connection is closed
 					return
 				} else {
 					m.LeavingQueue()
@@ -141,6 +145,7 @@ func SendChan(t Transport, onErr func(uint32, error), sendQueueLen int) (chan<- 
 					err := t.Send(m)
 					if err != nil && onErr != nil {
 						onErr(xid, err)
+						t.Close() // ensure connection is closed
 					}
 				}
 			}
@@ -333,9 +338,11 @@ func (r *Driver) safeSend(driverCtx context.Context, callReplyCtx context.Contex
 		return nil
 	case <-driverCtx.Done():
 		m.Recycle()
+		r.Close() // ensure connection is closed
 		return ErrTransportClosed
 	case <-callReplyCtx.Done():
 		m.Recycle()
+		// Interrupting a send before it goes out leaves the connection in a usable state.
 		return callReplyCtx.Err()
 	}
 }
