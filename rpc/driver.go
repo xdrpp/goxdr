@@ -213,7 +213,6 @@ type Driver struct {
 	started  int32
 
 	msgPool MessagePool
-	numProc int
 
 	local  string
 	remote string
@@ -256,13 +255,11 @@ func (r *Driver) logMsg(m *Message, t xdr.XdrType, f string, args ...any) {
 type DriverRegime struct {
 	RecvQueueLen int
 	SendQueueLen int
-	NumProc      int
 }
 
 var DefaultDriverRegime = DriverRegime{
 	RecvQueueLen: 10,
 	SendQueueLen: 10,
-	NumProc:      3,
 }
 
 // Allocate a Driver for a transport.  NewDriver takes ownership of
@@ -293,7 +290,6 @@ func NewDriverTuned(
 		cancel:  cancel,
 		in:      ReceiveChan(ctx, t, regime.RecvQueueLen),
 		msgPool: mp,
-		numProc: regime.NumProc,
 		//
 		local:  t.Local(),
 		remote: t.Remote(),
@@ -408,13 +404,7 @@ func (r *Driver) Go() {
 	if atomic.SwapInt32(&r.started, 1) == 1 {
 		panic("rpc.Driver.Go called multiple times")
 	}
-	if r.numProc == 1 {
-		r.doMsgs()
-	} else {
-		for i := 0; i < r.numProc; i++ {
-			go r.doMsgs()
-		}
-	}
+	r.doMsgs()
 }
 
 func (r *Driver) doMsgs() {
@@ -431,7 +421,7 @@ func (r *Driver) doMsgs() {
 				r.cancel()
 			} else {
 				m.LeavingQueue()
-				r.doMsg(m)
+				go r.doMsg(m)
 			}
 		}
 	}
