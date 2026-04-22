@@ -53,6 +53,8 @@ jobs:
 
       - run: ./goxdr -enum-comments -p rpc_test -o rpc/prot_test.go rpc/prot_test.x
 
+      - run: go build ./cmd/gorpc
+
       - run: go test -v ./xdr ./rpc
 
       - run: cd cmd/goxdr && go test -v
@@ -95,6 +97,8 @@ jobs:
       - run: ./goxdr -B -p xdr -o xdr/boilerplate.go
 
       - run: ./goxdr -enum-comments -p rpc_test -o rpc/prot_test.go rpc/prot_test.x
+
+      - run: go build ./cmd/gorpc
 
       - run: go test -race -v ./xdr ./rpc
 
