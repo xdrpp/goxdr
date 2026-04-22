@@ -1,0 +1,101 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+
+      - run: go install golang.org/x/tools/cmd/goyacc@latest
+
+      - run: echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - run: |
+          cat > go.mod <<'EOF'
+          module github.com/xdrpp/goxdr
+
+          go 1.24.0
+
+          require golang.org/x/tools v0.31.0
+          EOF
+
+      - run: go generate
+        working-directory: cmd/goxdr
+
+      - run: sed -e 's|^[ 	]*//line|//line|' parse.go > parse.go~ && mv -f parse.go~ parse.go
+        working-directory: cmd/goxdr
+
+      - run: go build -o cmd/goxdr/goxdr ./cmd/goxdr
+
+      - run: cp cmd/goxdr/goxdr ./goxdr
+
+      - run: ./goxdr -enum-comments -p rpc -o rpc/rpc_msg.go rpc/rpc_msg.x
+
+      - run: ./goxdr -B -p xdr -o xdr/boilerplate.go
+
+      - run: ./goxdr -enum-comments -p rpc_test -o rpc/prot_test.go rpc/prot_test.x
+
+      - run: go test -v ./xdr ./rpc
+
+      - run: cd cmd/goxdr && go test -v
+
+  test-race:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.x'
+          cache: true
+
+      - run: go install golang.org/x/tools/cmd/goyacc@latest
+
+      - run: echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - run: |
+          cat > go.mod <<'EOF'
+          module github.com/xdrpp/goxdr
+
+          go 1.24.0
+
+          require golang.org/x/tools v0.31.0
+          EOF
+
+      - run: go generate
+        working-directory: cmd/goxdr
+
+      - run: sed -e 's|^[ 	]*//line|//line|' parse.go > parse.go~ && mv -f parse.go~ parse.go
+        working-directory: cmd/goxdr
+
+      - run: go build -o cmd/goxdr/goxdr ./cmd/goxdr
+
+      - run: cp cmd/goxdr/goxdr ./goxdr
+
+      - run: ./goxdr -enum-comments -p rpc -o rpc/rpc_msg.go rpc/rpc_msg.x
+
+      - run: ./goxdr -B -p xdr -o xdr/boilerplate.go
+
+      - run: ./goxdr -enum-comments -p rpc_test -o rpc/prot_test.go rpc/prot_test.x
+
+      - run: go test -race -v ./xdr ./rpc
+
+      - run: cd cmd/goxdr && go test -race -v
