@@ -78,9 +78,13 @@ func contains[T any](slice []T, ptr *T) bool {
 		return false
 	}
 
-	first := unsafe.Pointer(&slice[0])
-	last := unsafe.Pointer(uintptr(first) + uintptr(len(slice))*unsafe.Sizeof(slice[0]))
+	size := unsafe.Sizeof(slice[0])
+	first := uintptr(unsafe.Pointer(&slice[0]))
+	last := uintptr(unsafe.Pointer(&slice[len(slice)-1]))
+	addr := uintptr(unsafe.Pointer(ptr))
 
-	ptrAddr := unsafe.Pointer(ptr)
-	return uintptr(ptrAddr) >= uintptr(first) && uintptr(ptrAddr) < uintptr(last)
+	if size == 0 {
+		return addr == first
+	}
+	return addr >= first && addr <= last && (addr-first)%size == 0
 }
