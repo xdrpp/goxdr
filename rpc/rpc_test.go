@@ -3,12 +3,14 @@ package rpc_test
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"os"
 	"syscall"
 	"testing"
+	"time"
 
 	"github.com/xdrpp/goxdr/rpc"
 )
@@ -23,6 +25,26 @@ func (*Server) Test_string(ctx context.Context, s string) (string, error) {
 }
 
 var _ TEST_V1 = &Server{}
+
+type blockingServer struct {
+	unblock <-chan struct{}
+}
+
+func (*blockingServer) Test_null(ctx context.Context) error { return nil }
+func (s *blockingServer) Test_inc(ctx context.Context, i int32) (int32, error) {
+	select {
+	case <-s.unblock:
+		return i + 1, nil
+	case <-ctx.Done():
+		return 0, ctx.Err()
+	}
+}
+func (*blockingServer) Test_add(ctx context.Context, i, j int32) (int32, error) { return i + j, nil }
+func (*blockingServer) Test_string(ctx context.Context, str string) (string, error) {
+	return "Hello " + str, nil
+}
+
+var _ TEST_V1 = &blockingServer{}
 
 func streampair() (ret [2]net.Conn) {
 	fds, err := syscall.Socketpair(syscall.AF_UNIX, syscall.SOCK_STREAM, 0)
@@ -46,9 +68,9 @@ func TestSocketpair(t *testing.T) {
 		cs[0].Write(message)
 		cs[0].Close()
 	}()
-	if all, err := ioutil.ReadAll(cs[1]); err != nil {
+	if all, err := io.ReadAll(cs[1]); err != nil {
 		t.Fatal(err)
-	} else if bytes.Compare(all, message) != 0 {
+	} else if !bytes.Equal(all, message) {
 		t.Fatalf("read %q wanted %q", string(all), string(message))
 	}
 }
@@ -121,4 +143,62 @@ func TestRPC(t *testing.T) {
 	if r, err := c.Test_string(ctx, "test"); r != "Hello test" {
 		t.Errorf("Test_string failed, (%v)", err)
 	}
+}
+
+func TestOutgoingCallContextRespectedWithWithoutCancelDriverContext(t *testing.T) {
+	parentCtx, parentCancel := context.WithCancel(context.Background())
+	clientDriverCtx := context.WithoutCancel(parentCtx)
+	parentCancel() // prove driver lifetime does not follow parent cancellation
+
+	cs := streampair()
+	unblock := make(chan struct{})
+	serverImpl := &blockingServer{unblock: unblock}
+
+	server := rpc.NewDriver(context.Background(), rpc.NewStreamTransport(cs[0]))
+	server.Lock = nil // allow multiple blocked calls without serial lock interference
+	server.Register(TEST_V1_Server{Srv: serverImpl})
+	go server.Go()
+	defer server.Close()
+
+	client := rpc.NewDriver(clientDriverCtx, rpc.NewStreamTransport(cs[1]))
+	go client.Go()
+	defer client.Close()
+
+	c := TEST_V1_Client{Send: client, Ctx: context.Background()}
+
+	t.Run("timeout", func(t *testing.T) {
+		callCtx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+		defer cancel()
+
+		start := time.Now()
+		_, err := c.Test_inc(callCtx, 1)
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("got %v, want %v", err, context.DeadlineExceeded)
+		}
+		if elapsed := time.Since(start); elapsed > time.Second {
+			t.Fatalf("call ignored timeout and took too long: %v", elapsed)
+		}
+	})
+
+	t.Run("cancellation", func(t *testing.T) {
+		callCtx, cancel := context.WithCancel(context.Background())
+		errCh := make(chan error, 1)
+
+		go func() {
+			_, err := c.Test_inc(callCtx, 1)
+			errCh <- err
+		}()
+
+		time.Sleep(20 * time.Millisecond)
+		cancel()
+
+		select {
+		case err := <-errCh:
+			if !errors.Is(err, context.Canceled) {
+				t.Fatalf("got %v, want %v", err, context.Canceled)
+			}
+		case <-time.After(time.Second):
+			t.Fatal("call did not return after cancellation")
+		}
+	})
 }
